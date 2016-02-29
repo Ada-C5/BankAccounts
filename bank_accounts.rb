@@ -4,7 +4,7 @@ module Bank
     
     # this class creates accounts, we can store account related things in it.
     class Account
-        attr_accessor :owner
+        # attr_accessor
 
         # set initializer to require a balance and an ID number
         def initialize(id_number, beginning_balance)
