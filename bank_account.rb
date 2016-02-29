@@ -10,7 +10,11 @@ module Bank
 		end
 
 		def withdraw(debit)
-			@balance = @balance - debit
+			if @debit>@balance
+				puts "Doing this will make your account overdrawn!"
+			else
+				@balance = @balance - debit
+			end
 			return @balance
 		end
 
