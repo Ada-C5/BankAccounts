@@ -25,21 +25,44 @@ module Bank
     end
 
   end
+
+  class Owner
+    attr_reader :first_name, :last_name, :address_one, :address_two, :city, :state, :zip_code
+
+    def initialize(owner_info)
+      @first_name = owner_info[:first_name]
+      @last_name = owner_info[:last_name]
+      @business_name = owner_info[:business_name]
+      @address_one = owner_info[:address_one]
+      @address_two = owner_info[:address_two]
+      @city = owner_info[:city]
+      @state = owner_info[:state]
+      @zip_code = owner_info[:zip_code]
+    end
+
+  end
+
 end
 
+lisa_owner = Bank::Owner.new(first_name: "Lisa", last_name: "Rolczynski", address_one: 1234, city: "Seattle", state: "WA", zip_code: 98117)
+puts "Owner: #{lisa_owner.first_name} #{lisa_owner.last_name}"
 
-lisa = Bank::Account.new(id: 123456789, initial_balance: 30.00)
-puts "Account id is: #{lisa.id}"
-puts "Account balance is: #{lisa.balance}"
+lisas_account = Bank::Account.new(id: 123456789, initial_balance: 30.00)
+puts "Account id is: #{lisas_account.id}"
+puts "Account balance is: #{lisas_account.balance}"
 
 puts "Withdraw 10 dollars."
-lisa.withdraw(10)
-puts "Account balance is: #{lisa.balance}"
+lisas_account.withdraw(10)
+puts "Account balance is: #{lisas_account.balance}"
 
 puts "Withdraw 500 dollars."
-lisa.withdraw(500)
-puts "Account balance is: #{lisa.balance}"
+lisas_account.withdraw(500)
+puts "Account balance is: #{lisas_account.balance}"
 
 puts "Deposit 1000 dollars."
-lisa.deposit(1000)
-puts "Account balance is: #{lisa.balance}"
+lisas_account.deposit(1000)
+puts "Account balance is: #{lisas_account.balance}"
+
+
+
+
