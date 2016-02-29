@@ -2,6 +2,7 @@ module Bank
 
 class Account
   attr_reader :balance, :id, :owner
+  # Can set owner after account has been created.
   attr_writer :owner
 
   def initialize(id, initial_balance, owner=nil)
@@ -12,8 +13,9 @@ class Account
     @owner = owner
   end
 
-  # method that accepts a single parameter which represents the amount of money
-  # that will be withdrawn. This method should return the updated account balance.
+  # Accepts a single parameter for the amount of money to be withdrawn.
+  # Absolute value to input for negative numbers.
+  # Returns the updated account balance with 2 decimal places.
   def withdraw(amount)
     amount = amount.abs
     if (@balance - amount) < 0
@@ -24,8 +26,9 @@ class Account
     return '%.2f' % @balance
   end
 
-  # method that accepts a single parameter which represents the amount of money
-  # that will be deposited. This method should return the updated account balance.
+  # Accepts a single parameter for the amount of money to be deposited.
+  # Absolute value to input for negative numbers.
+  # Returns the updated account balance with 2 decimal places.
   def deposit(amount)
     amount = amount.abs
     @balance = @balance + amount
