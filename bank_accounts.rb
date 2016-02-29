@@ -19,8 +19,14 @@ module Bank
       show_balance
     end
 
+    def deposit(amount_to_deposit)
+      @balance = @balance + amount_to_deposit
+      show_balance
+    end
+
     def show_balance
-      puts "The balance for this account is currently #{@balance}."
+      puts "The balance for this account is currently $#{@balance}."
+      return @balance
     end
   end
 end
