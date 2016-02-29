@@ -5,6 +5,8 @@ module Bank
 
   #A new account should be created with an ID and an initial balance
   class Account
+    #Should be able to access the current balance of an account at any time.
+    attr_accessor :balance
 
     def initialize(id, initial_balance)
       @id = id
@@ -23,7 +25,7 @@ module Bank
     def deposit(amount)
       @balance = @balance + amount
       return @balance
-    end 
+    end
 
 
 
