@@ -23,10 +23,12 @@ The Account can be created with an owner, OR you can create a method that will a
 
 module Bank
 
-  class Account(account_information)
-    @id = account_information[:id]
-    @initial_balance = account_information[:initial_balance]
-  end
+  class Account
+
+    def initialize(account_information)
+      @id = account_information[:id]
+      @initial_balance = account_information[:initial_balance]
+    end
 
 =begin
   #per POODR, wrap instance varriables that will be referred to in numerous places in a method so that when we have an unaticipated adjustment in the fugure, we will be able to update it in one place (and one place only).  For banks, this could be something like an exchange rate or inflation, seems likely, so I will do it now.
@@ -47,6 +49,7 @@ module Bank
         #don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
       end
     end
+  end
 
 
 end
