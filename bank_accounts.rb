@@ -7,13 +7,13 @@ module Bank
         # attr_accessor
 
         # set initializer to require a balance and an ID number
-        def initialize(id_number, beginning_balance)
+        def initialize(id_number, beginning_balance, owner = nil)
             if beginning_balance < 0
                 raise ArgumentError.new("You think we give credit here? HAH!")
             end
             @id_number = id_number
             @balance = beginning_balance
-            @owner = ""
+            @owner = owner
         end
 
         # withdraw method
@@ -45,7 +45,6 @@ module Bank
         def add_owner(owner_object_name)
             @owner = owner_object_name
         end
-
     end
 
     # this will create owner objects. We can store info about account owners in it.
