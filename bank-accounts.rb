@@ -16,7 +16,10 @@ module Bank
 		end
 
 		def deposit_money(amount)
-
+			new_balance = @balance + amount
+			puts "Depositing $#{amount} to your account."
+			@balance = new_balance
+			show_balance
 		end
 
 		def show_balance
@@ -30,6 +33,7 @@ new_account = Bank::Account.new("12345", "150.00")
 p new_account
 p new_account.show_balance
 p new_account.withdraw_money(45.00)
+p new_account.deposit_money(45.00)
 
 # account ID generation, required externally. 
 # give it an external balance  
