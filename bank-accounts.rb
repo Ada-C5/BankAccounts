@@ -10,20 +10,27 @@ module Bank
 
 		def withdraw_money(amount)
 			new_balance = @balance - amount
-			puts "Removing $#{amount} from current balance of $#{@balance}"
+			while new_balance <= 0 
+				puts "*** ERROR ***"
+				puts "Insufficent funds."
+				new_balance = @balance + amount
+				show_balance
+				exit
+			end
+			puts format("Removing $%.2f from current balance of $%.2f", amount, @balance)
 			@balance = new_balance
 			show_balance
 		end
 
 		def deposit_money(amount)
 			new_balance = @balance + amount
-			puts "Depositing $#{amount} to your account."
+			puts format("Depositing $%.2f to your account", @balance)
 			@balance = new_balance
 			show_balance
 		end
 
 		def show_balance
-			puts "Currently you have $#{@balance}"
+			puts format("Currently you have an account balance of $%.2f", @balance)
 		end
 			
 	end
