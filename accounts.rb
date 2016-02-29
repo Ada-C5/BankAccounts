@@ -1,10 +1,13 @@
-require 'Money'
+# require 'Money'
 module Bank
  class Account
    attr_accessor :balance
    attr_reader :id
 
    def initialize(initial_balance, id_number)
+     unless initial_balance > 0
+       raise ArgumentError.new("Account must have money in it.")
+     end
      @balance = initial_balance
      @id = id_number
    end
