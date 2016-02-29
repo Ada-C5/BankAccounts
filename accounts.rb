@@ -38,10 +38,13 @@ module Bank
 
   end
 
-  class Owner(id, name, address)
-    @owner_id = id
-    @owner_name = name
-    @owner_address = address
+  class Owner
+
+    def initialize(id, name, address)
+      @owner_id = id
+      @owner_name = name
+      @owner_address = address
+    end 
 
   end
 end
