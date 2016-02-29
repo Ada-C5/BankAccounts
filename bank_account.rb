@@ -3,9 +3,9 @@ module Bank
 	class Account
 		attr_accessor :balance
 
-		def initialize (init_balance)
-			@ID = 9028
-			@balance = init_balance
+		def initialize owner
+			@id = owner[:id]
+			@balance = owner[:init_balance]
 
 			raise ArgumentError, "Initial balance must be greater than zero." unless @balance>=0
 		end
@@ -28,9 +28,12 @@ module Bank
 	class Owner
 		attr_accessor
 
-		def initialize (name, address)
-			@name = name
-			@address = address
+		def initialize owner
+			@name = owner[:name]
+			@address = owner[:address]
+			@city = owner [:city]
+			@state = owner [:state]
+			@zip = owner[:zip]
 		end
 	end
 end
