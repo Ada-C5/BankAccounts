@@ -9,7 +9,7 @@ module Bank
   end
 
   class Account
-    attr_accessor :balance, :id, :amount, :owner
+    attr_accessor :balance, :id, :amount, :owner, :name
 
     def initialize(balance, id)
       unless balance.is_a?(Integer) && balance >= 0
@@ -18,6 +18,7 @@ module Bank
       @balance = balance
       @id = id
       @owner = ""
+      @name = ""
     end
 
     def withdraw(amount)
