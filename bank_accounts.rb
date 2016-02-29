@@ -17,33 +17,49 @@
       # end
       # require "gym"
 
+### Error handling
+  # 1. A new account cannot be created with initial negative balance - this will `raise` an `ArgumentError` (Google this)
+  # 1. The `withdraw` method does not allow the account to go negative - Will `puts` a warning message and then return the original un-modified balance
+
 module Bank
   class Account
     # initialize method creates instance of Account class with @instance variables @id,  @init_balance, and balance
     def initialize(accountdata)
     @id = accountdata[:id] # float? provided from csv?
     @init_balance = accountdata[:init_balance] #float
-    @balance = accountdata[:init_balance]# float
+    @balance = accountdata[:balance]# float
+    # @init_balance = @balance
+        if @init_balance < 0
+          raise ArgumentError.new("Account cannot be initialized with a negative balance.")
+        end
+    # set @balance to value of @init_balance
+    @balance = @init_balance
     end
+
 
     # withdraw method accepts a single parameter which represents the amount of the withdrawal. method should return the updated account balance.
     def withdraw(withdrawal)
-      if @init_balance == @balance
-        @balance = @balance - withdrawal
-          else @balance = @init_balance - withdrawal
+      if @balance - withdrawal >= 0
+        @balance -= withdrawal
+          else puts "Withdrawal cannot be completed with available funds."
+        balance
       end
-      return @balance
     end
 
     # deposit method accepts a single parameter which represents the amount of the deposit. method should return the updated account balance.
     def deposit(deposit)
-      if @init_balance == @balance
-      end
+      @balance += deposit
+      balance
     end
 
     def balance
       return @balance
     end
+
+    # just checking to see if differentiating @init_balance and @balance worked.
+    # def initial_balance
+    #   return @init_balance
+    # end
 
   end
 end
