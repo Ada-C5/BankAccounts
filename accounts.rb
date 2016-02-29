@@ -33,15 +33,15 @@ module Bank
 
   end
 
-  # class Owner
-  #   attr_accessor :name, :address, :phone
-  #
-  #   def initialize(owner_hash)
-  #     @name = owner_hash[:name]
-  #     @address = owner_hash[:address]
-  #     @phone = owner_hash[:phone]
-  #   end
-  #
-  # end
+  class Owner
+    attr_accessor :name, :address, :phone
+
+    def initialize(owner_hash)
+      @name = owner_hash[:name]
+      @address = owner_hash[:address]
+      @phone = owner_hash[:phone]
+    end
+
+  end
 
 end
