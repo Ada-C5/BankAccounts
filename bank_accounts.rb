@@ -10,4 +10,6 @@ module Bank
       @id = id
       @balance = initial_balance
     end
+
+  end
 end
