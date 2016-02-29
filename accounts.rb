@@ -1,7 +1,15 @@
 module Bank
 
+  class Owner
+    attr_accessor :name #add address, phone
+    def initialize(owner_hash)
+      @name = owner_hash[:name]
+      #add address, phone after this can get connected with Account class
+    end
+  end
+
   class Account
-    attr_accessor :balance, :id, :amount
+    attr_accessor :balance, :id, :amount, :owner
 
     def initialize(balance, id)
       unless balance.is_a?(Integer) && balance >= 0
@@ -9,6 +17,7 @@ module Bank
       end
       @balance = balance
       @id = id
+      @owner = ""
     end
 
     def withdraw(amount)
@@ -31,15 +40,10 @@ module Bank
       puts "Your current balance is $#{@balance}."
     end
 
-  end
-
-  class Owner
-    attr_accessor :name, :address, :phone
-
-    def initialize(owner_hash)
-      @name = owner_hash[:name]
-      @address = owner_hash[:address]
-      @phone = owner_hash[:phone]
+    def define_user(name)
+      @name = name
+      @owner = Bank::Owner.new(name: @name) #this doesn't work
+      puts @owner #returns nil
     end
 
   end
