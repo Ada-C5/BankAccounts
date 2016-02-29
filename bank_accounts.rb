@@ -9,7 +9,11 @@
 
 module Bank
   class Account
+    attr_reader :balance
     def initialize(id, initial_balance)
+      if initial_balance < 1
+        raise ArgumentError.new("You must have at least $1 to open an account.")
+      end
       @id = id
       @balance = initial_balance
     end
