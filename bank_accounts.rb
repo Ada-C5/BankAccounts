@@ -19,20 +19,31 @@
 
 module Bank
   class Account
-    # initialize method creates instance of Account class with @instance variables @id and @init_balance
-    def initialize(Accountdata)
-    @id = Accountdata[:id] # float? provided from csv?
-    @init_balance = Accountdata[:init_balance] #float
+    # initialize method creates instance of Account class with @instance variables @id,  @init_balance, and balance
+    def initialize(accountdata)
+    @id = accountdata[:id] # float? provided from csv?
+    @init_balance = accountdata[:init_balance] #float
+    @balance = accountdata[:init_balance]# float
     end
 
     # withdraw method accepts a single parameter which represents the amount of the withdrawal. method should return the updated account balance.
-    def withdraw
-
+    def withdraw(withdrawal)
+      if @init_balance == @balance
+        @balance = @balance - withdrawal
+          else @balance = @init_balance - withdrawal
+      end
+      return @balance
     end
 
     # deposit method accepts a single parameter which represents the amount of the deposit. method should return the updated account balance.
-    def deposit
-
+    def deposit(deposit)
+      if @init_balance == @balance
+      end
     end
+
+    def balance
+      return @balance
+    end
+
   end
 end
