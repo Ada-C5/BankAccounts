@@ -5,6 +5,9 @@ module Bank
     
         # set initializer to require a balance and an ID number
         def initialize(id_number, beginning_balance)
+            if beginning_balance < 0
+                raise ArgumentError.new("You think we give credit here? HAH!")
+            end
             @id_number = id_number
             @balance = beginning_balance
             @owner = ""
@@ -34,6 +37,5 @@ module Bank
         def balance
             puts "The balance of account #{ @id_number } is #{ @balance }."
         end
-
     end
 end
