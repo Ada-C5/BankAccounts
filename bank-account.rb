@@ -4,10 +4,11 @@
 
 module Bank
   class Account
-    attr_reader :id, :balance
+    attr_reader :id, :balance, :owner
     
     def initialize(account_info)
       @id = account_info[:id]
+      @owner = account_info[:owner]
       @balance = account_info[:initial_balance]
       if @balance < 0
         raise ArgumentError.new("You can't open an account with no money!")
@@ -25,6 +26,10 @@ module Bank
 
     def deposit(money)
       @balance += money
+    end
+
+    def add_owner(owner_obj)
+      @owner = owner_obj
     end
 
   end
@@ -65,6 +70,9 @@ puts "Account balance is: #{lisas_account.balance}"
 puts "Deposit 1000 dollars."
 lisas_account.deposit(1000)
 puts "Account balance is: #{lisas_account.balance}"
+
+lisas_account.add_owner(lisa_owner)
+puts "Account owner name is: #{lisas_account.owner.first_name}"
 
 
 
