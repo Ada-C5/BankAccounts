@@ -2,14 +2,14 @@ module Bank
   class Account
     def initialize (user_id, initial_balance)
       @user_id = user_id
-      @balance = initial_balance
-      if initial_balance <= 0
-        error_initial_balance
+      @balance = initial_balance    # Renamed initial balance variable to balance
+      if initial_balance <= 0       # for clarity as the balance will change over time.
+        error_initial_balance       # Cannot have a negative initial balance.
       end
     end
 
     def withdraw(amount_to_withdraw)
-      if amount_to_withdraw >= @balance
+      if amount_to_withdraw >= @balance #cannot put the account into negative balance
         error_withdraw
       else
         @balance = @balance - amount_to_withdraw
@@ -32,5 +32,6 @@ module Bank
       puts "You may not withdraw that amount as you only have $#{@balance} in your account."
       @balance
     end
+
   end
 end
