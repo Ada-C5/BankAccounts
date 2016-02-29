@@ -1,8 +1,11 @@
 # Rowan Cota, wave 1, 2.29.16
 
 module Bank
-    class Account
     
+    # this class creates accounts, we can store account related things in it.
+    class Account
+        attr_accessor :owner
+
         # set initializer to require a balance and an ID number
         def initialize(id_number, beginning_balance)
             if beginning_balance < 0
@@ -37,5 +40,22 @@ module Bank
         def balance
             puts "The balance of account #{ @id_number } is #{ @balance }."
         end
+
+        # this will allow you to give a 
+        def add_owner(owner_object_name)
+            @owner = owner_object_name
+        end
+
     end
+
+    # this will create owner objects. We can store info about account owners in it.
+    class Owner
+        
+        # this method sets the parameters for instantiating a new owner.
+        def initialize(name)
+            @name = name
+            @accounts = []
+        end
+    end
+
 end
