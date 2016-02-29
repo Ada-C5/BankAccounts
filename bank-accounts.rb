@@ -5,17 +5,18 @@ module Bank
 
 		def initialize(account_id, balance)
 			@account_id = account_id
-			@balance = balance
-			@withdraw = 0
-			@deposit = 0 
+			@balance = balance.to_f
 		end
 
-		def withdraw_money
-
+		def withdraw_money(amount)
+			new_balance = @balance - amount
+			puts "Removing $#{amount} from current balance of $#{@balance}"
+			@balance = new_balance
+			show_balance
 		end
 
-		def deposit_money
-			
+		def deposit_money(amount)
+
 		end
 
 		def show_balance
@@ -28,7 +29,7 @@ end
 new_account = Bank::Account.new("12345", "150.00")
 p new_account
 p new_account.show_balance
-
+p new_account.withdraw_money(45.00)
 
 # account ID generation, required externally. 
 # give it an external balance  
