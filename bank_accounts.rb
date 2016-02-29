@@ -2,7 +2,6 @@
 
 module Bank
     class Account
-        attr_reader :id_number, :balance, :owner
     
         # set initializer to require a balance and an ID number
         def initialize(id_number, beginning_balance)
@@ -12,11 +11,20 @@ module Bank
         end
 
         # withdraw method
-        def withdraw
+        def withdraw(amount)
+            if (@balance - amount) >= 0
+                @balance = @balance - amount
+                puts "After withdrawing #{ amount } the balance for account #{ @id_number } is #{ @balance }."
         end
 
         # deposit method
-        def deposit
+        def deposit(amount)
+
+        end
+
+        # show the balance
+        def balance
+            puts "The balance of account #{ @id_number } is #{ @balance }."
         end
 
     end
