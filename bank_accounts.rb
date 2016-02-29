@@ -26,7 +26,8 @@ module Bank
 
         # deposit method
         def deposit(amount)
-
+            @balance = @balance + amount
+            puts "Congrats account #{ @id_number }, your new balance is #{ @balance }!"
         end
 
         # show the balance
