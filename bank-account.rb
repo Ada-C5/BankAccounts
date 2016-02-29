@@ -9,6 +9,9 @@ module Bank
     def initialize(account_info)
       @id = account_info[:id]
       @balance = account_info[:initial_balance]
+      if @balance < 0
+        raise ArgumentError.new("You can't open an account with no money!")
+      end
     end
 
     def withdraw(money)
