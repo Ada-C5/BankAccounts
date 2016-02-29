@@ -18,8 +18,15 @@ module Bank
     # withdraw method that accepts a single parameter which represents the amount of money
     # that will be withdrawn. This method should return the updated account balance.
     def withdraw(amount)
-      @balance = @balance - amount
-      return @balance
+      #withdraw method does not allow the account to go negative - Will puts a
+      #warning message and then return the original un-modified balance
+      if amount < @balance
+        @balance = @balance - amount
+        return @balance
+      else
+        puts "WARNING: The amount requested is greater than the account's balance."
+        return @balance
+      end
     end
 
     # deposit method that accepts a single parameter which represents the amount of money
