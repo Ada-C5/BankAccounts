@@ -6,13 +6,13 @@ Primary Functionality
 Create an Account class which should have the following functionality:
 * A new account should be created with an ID and an initial balance
 Note - for Wave 1 ID is required externally.
-Should have a withdraw method that accepts a single parameter which represents the amount of money that will be withdrawn. This method should return the updated account balance.
+* Should have a withdraw method that accepts a single parameter which represents the amount of money that will be withdrawn. This method should return the updated account balance.
 Should have a deposit method that accepts a single parameter which represents the amount of money that will be deposited. This method should return the updated account balance.
 Should be able to access the current balance of an account at any time.
 
 Error handling
 A new account cannot be created with initial negative balance - this will raise an ArgumentError (Google this)
-The withdraw method does not allow the account to go negative - Will puts a warning message and then return the original un-modified balance
+*The withdraw method does not allow the account to go negative - Will puts a warning message and then return the original un-modified balance
 
 Bonus Optional Fun Time:
 Create an Owner class which will store information about those who own the Accounts.
@@ -24,10 +24,12 @@ The Account can be created with an owner, OR you can create a method that will a
 module Bank
 
   class Account
+    attr_reader :balance
 
     def initialize(account_information)
       @id = account_information[:id]
       @initial_balance = account_information[:initial_balance]
+      @balance = @initial_balance #will start out at initial balance and then be updated as we add/withdraw money
     end
 
 =begin
@@ -39,17 +41,31 @@ module Bank
 =end
 
     def withdraw(amount)
-      updated_balance = (@initial_balance - amount)
+      updated_balance = (@balance - amount)
 
       if updated_balance > 0
-        puts "After withdrawing #{ amount }, the new account balance is #{ updated_balance }. "
-        return @initial_balance = updated_balance
+        puts "After withdrawing $#{ amount }.00, the new account balance is $#{ updated_balance }.00. "
+        return @balance = updated_balance
       else
-        puts "You cannot withdraw #{ amount }.  Your current balance is #{ @initial_balance }."
+        puts "WARNING: You cannot withdraw $#{ amount }.00.  This is more than your current balance of $#{ @balance }.00."
         #don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
       end
     end
+
+    def deposit(amount)
+      updated_balance = (@balance + amount)
+
+      puts "After depositing $#{ amount }.00, the new account balance is $#{  updated_balance }.00. "
+      return @balance = updated_balance
+    end
+
   end
 
 
 end
+
+#test run the program
+
+account = Bank::Account.new(id: 1, initial_balance: 100)
+account.deposit(101)
+puts account.balance
