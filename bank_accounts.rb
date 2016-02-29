@@ -19,6 +19,9 @@ module Bank
     end
 
     def withdraw(amount_to_withdraw)
+      if amount_to_withdraw > @balance
+        raise ArgumentError.new("This withdrawal would cause a negative balance. Do not attempt.")
+      end
       @balance = @balance - amount_to_withdraw
       show_balance
     end
