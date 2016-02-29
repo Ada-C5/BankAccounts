@@ -11,6 +11,7 @@ module Bank
 
     def balance
       balance = @initial_balance
+      return balance
     end
 
     def identification #this method is creating an identification number and storing it in the empty array
@@ -20,18 +21,20 @@ module Bank
       #puts @id #test to make sure correct numbers went into empty error
     end
 
-    def withdraw(200)
-      balance = balance - money
-      puts balance
+    def withdraw(money)
+      balance = 400 - money
+      puts "#{balance} yay"
     end
 
-    def deposit(200)
-      balance = balance + money
-      puts balance
-    end
+    # def deposit(money = "200".to_f)
+    #   balance = balance + money
+    #   puts balance
+    # end
 
   end
 end
 
-adriana = Bank::Account.new("adriana", "cannon", "400")
-adriana.identification
+adriana_account = Bank::Account.new("adriana", "cannon", "400")
+#adriana_account.identification
+adriana_account.withdraw(100)
+#adriana_account.deposit
