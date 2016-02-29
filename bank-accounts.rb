@@ -11,8 +11,8 @@ Note - for Wave 1 ID is required externally.
 * Should be able to access the current balance of an account at any time.
 
 Error handling
-A new account cannot be created with initial negative balance - this will raise an ArgumentError (Google this)
-*The withdraw method does not allow the account to go negative - Will puts a warning message and then return the original un-modified balance
+* A new account cannot be created with initial negative balance - this will raise an ArgumentError (Google this)
+* The withdraw method does not allow the account to go negative - Will puts a warning message and then return the original un-modified balance
 
 Bonus Optional Fun Time:
 Create an Owner class which will store information about those who own the Accounts.
@@ -29,6 +29,7 @@ module Bank
       @id = account_information[:id]
       @initial_balance = account_information[:initial_balance]
       @balance = @initial_balance #will start out at initial balance and then be updated as we add/withdraw money
+      raise ArgumentError.new("An account cannot be created with an initial negative balance.") if @initial_balance < 0
     end
 
 =begin
@@ -69,6 +70,6 @@ end
 
 #test run the program
 
-account = Bank::Account.new(id: 1, initial_balance: 100)
+account = Bank::Account.new(id: 1, initial_balance: -100)
 account.deposit(101)
 puts account.balance
