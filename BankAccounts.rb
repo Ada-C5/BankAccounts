@@ -4,6 +4,9 @@ module Bank
     def initialize(id,initial_balance)
       @id = id
       @initial_balance = initial_balance.to_f
+      if @initial_balance < 1.0
+        raise ArgumentError.new("Account can not start with a negative balance")
+      end
     end
 
     def withdraw(withdraw)
@@ -19,6 +22,10 @@ module Bank
     def deposit(deposit)
       @initial_balance = @initial_balance + deposit
       return @initial_balance
+    end
+
+    def balance
+      @initial_balance
     end
 
 
