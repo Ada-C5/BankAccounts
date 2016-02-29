@@ -40,11 +40,12 @@ module Bank
 
   class Owner
 
-    def initialize(id, name, address)
-      @owner_id = id
-      @owner_name = name
-      @owner_address = address
-    end 
+    def initialize(owner_hash)
+      @owner_id = owner_hash[:id]
+      @owner_name = owner_hash[:name]
+      @owner_address = owner_hash[:address]
+    end
+
 
   end
 end
