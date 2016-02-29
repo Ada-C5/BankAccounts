@@ -18,5 +18,21 @@
       # require "gym"
 
 module Bank
+  class Account
+    # initialize method creates instance of Account class with @instance variables @id and @init_balance
+    def initialize(Accountdata)
+    @id = Accountdata[:id] # float? provided from csv?
+    @init_balance = Accountdata[:init_balance] #float
+    end
 
+    # withdraw method accepts a single parameter which represents the amount of the withdrawal. method should return the updated account balance.
+    def withdraw
+
+    end
+
+    # deposit method accepts a single parameter which represents the amount of the deposit. method should return the updated account balance.
+    def deposit
+
+    end
+  end
 end
