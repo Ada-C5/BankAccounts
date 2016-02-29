@@ -1,15 +1,14 @@
-# Create an Account class which should have the following functionality:
-# A new account should be created with an ID and an initial balance
-# Should have a withdraw method that accepts a single parameter which represents the amount of money that will be withdrawn. This method should return the updated account balance.
-# Should have a deposit method that accepts a single parameter which represents the amount of money that will be deposited. This method should return the updated account balance.
-# Should be able to access the current balance of an account at any time.
-
-# use this later when you're ready to deal with converting 1000 into $10.00, etc.
+# use money gem later when users get involved
+# for example, if a user enters 10, it will convert to 1000 for the money gem, which will then convert it to $10.00
 # require "money"
 
 module Bank
+
   class Account
-    attr_reader :balance
+    # For bank employee eyes only! I would remove the attr_reader if I was going
+    # to expose this code anywhere public.
+    attr_reader :id, :balance
+
     def initialize(id, initial_balance)
       if initial_balance < 1
         raise ArgumentError.new("You must have at least $1 to open an account.")
@@ -20,7 +19,8 @@ module Bank
 
     def withdraw(amount_to_withdraw)
       if amount_to_withdraw > @balance
-        raise ArgumentError.new("This withdrawal would cause a negative balance. Do not attempt.")
+        raise ArgumentError.new("This withdrawal would cause a negative balance.
+        Do not attempt.")
       end
       @balance = @balance - amount_to_withdraw
       show_balance
@@ -31,9 +31,23 @@ module Bank
       show_balance
     end
 
+    # displays the balance in a nice user-friendly way, but also returns it to the other methods
     def show_balance
       puts "The balance for this account is currently $#{@balance}."
       return @balance
+    end
+  end
+
+  class Owner
+    # For bank employee eyes only! I would remove the attr_reader if I was going
+    # to expose this code anywhere public.
+    attr_reader :name, :phone, :email, :address
+
+    def initialize(name, phone_number, email_address, street_address)
+      @name = name
+      @phone = phone_number
+      @email = email_address
+      @address = street_address
     end
   end
 end
