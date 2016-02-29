@@ -17,15 +17,16 @@ module Bank
     def withdraw(withdraw_amount)
       if @balance - withdraw_amount < 0
         puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
+        puts "Current account balance: $#{'%.02f'% @balance}"
       else
         @balance -= withdraw_amount
-        puts "New account balance: $#{@balance}"
+        puts "New account balance: $#{'%.02f'% @balance}"
       end
     end
 
     def deposit(deposit_amount)
       @balance += deposit_amount
-      puts "New account balance: $#{@balance}"
+      puts "New account balance: $#{'%.02f'% @balance}"
     end
 
     def new_owner(owner)
