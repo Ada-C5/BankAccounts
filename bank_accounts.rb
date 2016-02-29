@@ -15,6 +15,13 @@ module Bank
             if (@balance - amount) >= 0
                 @balance = @balance - amount
                 puts "After withdrawing #{ amount } the balance for account #{ @id_number } is #{ @balance }."
+            elsif (@balance - amount) < 0
+                puts "HEY! That is unpossible because you don't have that much money! What do you think this is, Wall Street?"
+                puts "The balance for account #{ @id_number } is still #{ @balance }."
+                return @balance
+            else
+                puts "You can't do that operation on a bank account."
+            end     
         end
 
         # deposit method
