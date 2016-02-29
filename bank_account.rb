@@ -2,21 +2,20 @@ module Bank
 
 	class Account
 		attr_accessor :balance
-		def initialize ()
-			@ID = ID
-			@init_balance = init_balance
+		def initialize (init_balance)
+			@ID = 9028
 			@balance = init_balance
-			@debit = debit
-			@credit = credit
+
+			raise ArgumentError, "Initial balance must be greater than zero." unless @balance>=0
 		end
 
-		def withdraw(@debit)
-			@balance = @balance - @debit
+		def withdraw(debit)
+			@balance = @balance - debit
 			return @balance
 		end
 
-		def deposit(@credit)
-			@balance = @balance - @credit
+		def deposit(credit)
+			@balance = @balance + credit
 			return @balance
 		end
 
