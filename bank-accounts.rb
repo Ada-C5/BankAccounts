@@ -14,7 +14,7 @@ Error handling
 * A new account cannot be created with initial negative balance - this will raise an ArgumentError (Google this)
 * The withdraw method does not allow the account to go negative - Will puts a warning message and then return the original un-modified balance
 
-Bonus Optional Fun Time:
+* Bonus Optional Fun Time:
 Create an Owner class which will store information about those who own the Accounts.
 This should have info like name and address and any other identifying information that an account owner would have.
 Add an owner property to each Account to track information about who owns the account.
@@ -24,11 +24,13 @@ The Account can be created with an owner, OR you can create a method that will a
 module Bank
 
   class Account
+    attr_reader :owner
 
     def initialize(account_information)
       @id = account_information[:id]
       @initial_balance = account_information[:initial_balance]
       @balance = @initial_balance #will start out at initial balance and then be updated as we add/withdraw money
+      @owner = account_information[:owner]
       raise ArgumentError.new("An account cannot be created with an initial negative balance.") if @initial_balance < 0
     end
 
@@ -65,11 +67,25 @@ module Bank
 
   end
 
+  class Owner
+    attr_reader :name, :address, :type, :date_joined_bank
+    def initialize(owner_properties)
+      @name = owner_properties[:name]
+      @address = owner_properties[:address]
+      @type = owner_properties[:type] #person, company, etc
+      @date_joined_bank = owner_properties[:date_joined_bank] #so we can do loyalty type stuff (member since???)
+
+    end
+  end
+
+
+
 
 end
 
 #test run the program
 
-account = Bank::Account.new(id: 1, initial_balance: -100)
+account = Bank::Account.new(id: 1, initial_balance: 100, owner: Bank::Owner.new(name: "Sarah", address: "123 Seattle, WA", type: "Person", date_joined_bank: 2007))
 account.deposit(101)
 puts account.balance
+puts account.owner.date_joined_bank
