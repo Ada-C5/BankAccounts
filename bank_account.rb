@@ -1,15 +1,20 @@
 module Bank
   class Account
     # new account with id and init_bal
-    def initialize(id, amount)
+    def initialize(id, amount, account_owner)
       @id = id
       @balance = amount
+      @owner = account_owner
       # raise error if trying to start new account with negative balance
       if amount < 0
         raise ArgumentError.new("New accounts must have a positive starting balance.")
       end
       # create new and corresponding owner instance
-      
+
+    end
+
+    def get_owner
+      @owner.get_info
     end
 
     # withdraw money from account
@@ -38,36 +43,29 @@ module Bank
   
     class Owner
       # take in name and id from user_input
-      def initialize(name, id, address, city, state)
-        @fname = name.split(" ").first
-        @lname = name.split(" ").last
-        @id = id
-        @address = address
-        @city = city
-        @state = state
+      def initialize(info)
+        @fname = info[:fname]
+        @lname = info[:lname]
+        @id = info[:id]
+        @address = info[:address]
+        @city = info[:city]
+        @state = info[:state]
       end
 
       # print owner info
       def get_info
-        puts "#{@fname} #{@lname} lives at #{@address}, their phone number is #{@phone} and their bank ID is #{@id}"
+        puts "#{@fname} #{@lname} lives at #{@address} in #{@city}, #{@state} and their bank ID is #{@id}"
       end
     end
 end
 
-# manually take in user input (anem, address, city, state, id, starting balance)
-puts "Who is the owner of this account?"
-name = gets.chomp
-puts "What is the owners street address?"
-address = gets.chomp
-puts "What city does the owner live in?"
-city = gets.chomp
-puts "What state does the owner live in?"
-state = gets.chomp
+# manually take in user input 
 puts "What is the ID for the new account?"
 id = gets.chomp
 puts "What is the starting balance?"
 amount = gets.chomp.to_i
 
 # create new instances of account and owner
-@my_account = Bank::Account.new(id, amount)
-@account_owner = Bank::Owner.new(name, id, address, city, state)
+
+@account_owner = Bank::Owner.new(fname: "Sally", lname: "Brown", id: 43, address: "22 W, 5th St", city: "Seattle", state:"WA")
+@my_account = Bank::Account.new(id, amount, @account_owner)
