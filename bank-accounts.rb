@@ -7,8 +7,8 @@ Create an Account class which should have the following functionality:
 * A new account should be created with an ID and an initial balance
 Note - for Wave 1 ID is required externally.
 * Should have a withdraw method that accepts a single parameter which represents the amount of money that will be withdrawn. This method should return the updated account balance.
-Should have a deposit method that accepts a single parameter which represents the amount of money that will be deposited. This method should return the updated account balance.
-Should be able to access the current balance of an account at any time.
+* Should have a deposit method that accepts a single parameter which represents the amount of money that will be deposited. This method should return the updated account balance.
+* Should be able to access the current balance of an account at any time.
 
 Error handling
 A new account cannot be created with initial negative balance - this will raise an ArgumentError (Google this)
@@ -24,7 +24,6 @@ The Account can be created with an owner, OR you can create a method that will a
 module Bank
 
   class Account
-    attr_reader :balance
 
     def initialize(account_information)
       @id = account_information[:id]
@@ -39,6 +38,10 @@ module Bank
       @initial_balance # the way I'm using this below - could this make a problem because I would be doing the adjustment twice? Not sure how this works yet.
     end
 =end
+
+    def balance #allow us to access the balance at any time formatted well
+      puts "Your current account balance is $#{@balance}.00."
+    end
 
     def withdraw(amount)
       updated_balance = (@balance - amount)
