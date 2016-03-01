@@ -57,10 +57,7 @@ module Bank
             @accounts = []
         end
 
-        def create_account
-            @accounts.push(Bank::Account.new(info))
-        end
-
+        # this adds accounts to the owner's list of accounts
         def add_account(account)
             @accounts.push(account)
         end
