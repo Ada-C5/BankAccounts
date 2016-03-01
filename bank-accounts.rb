@@ -48,16 +48,17 @@ module Bank
       @id = account_information[:id]
       @initial_balance = account_information[:initial_balance]
       @balance = @initial_balance #will start out at initial balance and then be updated as we add/withdraw money
+      @open_date = account_information[:open_date]
       @owner = account_information[:owner]
       raise ArgumentError.new("An account cannot be created with an initial negative balance.") if @initial_balance < 0
     end
 
     def self.all?
-
+      #Add the following class methods to your existing Account class self.all - returns a collection of Account instances, representing all of the Accounts described in the CSV. See below for the CSV file specifications
     end
 
     def self.find
-
+        # self.find(id) - returns an instance of Account where the value of the id field in the CSV matches the passed parameter
     end
 
     def set_owner(owner_object)
