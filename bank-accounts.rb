@@ -1,7 +1,7 @@
 =begin
 WAVE 1
 
-Primary Functionality
+* Primary Functionality
 * Create a Bank module which will contain your Account class and any future bank account logic.
 Create an Account class which should have the following functionality:
 * A new account should be created with an ID and an initial balance
@@ -10,7 +10,7 @@ Note - for Wave 1 ID is required externally.
 * Should have a deposit method that accepts a single parameter which represents the amount of money that will be deposited. This method should return the updated account balance.
 * Should be able to access the current balance of an account at any time.
 
-Error handling
+* Error handling
 * A new account cannot be created with initial negative balance - this will raise an ArgumentError (Google this)
 * The withdraw method does not allow the account to go negative - Will puts a warning message and then return the original un-modified balance
 
@@ -41,6 +41,9 @@ module Bank
       @initial_balance # the way I'm using this below - could this make a problem because I would be doing the adjustment twice? Not sure how this works yet.
     end
 =end
+    def add_owner(owner_object)
+      @owner = owner_object
+    end
 
     def balance #allow us to access the balance at any time formatted well
       puts "Your current account balance is $#{@balance}.00."
@@ -86,6 +89,13 @@ end
 #test run the program
 
 account = Bank::Account.new(id: 1, initial_balance: 100, owner: Bank::Owner.new(name: "Sarah", address: "123 Seattle, WA", type: "Person", date_joined_bank: 2007))
+
 account.deposit(101)
 puts account.balance
 puts account.owner.date_joined_bank
+
+account2 = Bank::Account.new(id: 1, initial_balance: 100)
+joe = Bank::Owner.new(name: "Joe", address: "123 Seattle, WA", type: "Person", date_joined_bank: 2007)
+
+account2.add_owner(joe)
+puts account2.owner.name
