@@ -41,12 +41,14 @@ module Bank
       @initial_balance # the way I'm using this below - could this make a problem because I would be doing the adjustment twice? Not sure how this works yet.
     end
 =end
-    def add_owner(owner_object)
+    
+    def set_owner(owner_object)
       @owner = owner_object
     end
 
     def balance #allow us to access the balance at any time formatted well
       puts "Your current account balance is $#{@balance}.00."
+      @balance #incase we want to return this to a different method
     end
 
     def withdraw(amount)
