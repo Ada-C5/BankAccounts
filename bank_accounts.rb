@@ -21,6 +21,17 @@ module Bank
             end
         end
 
+        # make a Class method that will instantiate accounts from a csv
+        def self.make_accounts(path_to_csv)
+            # this needs to iterate through the CSV
+
+            # then it needs to pass the data from the line to the account
+
+            # then it needs to return the object and a message so I can make sure it worked
+
+        end
+
+
         # withdraw method
         def withdraw(amount)
             if (@balance - amount) >= 0
