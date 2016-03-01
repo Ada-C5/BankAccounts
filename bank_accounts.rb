@@ -6,6 +6,9 @@ module Bank
     class Account
         # attr_accessor
 
+        # the initializer needs to take the info from a CSV
+        # and instantiate objects using it.
+        # but I don't want to make that the only way, so I should probably design a method.
         # set initializer to require a balance and an ID number
         def initialize(account_info)
             @id_number = account_info[:id_number]
