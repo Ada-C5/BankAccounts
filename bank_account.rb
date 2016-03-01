@@ -1,12 +1,19 @@
 module Bank
   class Account
-    attr_reader :account_id, :account_balance
+    attr_reader :account_id, :account_balance, :owner_id
+    @@Accounts = []
 
     def initialize(initial_balance, owner_id)
       if initial_balance < 0
         raise ArgumentError, "Initial balance must be greater than $0.00."
       end
+      1.times do
       @account_id = rand(111111...999999)
+        if @@Accounts.include?(@account_id)
+          redo
+        end
+      end
+      @@Accounts << @account_id
       @account_balance = initial_balance.to_f.round(2)
       #need to add an owner to the account during initialize
       @owner_id = owner_id
@@ -33,9 +40,9 @@ module Bank
   end
 
   class Owner
-    attr_reader :first_name, :last_name
+    attr_reader :first_name, :last_name, :user_id
 
-    def initialize
+    def initialize(first_name, last_name)
       @first_name = first_name
       @last_name = last_name
       @user_id = @first_name[0] + @last_name + rand(111...999).to_s
@@ -47,6 +54,6 @@ module Bank
 end
 
 #adriana_account = Bank::Account.new("adriana", "cannon", "0")
-#adriana_account = Bank::Owner.new("adriana", "cannon")
+#adriana_owner = Bank::Owner.new("adriana", "cannon")
 # adriana_account.deposit(200)
 # #adriana_account.withdraw(100)
