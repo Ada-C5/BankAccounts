@@ -7,13 +7,14 @@ module Bank
         # attr_accessor
 
         # set initializer to require a balance and an ID number
-        def initialize(id_number, beginning_balance, owner = nil)
-            if beginning_balance < 0
+        def initialize(account_info)
+            @id_number = account_info[:id_number]
+            @balance = account_info[:beginning_balance]
+            @owner = account_info[:owner]
+
+            if @balance < 0
                 raise ArgumentError.new("You think we give credit here? HAH!")
             end
-            @id_number = id_number
-            @balance = beginning_balance
-            @owner = owner
         end
 
         # withdraw method
@@ -54,6 +55,14 @@ module Bank
         def initialize(name)
             @name = name
             @accounts = []
+        end
+
+        def create_account
+            @accounts.push(Bank::Account.new(info))
+        end
+
+        def add_account(account)
+            @accounts.push(account)
         end
     end
 
