@@ -21,21 +21,41 @@
   # 1. A new account cannot be created with initial negative balance - this will `raise` an `ArgumentError` (Google this)
   # 1. The `withdraw` method does not allow the account to go negative - Will `puts` a warning message and then return the original un-modified balance
 
+
+  # Wave 2: CSV Files!
+  #
+  # Primary Requirements
+  #
+  # Update the Account class to be able to handle all of these fields from the CSV file used as input.
+  # For example, manually choose the data from the first line of the CSV file and ensure you can create a new instance of your Account using that data
+  # Add the following class methods to your existing Account class
+  # self.all - returns a collection of Account instances, representing all of the Accounts described in the CSV. See below for the CSV file specifications
+  # self.find(id) - returns an instance of Account where the value of the id field in the CSV matches the passed parameter
+  # CSV Data File for Bank::Account
+  #
+  # The data, in order in the CSV, consists of:
+  #
+  # ID - (Fixnum) a unique identifier for that Account
+  # Balance - (Fixnum) the account balance amount, in cents (i.e., 150 would be $1.50)
+  # OpenDate - (Datetime) when the account was opened
+
 module Bank
 
-  require "money"
+  # require "money"
 
   class Account
     # initialize method creates instance of Account class with @instance variables @id,  @init_balance, and balance
     def initialize(accountdata)
-    @owner = accountdata[:owner]
-    @id = accountdata[:id] # float? provided from csv?
+    @owner = accountdata[:owner] # string
+    @id = accountdata[:id] # fixnum? provided from csv?
+    @balance
+    @open_date 
     @init_balance = accountdata[:init_balance].to_f #float
+      if @init_balance < 0
+        raise ArgumentError.new("Account cannot be initialized with a negative balance.")
+      end
     @balance = accountdata[:balance].to_f # float
-    # @init_balance = @balance
-        if @init_balance < 0
-          raise ArgumentError.new("Account cannot be initialized with a negative balance.")
-        end
+
     # set @balance to value of @init_balance
     @balance = @init_balance
     end
@@ -77,7 +97,7 @@ module Bank
 
   class Owner
     def initialize(ownerdata)
-      @title = ownerdata[:title]
+      @title = ownerdata[:title] # all strings
       @first_name = ownerdata[:first_name]
       @middle_init = ownerdata[:middle_init]
       @last_name = ownerdata[:last_name]
