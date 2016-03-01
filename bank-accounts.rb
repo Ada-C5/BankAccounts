@@ -41,7 +41,7 @@ module Bank
       @initial_balance # the way I'm using this below - could this make a problem because I would be doing the adjustment twice? Not sure how this works yet.
     end
 =end
-    
+
     def set_owner(owner_object)
       @owner = owner_object
     end
