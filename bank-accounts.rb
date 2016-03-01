@@ -53,8 +53,18 @@ module Bank
       raise ArgumentError.new("An account cannot be created with an initial negative balance.") if @initial_balance < 0
     end
 
-    def self.all?
-      #Add the following class methods to your existing Account class self.all - returns a collection of Account instances, representing all of the Accounts described in the CSV. See below for the CSV file specifications
+    def self.all(data_file) #returns a collection of Account instances, representing all of the Accounts described in the CSV.
+
+      accounts = [] #start as an empty array. We will fill with instances from our data file.
+
+      accounts_data = CSV.read(data_file)
+      accounts_data.each do |row|
+        account = Bank::Account.new(id: row[0].to_f, initial_balance: row[1].to_f, open_date: row[2]) # to_f becasue ID and initial balance should be numbers
+        accounts << account #put it into our collection of instances! (accounts)
+      end
+
+      return accounts
+
     end
 
     def self.find
@@ -106,14 +116,19 @@ end
 
 #test run the program
 
-account = Bank::Account.new(id: 1, initial_balance: 100, owner: Bank::Owner.new(name: "Sarah", address: "123 Seattle, WA", type: "Person", date_joined_bank: 2007))
+accounts = Bank::Account.all("./support/accounts.csv")
+puts accounts[0].balance
 
-account.deposit(101)
-puts account.balance
-puts account.owner.date_joined_bank
-
-account2 = Bank::Account.new(id: 1, initial_balance: 100)
-joe = Bank::Owner.new(name: "Joe", address: "123 Seattle, WA", type: "Person", date_joined_bank: 2007)
-
-account2.set_owner(joe)
-puts account2.owner.name
+#account_row = ["1212","1235667","1999-03-27 11:30:09 -0800"]
+#
+#account = Bank::Account.new(id: account_row[0].to_f, initial_balance: #account_row[1].to_f, open_date: account_row[2]) #need to change numbers back to #numbers because they will come in from CSV as strings
+#puts account.balance
+#account.deposit(101)
+#puts account.balance
+#puts account.owner.date_joined_bank
+# "./support/accounts.csv"
+# account2 = Bank::Account.new(id: 1, initial_balance: 100)
+# joe = Bank::Owner.new(name: "Joe", address: "123 Seattle, WA", type: "Person", # date_joined_bank: 2007)
+#
+# account2.set_owner(joe)
+# puts account2.owner.name
