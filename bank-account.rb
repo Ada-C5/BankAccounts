@@ -2,7 +2,7 @@
 # 2016-02-29
 
 require 'money'
-I18n.enforce_available_locales = false
+I18n.enforce_available_locales = false # need this not to trip an I18n error!
 
 module Bank
   class Account
@@ -12,7 +12,7 @@ module Bank
       @id = account_info[:id]
       @owner = account_info[:owner]
       @balance = account_info[:initial_balance]
-      if @balance < Money.new(0)
+      if @balance < Money.new(0) # if not a money object, comparison with balance won't work
         raise ArgumentError.new("You can't open an account with no money!")
       end
     end
@@ -57,8 +57,11 @@ end
 lisa_owner = Bank::Owner.new(first_name: "Lisa", last_name: "Rolczynski", address_one: 1234, city: "Seattle", state: "WA", zip_code: 98117)
 puts "Owner: #{lisa_owner.first_name} #{lisa_owner.last_name}"
 
+# use the Money gem. By default, the currency is in USD. (to override: Money.new(3000, "EUR"))
+# must change all instances of money to a money object; can't do math with fixnums & money objects
 lisas_account = Bank::Account.new(id: 123456789, initial_balance: Money.new(3000))
 puts "Account id is: #{lisas_account.id}"
+# format numbers to be expressed in dollars (not cents) and include $ symbol using .format
 puts "Account balance is: #{lisas_account.balance.format}"
 
 puts "Withdraw $10."
