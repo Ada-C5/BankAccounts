@@ -1,9 +1,13 @@
-# accounts = CSV.read("support.accounts.csv")
+ # accounts = CSV.read("/Users/cristal/C5/projects/bank-account/BankAccounts/support/accounts.csv")
+require 'csv'
+accounts = CSV.read('accounts.csv')
 module Bank
   class Account
     def initialize(id=0, money=0)
       @id = id
       @money = money
+      @initial_money = money
+
 
       if @money < 0
         raise ArgumentError.new("Only positive numbers are allowed in the bank.")
@@ -32,4 +36,34 @@ module Bank
     end
 
   end
+
+class Owner
+  attr_accessor :name, :address,
+
+  def initialize(owner_hash)
+    @owner_hash = owner_hash
+  end
+end
+
+# refer to csv files for info
+owner_hash ={
+  :list_num =>
+  :name => {
+    :first_name =>
+    :last_name =>
+  }
+  :address =>{
+    :street =>
+    :city =>
+    :state =>
+  }
+  :id =>
+  :initial_balance =>
+
+  :open_info => {
+    :date =>
+    :time =>
+  }
+}
+
 end
