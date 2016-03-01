@@ -1,31 +1,52 @@
 module Bank
   class Account
+    attr_reader :id, :updated_balance
+    attr_accessor :owner
     def initialize(id, initial_balance)
       @id = id
       @updated_balance = initial_balance
+      if !initial_balance.is_a?(Numeric)
+       raise ArgumentError.new("A new account cannot be created with initial negative balance")
+      end
+      @owner = owner
     end
 
     def withdraw(withdraw)
       @updated_balance = @updated_balance - withdraw
-      puts @updated_balance
+      if @updated_balance < 0
+        @updated_balance = @updated_balance + withdraw
+        puts "You dont have all that money"
+      end
+      balance
     end
 
     def deposit(deposit)
       @updated_balance = @updated_balance + deposit
-      puts @updated_balance
+      balance
+    end
+
+    def balance
+      puts "#{@updated_balance} is your new balance"
+    end
+
+
+
+  end
+
+  class Owner #< Account
+    attr_accessor :name, :last_name, :address, :email, :mobile
+    def initialize(user_hash)
+      @name = user_hash[:name]
+      @last_name = user_hash[:last_name]
+      @address = user_hash[:address]
+      @email = user_hash[:email]
+      @mobile = user_hash[:mobile]
     end
   end
+
 end
 
-melissa = Bank::Account.new(123, 5400)
-melissa.withdraw(100) #=> 5300
-melissa.deposit(200) #=> 5500
-melissa.withdraw(500) #=> 5000
-melissa.deposit(200) #=> 5200
-melissa.deposit(200) #=> 5400
+melissa_account = Bank::Account.new(123, 5400)
 
-puts Bank::Account::BALANCE
-
-
-
-# puts melissa.class
+melissa = Bank::Owner.new(name: "Melissa", last_name: "Jimison", email: "mjimison@gmail.com")
+melissa = Bank::Owner.new(name: "David", last_name: "Quintero", email: "djimison@gmail.com")
