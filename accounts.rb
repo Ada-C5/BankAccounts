@@ -42,9 +42,9 @@ module Bank
     end
 
     def define_user(name)
-      @name = name
-      @owner = Bank::Owner.new(name: @name) #this doesn't work
-      puts @owner #returns nil
+      @name = name #this works now
+      @owner = Bank::Owner.new(name: @name) #still doens't work.
+      puts @owner
     end
 
   end
