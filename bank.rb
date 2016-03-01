@@ -80,10 +80,15 @@ module Bank
   end
 end
 
+#First account/owner:
 account_1 = Bank::Account.new(id_number: 100, balance: 1000)
 owner_1 = Bank::Owner.new(name: "Brad Bradley", auth_users: "Chad Bradley", auth_users_relation: "Spouse", address: "123 Farts Ln, Seattle, WA 98103", last_4_of_social: "9328", mothers_maiden_name: "Acker")
 
 account_1.add_owner(owner_1)
 
+# test attempts:
+# account_1.withdraw(1100)
+# account_1.deposit(34)
+
 ### puts account_1.owner_info[0].name #this will print owner_1's name. I would like to
-### use a hash for this, but can't figure out how. 
+### use a hash for this, but can't figure out how.
