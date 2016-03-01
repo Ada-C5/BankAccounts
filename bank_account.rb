@@ -36,7 +36,7 @@ module Bank
     end
 
     def balance_inquiry
-      '%.2f' % @balance
+      "$#{'%.2f' % @balance}"
     end
   end
 
