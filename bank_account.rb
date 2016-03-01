@@ -1,7 +1,7 @@
 module Bank
 
   class Account
-    attr_reader :balance, :id, :owner
+    attr_reader :id, :owner
     # Can set owner after account has been created.
     attr_writer :owner
 
@@ -9,7 +9,7 @@ module Bank
       raise ArgumentError, "Starting balance must be a number." unless initial_balance.is_a? Numeric
       raise ArgumentError, "You must not have a negative starting balance." unless initial_balance > 0
       @id = id
-      @balance = '%.2f' % initial_balance
+      @balance = initial_balance
       @owner = owner
     end
 
@@ -23,7 +23,7 @@ module Bank
       else
         @balance = @balance - amount
       end
-      return '%.2f' % @balance
+      return balance_inquiry
     end
 
     # Accepts a single parameter for the amount of money to be deposited.
@@ -32,15 +32,18 @@ module Bank
     def deposit(amount)
       amount = amount.abs
       @balance = @balance + amount
-      return '%.2f' % @balance
+      return balance_inquiry
     end
 
+    def balance_inquiry
+      '%.2f' % @balance
+    end
   end
 
   class Owner
     attr_reader :name, :address, :phone
     def initialize(user_hash)
-      @name = "#{user_hash[:first_name]} #{user_hash[:last_name]}"
+      @name = "#{user_hash[:first_name].capitalize} #{user_hash[:last_name].capitalize}"
       @address = user_hash[:address]
       @phone = user_hash[:phone_number].to_s
     end
