@@ -22,6 +22,10 @@ module Bank
         # make a Class method that will instantiate accounts from a csv
         def self.make_accounts(path_to_csv)
             # this needs to iterate through the CSV
+            CSV.foreach(./support/accounts.csv) do |row|
+                id_num = row[0]
+                balance = row[1]
+                open_date = row[2]
 
             # then it needs to pass the data from the line to the account
 
