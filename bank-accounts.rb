@@ -37,7 +37,7 @@ Balance - (Fixnum) the account balance amount, in cents (i.e., 150 would be $1.5
 OpenDate - (Datetime) when the account was opened
 =end
 
-Require "CSV"
+require "CSV"
 
 module Bank
 
@@ -66,7 +66,7 @@ module Bank
     end
 
     def balance #allow us to access the balance at any time formatted well
-      puts "Your current account balance is $#{ @balance }.00."
+      puts "Your current account balance is $#{ sprintf("%.2f", @balance) }."
       @balance #incase we want to return this to a different method
     end
 
@@ -74,10 +74,10 @@ module Bank
       updated_balance = (@balance - amount)
 
       if updated_balance > 0
-        puts "After withdrawing $#{ amount }.00, the new account balance is $#{ updated_balance }.00. "
+        puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{ sprintf("%.2f", updated_balance) }. "
         return @balance = updated_balance
       else
-        puts "WARNING: You cannot withdraw $#{ amount }.00.  This is more than your current balance of $#{ @balance }.00."
+        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }.00.  This is more than your current balance of $#{ sprintf("%.2f", @balance) }."
         #don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
       end
     end
@@ -85,7 +85,7 @@ module Bank
     def deposit(amount)
       updated_balance = (@balance + amount)
 
-      puts "After depositing $#{ amount }.00, the new account balance is $#{  updated_balance }.00. "
+      puts "After depositing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
       return @balance = updated_balance
     end
 
