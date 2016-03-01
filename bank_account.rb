@@ -13,6 +13,7 @@ module Bank
 
     end
 
+    # return information about owner
     def get_owner
       @owner.get_info
     end
@@ -41,22 +42,22 @@ module Bank
     end
   end
   
-    class Owner
-      # take in name and id from user_input
-      def initialize(info)
-        @fname = info[:fname]
-        @lname = info[:lname]
-        @id = info[:id]
-        @address = info[:address]
-        @city = info[:city]
-        @state = info[:state]
-      end
-
-      # print owner info
-      def get_info
-        puts "#{@fname} #{@lname} lives at #{@address} in #{@city}, #{@state} and their bank ID is #{@id}"
-      end
+  class Owner
+    # take in name and id from user_input
+    def initialize(info)
+      @fname = info[:fname]
+      @lname = info[:lname]
+      @id = info[:id]
+      @address = info[:address]
+      @city = info[:city]
+      @state = info[:state]
     end
+
+    # print owner info
+    def get_info
+      puts "#{@fname} #{@lname} lives at #{@address} in #{@city}, #{@state} and their bank ID is #{@id}"
+    end
+  end
 end
 
 # manually take in user input 
@@ -66,6 +67,5 @@ puts "What is the starting balance?"
 amount = gets.chomp.to_i
 
 # create new instances of account and owner
-
-@account_owner = Bank::Owner.new(fname: "Sally", lname: "Brown", id: 43, address: "22 W, 5th St", city: "Seattle", state:"WA")
-@my_account = Bank::Account.new(id, amount, @account_owner)
+@sally = Bank::Owner.new(fname: "Sally", lname: "Brown", id: 43, address: "22 W, 5th St", city: "Seattle", state:"WA")
+@my_account = Bank::Account.new(id, amount, @sally)
