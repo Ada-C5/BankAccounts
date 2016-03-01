@@ -99,5 +99,5 @@ puts account.owner.date_joined_bank
 account2 = Bank::Account.new(id: 1, initial_balance: 100)
 joe = Bank::Owner.new(name: "Joe", address: "123 Seattle, WA", type: "Person", date_joined_bank: 2007)
 
-account2.add_owner(joe)
+account2.set_owner(joe)
 puts account2.owner.name
