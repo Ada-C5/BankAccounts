@@ -7,7 +7,7 @@ module Bank
   class Account
     # For bank employee eyes only! I would remove the attr_reader if I was going
     # to expose this code anywhere public.
-    attr_reader :id, :balance
+    attr_reader :id, :balance, :owner
 
     def initialize(id, initial_balance)
       if initial_balance < 1
@@ -15,6 +15,16 @@ module Bank
       end
       @id = id
       @balance = initial_balance
+      @owner = "No Owner Assigned" # temporary value until Owner is created
+    end
+
+    # If the owner has already been created in the Owner class, the method should be called like so:
+    # account_instance.add_owner(owner_instance.name)
+    # If owner does not exist, the method should be called like so:
+    # account_instance = Bank::Owner.new("Barbara Thompson", "545-665-5535", "looploop@loo.org", "5545 Apple Drive Issaquah, WA 98645")
+    def add_owner(owner_name)
+      @owner = owner_name
+      #Bank::Owner.name
     end
 
     def withdraw(amount_to_withdraw)
@@ -36,12 +46,13 @@ module Bank
       puts "The balance for this account is currently $#{@balance}."
       return @balance
     end
+
   end
 
   class Owner
     # For bank employee eyes only! I would remove the attr_reader if I was going
     # to expose this code anywhere public.
-    attr_reader :name, :phone, :email, :address
+    attr_reader :name, :phone, :email, :address, :owner
 
     def initialize(name, phone_number, email_address, street_address)
       @name = name
