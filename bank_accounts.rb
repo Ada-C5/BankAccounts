@@ -22,12 +22,16 @@
   # 1. The `withdraw` method does not allow the account to go negative - Will `puts` a warning message and then return the original un-modified balance
 
 module Bank
+
+  require "money"
+
   class Account
     # initialize method creates instance of Account class with @instance variables @id,  @init_balance, and balance
     def initialize(accountdata)
+    @owner = accountdata[:owner]
     @id = accountdata[:id] # float? provided from csv?
-    @init_balance = accountdata[:init_balance] #float
-    @balance = accountdata[:balance]# float
+    @init_balance = accountdata[:init_balance].to_f #float
+    @balance = accountdata[:balance].to_f # float
     # @init_balance = @balance
         if @init_balance < 0
           raise ArgumentError.new("Account cannot be initialized with a negative balance.")
@@ -36,6 +40,9 @@ module Bank
     @balance = @init_balance
     end
 
+    # def money_print
+    #   Money.new(@balance, "USD").to_f
+    # end
 
     # withdraw method accepts a single parameter which represents the amount of the withdrawal. method should return the updated account balance.
     def withdraw(withdrawal)
@@ -53,7 +60,7 @@ module Bank
     end
 
     def balance
-      return @balance
+      @balance
     end
 
     # just checking to see if differentiating @init_balance and @balance worked.
@@ -61,5 +68,26 @@ module Bank
     #   return @init_balance
     # end
 
+    # add an owner (instance of Owner class, below) to an already existing account.
+    def add_owner(owner)
+      @owner = owner
+    end
+
+  end
+
+  class Owner
+    def initialize(ownerdata)
+      @title = ownerdata[:title]
+      @first_name = ownerdata[:first_name]
+      @middle_init = ownerdata[:middle_init]
+      @last_name = ownerdata[:last_name]
+      @street_address = ownerdata[:street_address]
+      @street_address2 = ownerdata[:street_address2]
+      @city = ownerdata[:city]
+      @state = ownerdata[:state]
+      @zip = ownerdata[:zip]
+      @cell = ownerdata[:cell]
+      @email = ownerdata[:email]
+    end
   end
 end
