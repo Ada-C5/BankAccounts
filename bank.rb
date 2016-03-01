@@ -37,10 +37,6 @@ module Bank
       if @balance < 0
         raise ArgumentError.new("Account balance cannot be lower than $0.")
       end
-
-      if @owner_info == nil
-        @owner_info = []
-      end
     end
 
     def withdraw(with_amount)
@@ -62,20 +58,20 @@ module Bank
       puts "Your current account balance is $#{ @balance }"
     end
 
-    def add_owner(owner_hash)
-      @owner_info << owner_hash
+    def add_owner(owner)
+      @owner_info = owner
     end
   end
 
   class Owner
-    attr_reader :name
-    def initialize(owner_hash)
-      @name = owner_hash[:name]
-      @auth_users = owner_hash[:auth_users]
-      @auth_users_relation = owner_hash[:auth_users_relation]
-      @address = owner_hash[:address]
-      @last_4_of_social = owner_hash[:last_4_of_social]
-      @mothers_maiden_name = owner_hash[:mothers_maiden_name]
+    attr_reader :name, :auth_users, :auth_users_relation, :address, :last_4_of_social, :mothers_maiden_name
+    def initialize(owner)
+      @name = owner[:name]
+      @auth_users = owner[:auth_users]
+      @auth_users_relation = owner[:auth_users_relation]
+      @address = owner[:address]
+      @last_4_of_social = owner[:last_4_of_social]
+      @mothers_maiden_name = owner[:mothers_maiden_name]
     end
   end
 end
@@ -85,6 +81,9 @@ account_1 = Bank::Account.new(id_number: 100, balance: 1000)
 owner_1 = Bank::Owner.new(name: "Brad Bradley", auth_users: "Chad Bradley", auth_users_relation: "Spouse", address: "123 Farts Ln, Seattle, WA 98103", last_4_of_social: "9328", mothers_maiden_name: "Acker")
 
 account_1.add_owner(owner_1)
+puts account_1.owner_info
+
+# puts account_1.owner_info.name
 
 # test attempts:
 # account_1.withdraw(1100)
