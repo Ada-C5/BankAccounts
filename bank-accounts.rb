@@ -19,7 +19,25 @@ Create an Owner class which will store information about those who own the Accou
 This should have info like name and address and any other identifying information that an account owner would have.
 Add an owner property to each Account to track information about who owns the account.
 The Account can be created with an owner, OR you can create a method that will add the owner after the Account has already been created.
+
+Wave 2
+
+Primary Requirements
+Update the Account class to be able to handle all of these fields from the CSV file used as input.
+For example, manually choose the data from the first line of the CSV file and ensure you can create a new instance of your Account using that data
+Add the following class methods to your existing Account class
+self.all - returns a collection of Account instances, representing all of the Accounts described in the CSV. See below for the CSV file specifications
+self.find(id) - returns an instance of Account where the value of the id field in the CSV matches the passed parameter
+
+CSV Data File for Bank::Account
+The data, in order in the CSV, consists of:
+
+ID - (Fixnum) a unique identifier for that Account
+Balance - (Fixnum) the account balance amount, in cents (i.e., 150 would be $1.50)
+OpenDate - (Datetime) when the account was opened
 =end
+
+Require "CSV"
 
 module Bank
 
@@ -34,20 +52,20 @@ module Bank
       raise ArgumentError.new("An account cannot be created with an initial negative balance.") if @initial_balance < 0
     end
 
-=begin
-  #per POODR, wrap instance varriables that will be referred to in numerous places in a method so that when we have an unaticipated adjustment in the fugure, we will be able to update it in one place (and one place only).  For banks, this could be something like an exchange rate or inflation, seems likely, so I will do it now.
+    def self.all?
 
-    def initial_balance
-      @initial_balance # the way I'm using this below - could this make a problem because I would be doing the adjustment twice? Not sure how this works yet.
     end
-=end
+
+    def self.find
+
+    end
 
     def set_owner(owner_object)
       @owner = owner_object
     end
 
     def balance #allow us to access the balance at any time formatted well
-      puts "Your current account balance is $#{@balance}.00."
+      puts "Your current account balance is $#{ @balance }.00."
       @balance #incase we want to return this to a different method
     end
 
@@ -82,9 +100,6 @@ module Bank
 
     end
   end
-
-
-
 
 end
 
