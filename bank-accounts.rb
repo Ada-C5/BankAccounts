@@ -46,6 +46,28 @@ module Bank
 	end
 end
 
+class Owner 
+
+attr_reader :name
+# attr_accessor :address, :favorite_color 
+
+	def initialize(name)
+		@name = name
+		# @address = address
+		# @favorite_color = favorite_color
+	end
+
+
+
+
+end
+
+jade = Owner.new("Jade Vance")
+p jade 
+
+jade = Bank::Account.new("246810", 300)
+p jade.account_id
+
 new_account = Bank::Account.new("12345", 150.00)
 puts new_account
 puts new_account.show_balance
