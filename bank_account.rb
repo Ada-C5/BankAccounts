@@ -1,17 +1,3 @@
-#Create a Bank module which will contain your Account class and any future bank account logic.
-#Create an Account class which should have the following functionality:
-#A new account should be created with an ID and an initial balance
-#Should have a withdraw method that accepts a single parameter which represents the amount of money that will be withdrawn.
-#  -  This method should return the updated account balance.
-#Should have a deposit method that accepts a single parameter which represents the amount of money that will be deposited.
-#   - This method should return the updated account balance.
-#Should be able to access the current balance of an account at any time.
-
-#Error handling
-#
-#A new account cannot be created with initial negative balance - this will raise an ArgumentError (Google this)
-#The withdraw method does not allow the account to go negative -
-# - Will puts a warning message and then return the original un-modified balance
 require 'yaml'
 module Bank
 
@@ -19,9 +5,12 @@ module Bank
     attr_accessor :name, :email, :accounts
 
     def initialize(owner_info)
+
       @name = owner_info[:name]
       @email = owner_info[:email]
       @street_address = owner_info[:street_address]
+      @city = owner_info[:city]
+      @state = owner_info[:state]
       @cell_phone = owner_info[:cell_phone]
       @accounts = []
     end
@@ -31,22 +20,21 @@ module Bank
       @accounts.push(Bank::Account.new(info))
     end
 
-    def display_accounts
-      puts @accounts.to_yaml
-    end
-
-
   end
 
   class Account
-    attr_reader :balance
+    attr_reader :balance, :account_owner
 
     def initialize(info)
       @account_type = info[:account_type]
       @id_num = info[:id_num]
       @balance = info[:balance]
-      #@owner_name = ??????
       raise ArgumentError.new("You need money to start an account here.") if @balance < 0
+      @account_owner = @name
+    end
+
+    def add_owner(owner)
+      @account_owner = owner
     end
 
     def withdraw(amount)
@@ -74,3 +62,9 @@ module Bank
 
 
 end
+
+@lisa = Bank::Owner.new(name: "Lisa Neesemann", email: "lisa@brp.org", city: "Brooklyn", state: 'NY')
+@lisa.create_account(account_type: "savings", id_num: 57, balance: 500  )
+@fancy_account = Bank::Account.new(id_num:78, balance: 67)
+@fancy_account.add_owner(@lisa)
+puts @lisa.to_yaml
