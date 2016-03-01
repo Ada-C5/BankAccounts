@@ -1,19 +1,12 @@
 module Bank
   class Account
-    attr_reader :account_id, :account_balance, :owner_id
-    @@Accounts = []
+    attr_reader :account_id, :account_balance, :owner_id, :open_date
 
-    def initialize(initial_balance, type_of_account, owner_id = 0)#owner_id = 0 by default
+    def initialize(initial_balance, account_id, open_date, owner_id = 0)#owner_id = 0 by default
       if initial_balance < 0
         raise ArgumentError, "Initial balance must be greater than $0.00."
       end
-      1.times do
-      @account_id = rand(111111...999999)
-        if @@Accounts.include?(@account_id)
-          redo
-        end
-      end
-      @@Accounts << @account_id
+      @account_id =
       @account_balance = initial_balance.to_f.round(2)
       @type_of_account = type_of_account
       #need to add an owner to the account during initialize
