@@ -1,15 +1,18 @@
+require 'CSV'
+
 module Bank
   class Account
+
     # new account with id and init_bal
-    def initialize(id, amount, account_owner)
+    def initialize(id, balance, date)
       @id = id
-      @balance = amount
-      @owner = account_owner
+      @balance = balance
+      @date = date
+      #@owner = account_owner
       # raise error if trying to start new account with negative balance
-      if amount < 0
+      if balance < 0
         raise ArgumentError.new("New accounts must have a positive starting balance.")
       end
-      # create new and corresponding owner instance
 
     end
 
@@ -40,6 +43,18 @@ module Bank
     def balance
       return @balance
     end
+
+    def self.create_accounts(file)
+      #open and read file
+      #save info to vars
+      #initialize new instances of accounts with vars
+      CSV.foreach(file) do |line|
+        id = line[0]
+        balance = line[1]
+        date = line[2]
+      end
+    end
+
   end
   
   class Owner
@@ -51,6 +66,7 @@ module Bank
       @address = info[:address]
       @city = info[:city]
       @state = info[:state]
+      @account = info[:account]
     end
 
     # print owner info
@@ -60,12 +76,18 @@ module Bank
   end
 end
 
+accounts = Bank::Account.create_accounts("./support/accounts.csv")
+
+
 # manually take in user input 
-puts "What is the ID for the new account?"
-id = gets.chomp
-puts "What is the starting balance?"
-amount = gets.chomp.to_i
+# puts "What is the ID for the new account?"
+# id = gets.chomp
+# puts "What is the starting balance?"
+# amount = gets.chomp.to_i
 
 # create new instances of account and owner
-@sally = Bank::Owner.new(fname: "Sally", lname: "Brown", id: 43, address: "22 W, 5th St", city: "Seattle", state:"WA")
-@my_account = Bank::Account.new(id, amount, @sally)
+# @sally = Bank::Owner.new(fname: "Sally", lname: "Brown", id: 43, address: "22 W, 5th St", city: "Seattle", state:"WA")
+# @sallys_account = Bank::Account.new(id, amount, @sally)
+
+
+
