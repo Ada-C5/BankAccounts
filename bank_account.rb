@@ -12,16 +12,40 @@
 #A new account cannot be created with initial negative balance - this will raise an ArgumentError (Google this)
 #The withdraw method does not allow the account to go negative -
 # - Will puts a warning message and then return the original un-modified balance
-
+require 'yaml'
 module Bank
+
+  class Owner
+    attr_accessor :name, :email, :accounts
+
+    def initialize(owner_info)
+      @name = owner_info[:name]
+      @email = owner_info[:email]
+      @street_address = owner_info[:street_address]
+      @cell_phone = owner_info[:cell_phone]
+      @accounts = []
+    end
+
+
+    def create_account(info)
+      @accounts.push(Bank::Account.new(info))
+    end
+
+    def display_accounts
+      puts @accounts.to_yaml
+    end
+
+
+  end
 
   class Account
     attr_reader :balance
 
     def initialize(info)
+      @account_type = info[:account_type]
       @id_num = info[:id_num]
       @balance = info[:balance]
-      @owner_name = info[:owner_name]
+      #@owner_name = ??????
       raise ArgumentError.new("You need money to start an account here.") if @balance < 0
     end
 
@@ -47,5 +71,6 @@ module Bank
     end
 
   end
+
 
 end
