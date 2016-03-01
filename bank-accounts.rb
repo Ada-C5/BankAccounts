@@ -10,8 +10,9 @@ module Bank
       @balance = balance
       @owner = owner
       if @balance < 0
-          raise ArgumentError, "Balance can't be less than 0"
+          raise ArgumentError, "Balance can't be less than $0"
       end
+      puts "An account has been created!"
     end
 
     def withdraw(withdraw_amount)
