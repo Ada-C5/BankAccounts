@@ -10,10 +10,11 @@ module Bank
         # and instantiate objects using it.
         # but I don't want to make that the only way, so I should probably design a method.
         # set initializer to require a balance and an ID number
-        def initialize(account_info)
-            @id_number = account_info[:id_number]
-            @balance = account_info[:beginning_balance]
-            @owner = account_info[:owner]
+        def initialize(id_num, balance_in_cents, open_date)
+            @id_number = id_num
+            @balance = balance_in_cents
+            @start_date = open_date
+            @owner = owner_id
 
             if @balance < 0
                 raise ArgumentError.new("You think we give credit here? HAH!")
