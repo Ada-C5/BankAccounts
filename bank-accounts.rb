@@ -46,7 +46,7 @@ module Bank
 
     def initialize(account_information)
       @id = account_information[:id]
-      @initial_balance = account_information[:initial_balance]
+      @initial_balance = account_information[:initial_balance] / 100.00 #CSV data comes in cents - I want to play in dollars so I am converting to dollars.
       @balance = @initial_balance #will start out at initial balance and then be updated as we add/withdraw money
       @open_date = account_information[:open_date]
       @owner = account_information[:owner]
