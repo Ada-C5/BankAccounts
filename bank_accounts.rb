@@ -1,5 +1,7 @@
 # Rowan Cota, wave 2, 3.1.2016
 
+require 'csv'
+
 module Bank
     
     # this class creates accounts, we can store account related things in it.
