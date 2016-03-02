@@ -1,25 +1,30 @@
+
 require 'CSV'
 
 module Bank
   class Account
-    attr_accessor :accounts
+
     def initialize(id, balance, date)
       @id = id
       @balance = balance
       @date = date
       #@owner = account_owner
-
       # raise error if trying to start new account with negative balance
       if balance < 0
         raise ArgumentError.new("New accounts must have a positive starting balance.")
       end
-
     end
 
     # return information about owner
     # def get_owner
     #   @owner.get_info
     # end
+
+    def money_convert(balance)
+      print_bal = balance.to_s
+      print_bal = print_bal.insert -3, "."
+      # return print_bal
+    end
 
     # withdraw money from account
     def withdraw(amount)
@@ -30,7 +35,7 @@ module Bank
       else 
         @balance = temp_balance
       end
-      return @balance
+      return money_convert(@balance)
     end
 
     # deposit money in account
@@ -112,8 +117,8 @@ end
 
 
 # TEST CALLS
-# accountz = Bank::Account.create_accounts("./support/accounts.csv")
-# puts accountz
+accountz = Bank::Account.create_accounts("./support/accounts.csv")
+puts accountz
 #puts "bottom account #{accounts.find(1212)}"
 #puts accounts[0].balance
 # my_account = Bank::Account.find(15154)
@@ -121,6 +126,9 @@ end
 # puts my_account.balance
 # kwel_accounts = Bank::Account.all("./support/accounts.csv")
 # puts kwel_accounts
+
+# puts Bank::Account.find(1212).balance
+# puts Bank::Account.find(1212).deposit(10)
 
 
 
