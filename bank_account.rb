@@ -15,17 +15,17 @@ require "CSV"
 			CSV.read("./support/accounts.csv", "r").each do |line|
       	all = []
         all << self.new(line [0], line[1].to_f, line [2])
-  		end
+  		  return all
+      end
   	end
 
     def self.find(id)
-   		CSV.read("accounts.csv", "r").each do |line|
-        if id == line[0]
-          @ACCOUNT_ID = line [0]
-          @balance = "$#{line [1]}/100.0"
-          @open_date = line [2]
-     			puts "Account ID = #{@ACCOUNT_ID}, Balance = #{@balance}, Open Date = #{@open_date} "
-          end
+      array = []
+   		CSV.read("./support/accounts.csv", "r").each do |line|
+        if line [0] == id.to_s
+          array = self.new(line [0], line[1].to_f, line [2])
+          return array
+        end
       end
     end
 
