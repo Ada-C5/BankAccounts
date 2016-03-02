@@ -94,7 +94,7 @@ module Bank
   
   class Owner
     #attr_accessor :id :lname :fname :street_address :city :state
-    attr_accessor :id
+
     # take in name and id from user_input
     def initialize(id, lname, fname, street_address, city, state)
       @id = id
@@ -122,23 +122,26 @@ module Bank
       return owners
     end
 
+    def self.all(file)
+      instances = self.create_owners(file)
+      return instances
+    end
+
     def get_id
       return @id
     end
 
-# BROKEN: currently returning an enumerator
-    # def self.find(id)
-    #   sought_owner = nil
-    #   owners = self.create_owners("./support/owners.csv")
-    #   puts owners
-    #   owners.each do |owner|
-    #     if owner.get_id == id
-    #       puts "its a match"
-    #       sought_owner = owner
-    #     end
-    #   end
-    #   return sought_owner
-    # end
+
+    def self.find(id)
+      sought_owner = nil
+      owners = self.create_owners("./support/owners.csv")
+      owners.each do |owner|
+        if owner.get_id == id
+          sought_owner = owner
+        end
+      end
+      return sought_owner
+    end
 
     def get_id
       return @id
@@ -146,8 +149,7 @@ module Bank
 
     # print owner info
     def get_info
-      #puts "#{@fname} #{@lname} lives at #{@street_address} in #{@city}, #{@state} and their bank ID is #{@id}"
-      puts "Get user info"
+      puts "#{@fname} #{@lname} lives at #{@street_address} in #{@city}, #{@state} and their bank ID is #{@id}"
     end
   
   end
@@ -155,9 +157,14 @@ end
 
 
 # # TEST CALLS
-ownerz = Bank::Owner.create_owners("./support/owners.csv")
-a = ownerz.find(14)
-puts a
+kwel = Bank::Owner.find(14).get_info
+puts kwel
+# puts kwel.get_id
+#ownerz = Bank::Owner.create_owners("./support/owners.csv")
+# kwel_ownerz = Bank::Account.all("./support/owners.csv")
+# puts kwel_ownerz[0].get_id
+#a = ownerz.find(14)
+#puts ownerz
 # puts a.class
 # info = ownerz.find(14).get_info
 # puts info
@@ -167,9 +174,9 @@ puts a
 # puts accountz
 #puts "bottom account #{accounts.find(1212)}"
 #puts accounts[0].balance
-# my_account = Bank::Account.find(15154)
-# puts Bank::Account.find(15154).balance
-# puts my_account.balance
+####my_account = Bank::Account.find(15154)
+#puts Bank::Account.find(15154).balance
+####puts my_account.balance
 # kwel_accounts = Bank::Account.all("./support/accounts.csv")
 # puts kwel_accounts
 
