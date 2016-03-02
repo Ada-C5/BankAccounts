@@ -46,10 +46,8 @@ module Bank
   class Account
     # initialize method creates instance of Account class with @instance variables @id,  @init_balance, and balance
     def initialize(accountdata)
-    @owner = accountdata[:owner] # string
+    # @owner = accountdata[:owner] # string
     @id = accountdata[:id] # fixnum? provided from csv?
-    @balance
-    @open_date 
     @init_balance = accountdata[:init_balance].to_f #float
       if @init_balance < 0
         raise ArgumentError.new("Account cannot be initialized with a negative balance.")
@@ -92,6 +90,50 @@ module Bank
     def add_owner(owner)
       @owner = owner
     end
+
+    # be able to instantiate a new account from a csv.
+    def acct_from_csv(csv_index)
+
+    require 'csv'
+    allaccountscsv = CSV.read("./support/accounts.csv", 'r')
+
+      @id = allaccountscsv[csv_index][0]
+      @balance = allaccountscsv[csv_index][1]
+      @open_date = allaccountscsv[csv_index][2]
+    end
+
+    # be able to instantiate a new account from each line in the csv.
+    # class method.
+    # similar to above.
+    def self.csv_to_accounts
+    require "CSV"
+    allaccountscsv = CSV.read("./support/accounts.csv", 'r')
+
+        allaccountscsv.each do |entry|
+          Account.new(name: "name")
+          @id = entry[0]
+          @balance = entry[1]
+          @open_date = entry[2]
+        end
+
+    end
+
+    def self.all
+      require "awesome_print"
+      require "CSV"
+      allaccountscsv = CSV.read("./support/accounts.csv", 'r')
+      allaccounts = []
+          allaccountscsv.each do |entry|
+
+            @id = entry[0]
+            @balance = entry[1]
+            @open_date = entry[2]
+            allaccounts << entry
+          end
+
+          ap allaccounts
+    end
+
 
   end
 
