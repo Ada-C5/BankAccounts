@@ -3,6 +3,7 @@
 # require "money"
 
 require 'csv'
+require 'money'
 module Bank
 
   class Account
@@ -48,6 +49,10 @@ module Bank
 
       # iterate over the Account instances until you find the instance with the matching id
       # all the account instances are listed in account_info_array
+
+      # the problem with this is it generates the accounts from the CSV every time.
+      # what if you've withdrawn or deposited from the account? the original CSV, which
+      # self.all reads from, doesn't reflect that!
       Bank::Account.all.each do |account|
         if account.id == given_id
           return account
@@ -56,6 +61,10 @@ module Bank
         end
       end
     end
+
+    # def convert_cents(money)
+    #   money = Money.new()
+    # end
 
     # If the owner has already been created in the Owner class, the method should be called like so:
     # account_instance.add_owner(owner_instance.name)
@@ -101,7 +110,5 @@ module Bank
     end
   end
 end
-
-new_account = Bank::Account.new(id: "", balance: "", date_created: "")
 
 #@array_of_accounts = CSV.open("accounts.csv", "r")
