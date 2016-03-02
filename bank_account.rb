@@ -19,7 +19,7 @@ module Bank
     end
 
     def self.csv_data(file_path="./support/accounts.csv")
-      csv_data = CSV.read(file_path)
+      CSV.read(file_path)
     end
 
     # make the accounts array a method and reference it that way instead of an instance variable
@@ -76,12 +76,18 @@ module Bank
   end
 
   class Owner
-    attr_reader :name, :address, :phone
+    attr_reader :id
     def initialize(user_hash)
-      @name = "#{user_hash[:first_name].capitalize} #{user_hash[:last_name].capitalize}"
-      @address = user_hash[:address]
-      @phone = user_hash[:phone_number].to_s
+      @id = user_hash[:id]
+      @first_name = user_hash[:first_name]
+      @last_name = user_hash[:last_name]
+      @address = [user_hash[:street], user_hash[:city], user_hash[:state]]
     end
+
+    def self.csv_data(file_path="./support/owners.csv")
+      CSV.read(file_path)
+    end
+
   end
 
 end
