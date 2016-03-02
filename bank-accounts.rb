@@ -16,23 +16,25 @@ module Bank
       if @balance < 0
           raise ArgumentError, "Balance can't be less than $0"
       end
-      puts "An account has been created!"
+      puts "A new account has been created!"
+    end
+
+    def self.import_account
+      accounts = []
+      CSV.foreach("support/accounts.csv") do |row|
+        accounts << Bank::Account.new(row[0], row[1], row[2])
+      end
+      pp accounts
     end
 
     #returns list of all accounts in CSV file and all info assoc w/them
     def self.all
-      CSV.foreach("support/accounts.csv") do |row|
-        pp row
-      end
+
     end
 
     #returns info on account when passed the id number
     def self.find(id)
-      CSV.foreach("support/accounts.csv") do |row|
-        if row[0] == id
-          pp row
-        end
-      end
+
     end
 
     def withdraw(withdraw_amount)
@@ -70,9 +72,6 @@ module Bank
 
 end
 
-CSV.foreach("support/accounts.csv") do |row|
-  account = Bank::Account.new(row[0], row[1], row[2])
-  puts "ID: #{account.id}"
-  puts "Initial Balance: #{account.balance}"
-  puts "Date Acct Opened: #{account.open_date}"
-end
+# CSV.foreach("support/accounts.csv") do |row|
+#   account = Bank::Account.new(row[0], row[1], row[2])
+# end
