@@ -90,23 +90,50 @@ module Bank
 	end 
 
 	class Owner 
-		# do stuff to read in csv file
-		# same pattern as Class Account 
+		def initialize
+			@owners = []
+		end
+
+		def self.read_csv(file)
+			csv = CSV.open(file, 'r')
+			owners = []
+
+			csv.each do |row|
+				owners << row
+			end
+			
+			@owners = owners
+			return @owners	
+		end 
+
+		def self.get_all(file)
+			all_owners = self.read_csv(file)
+		end
+
+		def self.find(id)
+			owners = @owners
+			owners.each_index do |i|
+				if owners[i][0] == id
+					return owners[i]
+				end
+			end
+		end
 	end
 end
 
 #
 # Testing Below
 #
+
 test = Bank::Account.get_all('./support/accounts.csv')
-pp test
 
-test.each_index do |x|
-	if test[x][0] == "1216" # pass in id
-		pp test[x]
-	end
-end
-
-test2 = Bank::Account.find("15151")
+test2 = Bank::Account.find("1215")
 pp test2
+
+# test3 = Bank::Owner.read_csv('./support/owners.csv')
+
+test4 = Bank::Owner.get_all('./support/owners.csv')
+
+test5 = Bank::Owner.find("14")
+pp test5
 
