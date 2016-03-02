@@ -8,7 +8,7 @@ I18n.enforce_available_locales = false # need this not to trip an I18n error!
 
 module Bank
   class Account
-    attr_reader :id, :balance, :owner, :creation_date
+    attr_reader :id, :owner, :creation_date
     
     def initialize(account_info)
       @id = account_info[:id]
@@ -40,8 +40,8 @@ module Bank
     end
 
     # turn balance into a Money object.  Format: $X.XX
-    def to_money
-      Money.new(balance).format
+    def get_balance
+      Money.new(@balance).format
     end
 
     # return a collection of Account instances, representing all of the
@@ -86,30 +86,52 @@ module Bank
 
 
   class Owner
-    attr_reader :first_name, :last_name, :address_one, :address_two, :city, :state, :zip_code
+    attr_reader :owner_id, :first_name, :last_name, :street_address, :city, :state
 
     def initialize(owner_info)
+      @owner_id = owner_info[:owner_id]
       @first_name = owner_info[:first_name]
       @last_name = owner_info[:last_name]
-      @business_name = owner_info[:business_name]
-      @address_one = owner_info[:address_one]
-      @address_two = owner_info[:address_two]
+      @street_address = owner_info[:street_address]
       @city = owner_info[:city]
       @state = owner_info[:state]
-      @zip_code = owner_info[:zip_code]
     end
 
-  end
+
 
 # return a collection of Owner instances, representing all owners described
 # in the CSV.
-  def self.all()
+    def self.all
+      owners = []
+      owners_hash = {}
 
-  end
+      # iterate through the lines of the CSV file owners.csv
+      CSV.open("./support/owners.csv", 'r').each do |line|
+        owners_hash[:owner_id] = line[0]
+        owners_hash[:last_name] = line[1]
+        owners_hash[:first_name] = line[2]
+        owners_hash[:street_address] = line[3]
+        owners_hash[:city] = line[4]
+        owners_hash[:state] = line[5]
+        owners << self.new(owners_hash)
+      end
 
-# return an instance of Owner where the value of the id field in the CSV
-# matches the passed parameter.
-  def self.find(id)
+      #return array full of owner objects
+      owners
+    end
+
+  # return an instance of Owner where the value of the id field in the CSV
+  # matches the passed parameter.
+    def self.find(id)
+      found_owner = nil
+      self.all.each do |line|
+        if id == line.owner_id
+          return line
+        end
+
+      end
+
+    end
 
   end
 
