@@ -14,8 +14,13 @@ module Bank
       @owner_id = owner_id   #need to add an owner to the account during initialize
     end
 
-    def self.all()
-
+    def self.all(file)
+      CSV.open
+      file = CSV.read("accounts.csv")
+      people = []
+      file.length.each do |array|
+        people << self.new(array)
+      end
     end
 
     def self.find()
@@ -44,12 +49,6 @@ module Bank
       @account_balance = @account_balance + money
       return @account_balance
     end
-
-    def get_files
-      file = CSV.read(accounts.csv)
-
-    end
-
   end
 
   class Owner
@@ -67,6 +66,10 @@ module Bank
   end
 
 end
+
+peoples = Bank::Account.all("accounts.csv")
+puts peoples
+peoples.length
 
 #adriana_account = Bank::Account.new(500, "checking")
 #adriana_owner = Bank::Owner.new("adriana", "cannon", "el paso", "texas")
