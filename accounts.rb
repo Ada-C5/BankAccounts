@@ -42,6 +42,14 @@ module Bank
      @balance = @balance + amount
    end
 
+   def self.find(id)
+     self.all.each do |account|
+       if account[0] = id
+         return account
+       end
+     end
+   end
+
    def self.find_owner_number(id) #search accounts by id number
      owner_list = CSV.read('./support/account_owners.csv')
      owner_list.each do |account|
@@ -61,34 +69,44 @@ module Bank
       if owner[1] == owner_number
         return owner_number
       end
-  end
-
-
-
-
-   def self.find(id)
-    self.all.each do |account|
-      if account[0] = id
-        return account
-      end
     end
-   end
   end
+ end
 
 
  class Owner
-   attr_reader :id
+   attr_reader :id, :name, :address, :city, :state
 
    def initialize(owner_hash)
-     @name = owner_hash[:name]
+     @name = owner_hash[:first_name] + owner_hash[:last_name]
      @id = owner_hash[:id]
      @address = owner_hash[:address]
+     @city = city
+     @state = state
    end
 
+   def self.pull_from_csv
+     CSV.read('./support/owners.csv')
+   end
 
+   def self.all
+     owners_hash = {}
+     self.pull_from_csv.each do |account|
+       new_owner = {
+         id: account[0],
+         first_name: account[2],
+         last_name: account[1],
+         address: account[3],
+         city: account[4],
+         state: account[5]
+       }
+       new_account = Bank::Owner.new(new_owner)
+       owners_hash[id] = new_account
+     end
+       owners_hash
+   end
+   
  end
 
 
-
- end
 end
