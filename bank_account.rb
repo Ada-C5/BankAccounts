@@ -1,5 +1,6 @@
 
 require 'CSV'
+# input for withdraw and deposit must include cents without decimal ($1.50 - input at 150)
 
 module Bank
   class Account
@@ -7,7 +8,6 @@ module Bank
       @id = id
       @balance = balance
       @date = date
-      #@owner = account_owner
       # raise error if trying to start new account with negative balance
       if balance < 0
         raise ArgumentError.new("New accounts must have a positive starting balance.")
@@ -26,6 +26,7 @@ module Bank
       Bank::Owner.find(owner_id)
     end
 
+    # convert balance output to have a decimal
     def money_convert(balance)
       print_bal = balance.to_s
       print_bal = print_bal.insert -3, "."
@@ -54,7 +55,7 @@ module Bank
       return money_convert(@balance)
     end
 
-    # shot id
+    # show id
     def get_id
       return @id
     end
@@ -68,11 +69,11 @@ module Bank
     def self.create_accounts(file)
       accounts = []
       CSV.foreach(file) do |line|
-        #save info to vars
+        # save info to vars
         id = line[0].to_i
         balance = line[1].to_i
         date = line[2].to_i
-        #initialize new instances of accounts with vars
+        # initialize new instances of accounts with vars
         accounts << self.new(id, balance, date)
       end
       # return array with each account instance created from file
@@ -100,9 +101,6 @@ module Bank
   end
   
   class Owner
-    #attr_accessor :id :lname :fname :street_address :city :state
-
-    # take in name and id from user_input
     def initialize(id, lname, fname, street_address, city, state)
       @id = id
       @fname = fname
@@ -112,6 +110,7 @@ module Bank
       @state = state
     end
 
+    # create many owner instances from csv file
     def self.create_owners(file)
       owners = []
       CSV.foreach(file) do |line|
@@ -129,6 +128,7 @@ module Bank
       return owners
     end
 
+    # return all instances from csv
     def self.all(file)
       instances = self.create_owners(file)
       return instances
@@ -138,7 +138,7 @@ module Bank
       return @id
     end
 
-
+    # find an owner with their id
     def self.find(id)
       sought_owner = nil
       owners = self.create_owners("./support/owners.csv")
@@ -150,15 +150,7 @@ module Bank
       return sought_owner
     end
 
-    def get_id
-      return @id
-    end
-
-    # print owner info
-    def get_info
-      puts "#{@fname} #{@lname} lives at #{@street_address} in #{@city}, #{@state} and their bank ID is #{@id}"
-    end
-
+    # get corresponding account instance for an owner
     def get_account
       account_id = nil
       accounts = Bank::Account.create_accounts("./support/accounts.csv")
@@ -170,6 +162,10 @@ module Bank
       Bank::Account.find(account_id)
     end
   
+    # print owner info
+    def get_info
+      puts "#{@fname} #{@lname} lives at #{@street_address} in #{@city}, #{@state} and their bank ID is #{@id}"
+    end
   end
 end
 
@@ -207,9 +203,11 @@ end
 # puts Bank::Account.find(1212).balance
 # puts Bank::Account.find(1212).deposit(10)
 
+# # # # TESTS FOR OWNER CLASS # # # # #
+###   TEST FOR GET_ACCOUNT METHOD   ###
 my_owner = Bank::Owner.find(14)
 account = my_owner.get_account
-puts "THIS IS THE FINAL ACCOUNT THAT SHOULD BE AN INSTANCE!!! #{account}"
+puts account
 
 
 
