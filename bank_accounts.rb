@@ -6,13 +6,16 @@ module Bank
     
     # this class creates accounts, we can store account related things in it.
     class Account
+        #can I set constants here?
+        CENTS_IN_A_DOLLAR = 100.0
+
         attr_reader :id_number, :owner
 
         # resetting initializer to use a hash, because I am indecisive about the best
         # method to do the thing I want to do. I will hate this again in an hour. 
         def initialize(account_info)
             @id_number = account_info[:id_num]
-            @balance = account_info[:balance]
+            @balance = account_info[:balance]/CENTS_IN_A_DOLLAR
             @start_date = account_info[:open_date]
             @owner = nil
 
@@ -53,7 +56,7 @@ module Bank
 
 
         # make a Class method that will instantiate accounts from a csv
-        def self.make_accounts(path_to_csv)
+        def self.all(path_to_csv)
             id_num = nil
             balance = nil
             open_date = nil
@@ -68,11 +71,6 @@ module Bank
                 account_list << self.new(account_starter)
             end
             account_list
-        end
-
-        #this will list all account instances that exist
-        def self.all
-
         end
 
 
@@ -93,7 +91,7 @@ module Bank
 
     # this will create owner objects. We can store info about account owners in it.
     class Owner
-        attr_reader :id
+        attr_reader :id, :accounts
         
         # this method sets the parameters for instantiating a new owner.
         def initialize(owner_info)
@@ -113,7 +111,7 @@ module Bank
         end
 
         # make a Class method that will instantiate accounts from a csv
-        def self.make_owners(path_to_csv)
+        def self.all(path_to_csv)
             id_num = nil
             last_name = nil
             first_name = nil
@@ -137,12 +135,6 @@ module Bank
             owner_list
         end
 
-        #this will list all account instances that exist
-        def self.all
-
-        end
-
-
         # this will find an account instance with a specified id
         # ids are kept as strings and so must be passed as strings
         # because of that, I'll convert ids (using to_s).
@@ -153,6 +145,20 @@ module Bank
             collection_to_search.each do |account|
                 if account.id_number == id.to_s
                     return account
+                end
+            end
+        end
+    end
+
+    # write a linker that can tie an account to an owner
+    class AccountLinker
+
+        def link_accounts(collection_of_accounts, collection_of_owners)
+            collection_of_accounts.each do |id|
+                collection_of_owners.each do |owner_id|
+                    if id.id_number == owner_id.id_number
+                        id.owner = owner_id
+                    end
                 end
             end
         end
