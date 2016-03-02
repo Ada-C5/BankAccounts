@@ -21,11 +21,9 @@ module Bank
       # unless balance.is_a?(Integer) && balance >= 0
       #   raise ArgumentError.new("New accounts must begin with a balance of 0 or more.")
       # end
-      @balance = balance
       @id = id
+      @balance = balance
       @opendate = opendate
-      # @owner = ""
-      # @name = ""
     end
 
     def self.all
@@ -55,37 +53,19 @@ module Bank
     def check_balance
       puts "Your current balance is $#{@balance}."
     end
-
-    # def define_user(name)
-    #   @name = name #this works now
-    #   @owner = Bank::Owner.new(name: @name) #still doens't work.
-    #   puts @owner
-    # end
-
   end
-
-  # class Owner
-  #   attr_accessor :name #add address, phone
-  #   def initialize(owner_hash)
-  #     @name = owner_hash[:name]
-  #     #add address, phone after this can get connected with Account class
-  #   end
-  # end
-
 end
 
+#require csv
 require 'csv'
 
+# turn csv into array using CSV.read
 all_accts = CSV.read("./support/accounts.csv")
-id = all_accts[0][0]
-bal = all_accts[0][1]
-date = all_accts[0][2]
-puts id
-puts bal
-puts date
-
-new_test = Bank::Account.new(100, 200, 300)
-puts new_test
-# all_accts.each do (0..12)
-# puts all_accts[note][0]
-# end
+all_accts.each do |n|
+  n=0
+# loop times: do this loop for as many accounts as there ArgumentError
+Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
+# each iteraction creates a new Bank::Account each account
+    # Bank::Accounts must initialize with (id, balance, open date)
+    # initialize with data from all_accts[n][0], all_accts[n][1], all_accts[n][2]
+end
