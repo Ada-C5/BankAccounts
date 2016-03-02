@@ -93,7 +93,7 @@ module Bank
     # this will create owner objects. We can store info about account owners in it.
     class Owner
         attr_reader :id_number
-        attr_accessor: :accounts
+        # attr_accessor :accounts
         
         # this method sets the parameters for instantiating a new owner.
         def initialize(owner_info)
@@ -143,13 +143,29 @@ module Bank
         # this allows more extensible code because it enables
         # ids to use alphabet characters too (and it's got the same
         # cost as converting IDs to Fixnums.
-        def self.find(collection_to_search, id)
-            collection_to_search.each do |account|
+        
+        def self.find(id)
+            accounts_to_search = []
+            accounts_to_search = Bank::Account.all("./support/accounts.csv")
+
+            accounts_to_seach.each do |account|
                 if account.id_number == id.to_s
                     return account
                 end
             end
+
         end
+
+
+
+        # commented out because it works, but it's using the wrong method signature 
+        # def self.find(collection_to_search, id)
+        #     collection_to_search.each do |account|
+        #         if account.id_number == id.to_s
+        #             return account
+        #         end
+        #     end
+        # end
     end
 
     # write a linker that can tie an account to an owner
@@ -174,9 +190,9 @@ module Bank
             owner_to_link.accounts << account_to_link
         end
 
-        def link_accounts(#maybe a csv path?)
+        def link_accounts(argument) # maybe a csv path?
              # stuff happens here
-         end
+        end
     end
 
 end
