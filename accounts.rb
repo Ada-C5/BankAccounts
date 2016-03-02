@@ -1,16 +1,3 @@
-#create instances from csv
-#class method to crete all accts
-# newproducts << Product.new(data[0], data[1], data[2], data[3])
-
-  # all_accts.length.times do |n|
-  # all_accts[n][0]
-
-# all_accts = CSV.read("./support/accounts.csv")
-# all_accts.length.times do |n|
-#  Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
-# end
-
-###
 require 'csv'
 
 module Bank
@@ -33,16 +20,26 @@ module Bank
 
     def self.all
       all_accts = CSV.read("./support/accounts.csv")
-
       all_accts.each do |n|
       n=0
       new_acct = Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
       end
-
     end
 
-    def self.find(id)
-# returns an instance of Account where the value of the id field in the CSV matches the passed parameter
+    def self.find(id_num)
+    id_num=id_num.to_s
+
+    all_accts = CSV.read("./support/accounts.csv")
+
+    all_accts.each do |n|
+    n=0
+      if id_num == all_accts[n][0]
+        Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
+        puts "YAY"
+      else
+        puts "NOPE"
+      end
+    end
     end
 
     def withdraw(amount)
@@ -66,24 +63,3 @@ module Bank
     end
   end
 end
-#
-# def self.all
-#   all_accts = CSV.read("./support/accounts.csv")
-#   accts_array = []
-#
-#   all_accts.each do |n|
-#   n=0
-#   new_acct = Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
-#   accts_array << new_acct
-#   end
-#
-# end
-#
-# self.find(id)
-# returns an instance of Account where the value of the id field
-# in the CSV matches the passed parameter
-
-#input "id" Argument
-
-#loop begins
-#search each account for if "id" == its [0]
