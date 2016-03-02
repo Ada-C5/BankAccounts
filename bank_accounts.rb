@@ -6,7 +6,7 @@ module Bank
     
     # this class creates accounts, we can store account related things in it.
     class Account
-        attr_reader :id_number
+        attr_reader :id_number, :owner
 
         # resetting initializer to use a hash, because I am indecisive about the best
         # method to do the thing I want to do. I will hate this again in an hour. 
@@ -75,9 +75,18 @@ module Bank
             ObjectSpace.each_object(Bank::Account) {|account| p account }
         end
 
-        # this will find an account with a specified it
-        def self.find(id)
-
+        # this will find an account instance with a specified id
+        # ids are kept as strings and so must be passed as strings
+        # because of that, I'll convert ids (using to_s).
+        # this allows more extensible code because it enables
+        # ids to use alphabet characters too (and it's got the same
+        # cost as converting IDs to Fixnums.
+        def self.find(collection_to_search, id)
+            collection_to_search.each do |account|
+                if account.id_number == id.to_s
+                    return account
+                end
+            end
         end
     end
 
