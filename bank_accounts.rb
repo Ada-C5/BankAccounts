@@ -57,16 +57,17 @@ module Bank
             id_num = nil
             balance = nil
             open_date = nil
-            account_list = []
             
+            account_list = []
             # this needs to iterate through the CSV
             CSV.foreach(path_to_csv) do |row|
                 id_num = row[0]
                 balance = row[1].to_i
                 open_date = row[2]
                 account_starter = {id_num: id_num, balance: balance, open_date: open_date}
-                self.new(account_starter)
+                account_list << self.new(account_starter)
             end
+            account_list
         end
 
         #this will list all account instances that exist
