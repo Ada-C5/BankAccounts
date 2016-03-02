@@ -2,7 +2,9 @@
 # Risha Allen
 # February 29th, 2016
 require 'csv'
+require 'awesome_print'
 module Bank
+
 # if I want an Account in the Bank module, Ruby will look for def initialize.
 # initialize is a framework for what I want. This copy is a kind of the basics in the account.
 # my basics are: id, balance
@@ -13,17 +15,19 @@ module Bank
 #----------------------------------------------------------------------------------
 #
   class Account
-    attr_accessor :owner, :id, :balance, :accounts
+    FILENAME = "./support/accounts.csv"
+    attr_accessor :owner, :id, :balance
     def initialize(account)
       if account != nil # this allows me to access a class without any specific values
-      @id = account[:id] #integer
-      @balance = account[:balance] #integer
-      @opendate = account[:opendate]
-      # inside the :owner is all the info
-      @owner = account[:owner] # this will be an instance of owner class
+        @id = account[:id] #integer
+        @balance = account[:balance] #integer
+        @opendate = account[:opendate]
+        # inside the :owner is all the info
+        # @accounts = []
+        @owner = account[:owner] # this will be an instance of owner class
+      end
       unless @balance >= 0
         raise ArgumentError.new("WARNING!")
-      end
       end
     end
 
@@ -37,7 +41,7 @@ module Bank
     end
 
     def withdraw(money_taken)
-      if @balance < money_taken
+      if @balance < money_taken.to_f
         puts "WARNING!"
         return @balance
       else
@@ -47,43 +51,56 @@ module Bank
     end
 
     def deposit(money_added)
-      @balance =  money_added + @balance
+      @balance =  money_added.to_f + @balance
       return @balance
     end
 
     def balance
       @balance
     end
-
-    def self.load(filename)
+                # this does work, but not for this assingment
+                # this method is opening a csv and instantiating a new account for each row.
+                # def self.all(filename)
+                #   @accounts = []
+                #   CSV.open(filename, "r") do |csv|
+                #   csv.read.each do |row|
+                #     # [1234, 100, 09-09283]
+                #     # @accounts << row
+                #     # account.first[0]
+                #     @accounts << Account.new(id: row[0], balance: row[1].to_i, opendate: row[2])
+                #     end
+                #   end
+                #     return @accounts
+                # end
+    def self.all
       accounts = []
-      CSV.open(filename, "r") do |csv|
+      CSV.open(FILENAME, "r") do |csv|
       csv.read.each do |row|
         # [1234, 100, 09-09283]
+        # @accounts << row
+        # account.first[0]
         accounts << Account.new(id: row[0], balance: row[1].to_i, opendate: row[2])
         end
       end
-      accounts
+      ap accounts
+        return accounts
     end
-      # or accounts << row
 
-    def self.all
-      bank_accounts = CSV.read("./support/accounts.csv")
-      bank_accounts.map do |acct_info|
-        Account.new(acct_info[0], acct_info[1].to_i, acct_info[2])
+    #   # or @@accounts << row
+
+    # this is a way to find data using one of the attributes
+    def self.find(id)
+      # acct_to_find = nil
+    account_item = self.all
+
+        account_item.each do |acct| # acct is a temp name for reference as the loop iterates though the array
+        if acct.id == id # calling the method that saying whats the id
+          ap acct
+          return acct
+        end
       end
     end
 
-
-    def find.all(id)
-    single_acct = self.all
-    single_acct.each do |acct|
-      if acct.id == id
-        return acct
-      end
-    end
-
-    end
   end
 
   class Owner
@@ -105,7 +122,10 @@ module Bank
 end
 # account1 = Bank::Account.new(id: 1, balance: 100)
 # risha = Bank::Owner.new(name: "risha", street_one: "15400 SE 155", city: "Seattle", state: "WA", zip_code: 11111, phone_number: "4256523702")
-account1 = Bank::Account.load("./support/accounts.csv")
-puts account1
-account2 = Bank::Account.all()
-puts account2
+# all_my_accounts = Bank::Account.all("./support/accounts.csv")
+# #puts all_my_accounts
+# #puts all_my_accounts.first[0]
+# single_item = Bank::Account.find('1212')
+# puts single_item
+
+# puts single_item.find(1212, "./support/accounts.csv")
