@@ -1,24 +1,41 @@
 require 'CSV'
+require 'awesome_print'
 
 module Bank
 
+
   class Account
-    attr_reader :id, :owner
+    attr_reader :id, :owner, :account_info, :account_array
     # Can set owner after account has been created.
     attr_writer :owner
 
-    def initialize(owner=nil)
+    def initialize(id, initial_balance, opendate, owner=nil)
       # raise ArgumentError, "Starting balance must be a number." unless initial_balance.is_a? Numeric
       # raise ArgumentError, "You must not have a negative starting balance." unless initial_balance > 0
-      @csv_info = CSV.read("./support/accounts.csv")
-      @account_info = {}
-      @csv_info.each_index do |i|
-        @id = @csv_info[i][0]
-        @balance = @csv_info[i][1]
-        @opendate = @csv_info[i][2]
-        @account_info[@id] = [@balance, @opendate]
-      end
+      @id = id
+      @balance = initial_balance
+      @opendate = opendate
       @owner = owner
+    end
+
+    def self.all
+      csv_info = CSV.read("./support/accounts.csv")
+      @account_info = []
+      csv_info.each_index do |i|
+        id = csv_info[i][0]
+        initial_balance = csv_info[i][1]
+        opendate = csv_info[i][2]
+        @account_info << self.new(id, initial_balance, opendate)
+      end
+      return @account_info
+    end
+
+    def self.find(find_id)
+      @account_info.each do |i|
+        if i.id == find_id
+          return i
+        end
+      end
     end
 
     # Accepts a single parameter for the amount of money to be withdrawn.
@@ -58,3 +75,12 @@ module Bank
   end
 
 end
+
+# csv_info = CSV.read("./support/accounts.csv")
+# #account_info = {}
+# csv_info.each_index do |i|
+#   id = csv_info[i][0]
+#   initial_balance = csv_info[i][1]
+#   opendate = csv_info[i][2]
+#   Bank::Account.new(id, initial_balance, opendate)
+# end
