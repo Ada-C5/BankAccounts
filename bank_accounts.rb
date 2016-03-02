@@ -190,7 +190,7 @@ module Bank
             owner_to_link.accounts << account_to_link
         end
 
-        def link_accounts(argument) # maybe a csv path?
+        def link_accounts(path_to_csv)
              # stuff happens here
         end
     end
