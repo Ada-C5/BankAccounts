@@ -4,32 +4,44 @@
   module Bank
   class Account
 
-    attr_reader :current_balance
-    attr_accessor :id, :initial_balance, :owner, :accounts
+    attr_reader :current_balance, :all_accounts
+    attr_accessor :id, :initial_balance, :owner
 
 
     def initialize(account)
-      ##unless account = nil, populate hash info
-      @id = account[:id] #|| @id = nil
-      @initial_balance = account[:initial_balance] #|| @id = nil
-      @current_balance = account[:current_balance]  #|| @current_balance = nil
-      @owner = account[:owner] #|| @owner = nil
-      @start_date = account[:start_date] #|| @start_date = nil
-      raise ArgumentError, "We cannot deposit negative amounts. Please enter your deposit amount." unless @current_balance >= 0
+      if account != nil
+        @id = account[:id]
+        @initial_balance = account[:initial_balance]
+        @current_balance = account[:current_balance]
+        @owner = account[:owner]
+        @start_date = account[:start_date]
+        @all_accounts = account[:all_accounts]
+        raise ArgumentError, "We cannot deposit negative amounts. Please enter your deposit amount." unless @current_balance.to_i >= 0
+      end
     end
 
-    def self.load_file(filename)
-      accounts =[]
+    def self.all(filename)
+      all_accounts = []
       CSV.open(filename, 'r') do |csv|
         csv.read.each do |line|
-        accounts << self.new(id: line[0], initial_balance: line[1].to_f, start_date: line[2])
+        all_accounts << self.new(id: line[0], initial_balance: line[1].to_f, start_date: line[2])
         end
       end
-      ap accounts
+      return all_accounts
     end
 
-    def self.all
+    def self.find(id_num, filename = "./support/accounts.csv")
+      CSV.foreach(filename, 'r') do |line|
+        #csv.read.each do |line|
+            if line[0].to_s == id_num.to_s
+              selected_account = self.new(id: line[0], initial_balance: line[1].to_f, start_date: line[2])
+              return selected_account
+            end
+            #self.new(id: line[0], initial_balance: line[1].to_f, start_date: line[2])
+      end
     end
+
+
     def withdraw(money)
       if @current_balance < money
         puts "We cannot deposit negative amounts. Please enter your deposit amount."
@@ -52,7 +64,7 @@
       return @current_balance
     end
 
-    def pass_owner_info(owner)
+    def add_owner(owner)
       @owner = owner
     end
   end
@@ -61,12 +73,11 @@
     attr_accessor :id, :name, :street_address, :street_address_2, :city, :zip_code, :phone
 
     def initialize(owner)
-      @name = owner[:name]
+      @first_name = owner[:first_name]
+      @slast_name = owner[:last_name]
       @street_address = owner[:street_address]
-      @street_address_2 = owner[:street_address_2]
       @city = owner[:city]
-      @zip_code = owner[:zip_code]
-      @phone = owner[:phone]
+      @state = owner[:state]
     end
   end
 end
@@ -76,5 +87,8 @@ end
 #my_account.pass_owner_info(owner) #to pass owner info into Account
 
 #to test the self and csv method
-#my_accounts = Bank::Account.load("./support/accounts.csv")
+test = Bank::Account.all("./support/accounts.csv")
+ap test
+
+#Bank::Account.find(1212, "./support/accounts.csv")
 #puts accounts[0]
