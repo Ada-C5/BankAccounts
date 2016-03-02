@@ -11,6 +11,7 @@
 # end
 
 ###
+require 'csv'
 
 module Bank
 
@@ -18,16 +19,26 @@ module Bank
     attr_accessor :balance, :id, :amount, :owner, :name
 
     def initialize(id, balance, opendate)
+
+      #Right now this error breaks the loop Bank::Account.all
       # unless balance.is_a?(Integer) && balance >= 0
       #   raise ArgumentError.new("New accounts must begin with a balance of 0 or more.")
       # end
+
       @id = id
       @balance = balance
       @opendate = opendate
+
     end
 
     def self.all
-#returns a collection of Account instances, representing all of the Accounts described in the CSV.
+      all_accts = CSV.read("./support/accounts.csv")
+
+      all_accts.each do |n|
+      n=0
+      new_acct = Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
+      end
+
     end
 
     def self.find(id)
@@ -55,17 +66,24 @@ module Bank
     end
   end
 end
+#
+# def self.all
+#   all_accts = CSV.read("./support/accounts.csv")
+#   accts_array = []
+#
+#   all_accts.each do |n|
+#   n=0
+#   new_acct = Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
+#   accts_array << new_acct
+#   end
+#
+# end
+#
+# self.find(id)
+# returns an instance of Account where the value of the id field
+# in the CSV matches the passed parameter
 
-#require csv
-require 'csv'
+#input "id" Argument
 
-# turn csv into array using CSV.read
-all_accts = CSV.read("./support/accounts.csv")
-all_accts.each do |n|
-  n=0
-# loop times: do this loop for as many accounts as there ArgumentError
-Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
-# each iteraction creates a new Bank::Account each account
-    # Bank::Accounts must initialize with (id, balance, open date)
-    # initialize with data from all_accts[n][0], all_accts[n][1], all_accts[n][2]
-end
+#loop begins
+#search each account for if "id" == its [0]
