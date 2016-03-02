@@ -115,7 +115,6 @@ module Bank
           @balance = entry[1]
           @open_date = entry[2]
         end
-
     end
 
     def self.all
@@ -133,6 +132,22 @@ module Bank
 
           ap allaccounts
     end
+
+    def self.find(id)
+      looking_for = []
+      require "CSV"
+
+      allaccountscsv = CSV.read("./support/accounts.csv", 'r')
+      allaccounts = []
+      # find the entry in the csv where id matches the user-requested id
+          allaccountscsv.each do |entry|
+            if entry[0] == id
+            looking_for << entry
+            end
+          end
+          return looking_for
+    end
+
 
 
   end
