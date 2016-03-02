@@ -14,7 +14,7 @@ module Bank
             @id_number = account_info[:id_num]
             @balance = account_info[:balance]
             @start_date = account_info[:open_date]
-            @owner = owner_id
+            @owner = nil
 
             if @balance < 0
                 raise ArgumentError.new("You think we give credit here? HAH!")
@@ -23,16 +23,19 @@ module Bank
 
         # make a Class method that will instantiate accounts from a csv
         def self.make_accounts(path_to_csv)
-
+            id_num = nil
+            balance = nil
+            open_date = nil
             # this needs to iterate through the CSV
             CSV.foreach(path_to_csv) do |row|
                 id_num = row[0]
                 balance = row[1]
                 open_date = row[2]
             end
+            puts id_num #debugging statement
 
             # then it needs to pass the data from the line to the account
-            Bank::Account.new(id_num: id_num, balance: balance, open_date: open_date)
+            # Bank::Account.new(id_num: id_num, balance: balance, open_date: open_date)
         end
 
 
