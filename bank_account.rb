@@ -25,14 +25,24 @@ module Bank
 
     # make the accounts array a method and reference it that way instead of an instance variable
     def self.accounts
-      accounts = []
+
+      accounts = {}
       csv_data.each_index do |i|
         id = csv_data[i][0]
         initial_balance = csv_data[i][1]
         opendate = csv_data[i][2]
-        accounts << self.new(id, initial_balance, opendate)
+        accounts[id] = self.new(id, initial_balance, opendate)
       end
       return accounts
+
+      # accounts = []
+      # csv_data.each_index do |i|
+      #   id = csv_data[i][0]
+      #   initial_balance = csv_data[i][1]
+      #   opendate = csv_data[i][2]
+      #   accounts << self.new(id, initial_balance, opendate)
+      # end
+      # return accounts
     end
 
     def self.all
