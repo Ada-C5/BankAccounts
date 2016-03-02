@@ -3,7 +3,6 @@ require 'CSV'
 module Bank
   class Account
     attr_accessor :accounts
-    # new account with id and init_bal
     def initialize(id, balance, date)
       @id = id
       @balance = balance
@@ -55,9 +54,8 @@ module Bank
       return @date
     end
 
-    # method to create new accounts from csv information
+    # create new accounts from csv information
     def self.create_accounts(file)
-      #open and read file
       accounts = []
       CSV.foreach(file) do |line|
         #save info to vars
@@ -73,17 +71,14 @@ module Bank
     
     # return all instances in array
     def self.all(file)
-      all = []
       instances = self.create_accounts(file)
-      instances.each do |account|
-        all << account
-      end
-      puts all
+      return instances
     end
 
     # return info about account with passed id
     def self.find(id)
       sought_account = nil
+      accounts = self.create_accounts("./support/accounts.csv")
       # look through accounts for desired id number
       accounts.each do |account|
         if account.get_id == id
@@ -115,11 +110,17 @@ module Bank
   end
 end
 
-accounts = Bank::Account.create_accounts("./support/accounts.csv")
+
+# TEST CALLS
+# accountz = Bank::Account.create_accounts("./support/accounts.csv")
+# puts accountz
 #puts "bottom account #{accounts.find(1212)}"
 #puts accounts[0].balance
-#Bank::Account.find(15154)
-Bank::Account.all("./support/accounts.csv")
+# my_account = Bank::Account.find(15154)
+# puts Bank::Account.find(15154).balance
+# puts my_account.balance
+# kwel_accounts = Bank::Account.all("./support/accounts.csv")
+# puts kwel_accounts
 
 
 
