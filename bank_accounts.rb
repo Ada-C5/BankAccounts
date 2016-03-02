@@ -146,7 +146,7 @@ module Bank
         
         def self.find(id)
             accounts_to_search = []
-            accounts_to_search = Bank::Account.all("./support/accounts.csv")
+            accounts_to_search = Bank::Owner.all("./support/owners.csv")
 
             accounts_to_seach.each do |account|
                 if account.id_number == id.to_s
@@ -191,7 +191,22 @@ module Bank
         end
 
         def link_accounts(path_to_csv)
-             # stuff happens here
+             account_to_link = ""
+             owner_to_link = ""
+
+             owner_collection = Bank::Owner.all("./support/owners.csv")
+             account_collection = Bank::Account.all("./support/accounts.csv")
+
+             CSV.foreach(path_to_csv) do |row|
+                account_to_link = row[0]
+                owner_to_link = row[1]
+                link_single_account(account_collection, account_to_link, owner_collection, owner_to_link)
+                link_single_owner(owner_collection, owner_to_link, account_collection, account_to_link)
+            end
+
+            owner_collection
+            account_collection
+
         end
     end
 
