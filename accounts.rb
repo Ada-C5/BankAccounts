@@ -6,7 +6,7 @@ module Bank
   #A new account should be created with an ID and an initial balance
   class Account
     #Should be able to access the current balance of an account at any time.
-    attr_reader :balance, :all_accounts
+    attr_reader :balance, :id
 
     def initialize(id, balance, open_date) #intialize owner to nil
       #A new account cannot be created with initial negative balance - this will raise an ArgumentError
@@ -17,29 +17,25 @@ module Bank
       #@account_owner = owner
     end
 
-    def self.all(file_path)
+    def self.all(file_path = "./support/accounts.csv")
       require 'CSV'
-      @all_accounts = []
-      file_path = "./support/accounts.csv"
+      all_accounts = []
       CSV.foreach(file_path, "r") do |line|
-        @all_accounts << self.new(line[0].to_i, line[1].to_f, line[2])
+        all_accounts << self.new(line[0].to_i, line[1].to_f, line[2])
       end
-      return @all_accounts
+      return all_accounts
     end
 
     def self.find(id)
-      require 'CSV'
-      selected_account = nil
-      file_path = "./support/accounts.csv"
-      CSV.foreach(file_path, "r") do |line|
-        if line[0] == id.to_s
-          selected_account = self.new(line[0].to_i, line[1].to_f, line[2])
+      all_accounts = self.all
+      all_accounts.each do |account_inst|
+        if account_inst.id == id
+          return account_inst
+        else
+          return false
         end
       end
-      return selected_account
     end
-
-
 
     # withdraw method that accepts a single parameter which represents the amount of money
     # that will be withdrawn. This method should return the updated account balance.
