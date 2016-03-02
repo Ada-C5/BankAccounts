@@ -4,8 +4,13 @@ require 'CSV'
 module Bank
 	
 	class Account
-		def initialize
-			@accounts = []
+		attr_reader :accounts, :balance
+
+		def initialize(accounts)
+			@accounts = accounts
+			@initial_balance = @accounts[:initial_balance]
+			@balance = @accounts[:initial_balance] # should this be current_balance in the future?
+			check_new_account(@accounts[:initial_balance])
 		end
 
 		# check to see if initial balance is less than 0
@@ -59,31 +64,30 @@ module Bank
 		end
 
 		def show_balance
-			puts format("Currently you have an account balance of $%.2f", @balance)
+			puts format("Currently you have an account balance of $%.2f", @accounts[:initial_balance])
 			puts "Have a nice day 🤑"
 		end
 
-		def self.read_csv(file)
-			csv = CSV.open(file, 'r')
+		def self.get_all(file)
 			accounts = []
 
-			csv.each do |row|
-				accounts << row
+			CSV.open(file, 'r') do |csv|
+			  csv.read.each do |line|
+			   accounts << self.new(
+			   	account_id: 				line[0], 
+			   	initial_balance: 		line[1].to_f,
+			   	account_open_date:  line[2]
+			   	)
+			 end
 			end
-			
-			@accounts = accounts
-			return @accounts	
+			 return accounts
 		end 
-
-		def self.get_all(file)
-			all_accounts = self.read_csv(file)
-		end
 		
-		def self.find(id)
-			accounts = @accounts
-			accounts.each_index do |i|
-				if accounts[i][0] == id
-					return accounts[i]
+		def self.find(id, file)
+			accounts = self.get_all(file)
+			accounts.each do |index|
+				if index.accounts[:account_id] == id 
+					return index
 				end
 			end
 		end
@@ -125,15 +129,10 @@ end
 # Testing Below
 #
 
-test = Bank::Account.get_all('./support/accounts.csv')
+# test = Bank::Account.get_all('./support/accounts.csv')
+# pp test
 
-test2 = Bank::Account.find("1215")
+
+test2 = Bank::Account.find("1212",'./support/accounts.csv')
 pp test2
-
-# test3 = Bank::Owner.read_csv('./support/owners.csv')
-
-test4 = Bank::Owner.get_all('./support/owners.csv')
-
-test5 = Bank::Owner.find("14")
-pp test5
 
