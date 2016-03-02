@@ -14,10 +14,17 @@ module Bank
       end
     end
 
-    # return information about owner
-    # def get_owner
-    #   @owner.get_info
-    # end
+    #????return owner instance
+    def get_owner
+      owner_id = nil
+      owners = Bank::Owner.create_owners("./support/owners.csv")
+      CSV.foreach("./support/account_owners.csv") do |line|
+        if line[0].to_i == @id
+          owner_id = line[1].to_i
+        end
+      end
+      Bank::Owner.find(owner_id)
+    end
 
     def money_convert(balance)
       print_bal = balance.to_s
@@ -157,10 +164,10 @@ end
 
 
 # # TEST CALLS
-kwel = Bank::Owner.find(14).get_info
-puts kwel
+# kwel = Bank::Owner.find(14).get_info
+# puts kwel
 # puts kwel.get_id
-#ownerz = Bank::Owner.create_owners("./support/owners.csv")
+#Bank::Owner.create_owners("./support/owners.csv")
 # kwel_ownerz = Bank::Account.all("./support/owners.csv")
 # puts kwel_ownerz[0].get_id
 #a = ownerz.find(14)
@@ -171,10 +178,16 @@ puts kwel
 # puts ownerz
 
 # accountz = Bank::Account.create_accounts("./support/accounts.csv")
+
 # puts accountz
 #puts "bottom account #{accounts.find(1212)}"
 #puts accounts[0].balance
-####my_account = Bank::Account.find(15154)
+my_account = Bank::Account.find(15154)
+#puts my_account.class
+owner = my_account.get_owner
+puts owner.get_info
+#puts owner.class
+puts "THIS IS THE FINAL OWNER THAT SHOULD BE AN INSTANCE!!! #{owner}"
 #puts Bank::Account.find(15154).balance
 ####puts my_account.balance
 # kwel_accounts = Bank::Account.all("./support/accounts.csv")
