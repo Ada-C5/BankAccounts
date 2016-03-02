@@ -64,7 +64,7 @@ module Bank
     def initialize(account_information)
       @id = account_information[:id]
       @initial_balance = account_information[:initial_balance]
-      @balance = initial_balance(100) #will start out at initial balance and then be updated as we add/withdraw money.  1 dollar = 100 cents for this particular CSV file.
+      @balance = initial_balance(100) #will start out at initial balance and then be updated as we add/withdraw money.  1 dollar = 100 cents for this particular CSV file. Consider keeping this "constant" somewhere else so other files/banks can changes this?
       @open_date = account_information[:open_date]
       @owner = account_information[:owner]
       raise ArgumentError.new("An account cannot be created with an initial negative balance.") if @initial_balance < 0
