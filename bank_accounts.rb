@@ -155,27 +155,28 @@ module Bank
     # write a linker that can tie an account to an owner
     class AccountLinker
 
+        # this will call the Account and Owner class find methods to find the two objects
+        # it then uses the accessor in the account to add an owner
+        # I don't like leaving owner exposed like that (since it can currently be overwritten)
         def link_single_owner(owner_collection, owner_id, account_collection, account_id)
             owner_to_link = Bank::Owner.find(owner_collection, owner_id)
             account_to_link = Bank::Account.find(account_collection, account_id)
             account_to_link.owner = owner_to_link
         end
 
+        # this uses the class find methods, but pushes account to link into an array of accounts
+        # eventually I would like to refactor this to push accounts into a hash, so the key
+        # will be the kind of account (checking or savings, etc.) and then the contents of the key
+        # will be the account.
         def link_single_account(account_collection, account_id, owner_collection, owner_id)
             owner_to_link = Bank::Owner.find(owner_collection, owner_id)
             account_to_link = Bank::Account.find(account_collection, account_id)
-            owner_to_link.accounts = account_to_link
+            owner_to_link.accounts << account_to_link
         end
 
-        # def link_accounts(collection_of_accounts, collection_of_owners)
-        #     collection_of_accounts.each do |id|
-        #         collection_of_owners.each do |owner_id|
-        #             if id.id_number == owner_id.id_number
-        #                 id.owner = owner_id
-        #             end
-        #         end
-        #     end
-        # end
+        def link_accounts(#maybe a csv path?)
+             # stuff happens here
+         end
     end
 
 end
