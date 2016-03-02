@@ -59,42 +59,43 @@ require "CSV" #data_file for this program is currently: "./support/accounts.csv"
 module Bank
 
   class Account
-    attr_reader :owner, :id
+    attr_reader :id, :balance, :owner #moved initial_balance and balance into their own explicit methods below. Initial_balance moved for adjustment from cents to dollars.
 
     def initialize(account_information)
       @id = account_information[:id]
-      @initial_balance = account_information[:initial_balance] / 100.00 #CSV data comes in cents - I want to play in dollars so I am converting to dollars.
-      @balance = @initial_balance #will start out at initial balance and then be updated as we add/withdraw money
+      @initial_balance = account_information[:initial_balance]
+      @balance = initial_balance(100) #will start out at initial balance and then be updated as we add/withdraw money.  1 dollar = 100 cents for this particular CSV file.
       @open_date = account_information[:open_date]
       @owner = account_information[:owner]
       raise ArgumentError.new("An account cannot be created with an initial negative balance.") if @initial_balance < 0
     end
 
-
+    def initial_balance(currency_changer = 1) #CSV data comes in cents - I want to play in dollars so I am converting to dollars.  Maybe a good idea to defaul to one if we don't have to convert?
+      @initial_balance/currency_changer
+    end
 
     def set_owner(owner_object)
       @owner = owner_object
     end
 
-    def balance #allow us to access the balance at any time formatted well
-      puts "Your current account balance is $#{ sprintf("%.2f", @balance) }."
-      @balance #incase we want to return this to a different method
+    def display_balance #allow us to access the balance at any time formatted well
+      puts "Your current account balance is $#{ sprintf("%.2f", balance) }."
     end
 
     def withdraw(amount)
-      updated_balance = (@balance - amount)
+      updated_balance = (balance - amount)
 
       if updated_balance > 0
         puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{ sprintf("%.2f", updated_balance) }. "
-        return @balance = updated_balance
+        return @balance = updated_balance # I think I need an instance variable here becuase we do need to update the running balance. Can't do this through a reader. Should I make an attr_accesssor for balance instead?
       else
-        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }.00.  This is more than your current balance of $#{ sprintf("%.2f", @balance) }."
+        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }.00.  This is more than your current balance of $#{ sprintf("%.2f", balance) }."
         #don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
       end
     end
 
     def deposit(amount)
-      updated_balance = (@balance + amount)
+      updated_balance = (balance + amount)
 
       puts "After depositing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
       return @balance = updated_balance
@@ -157,7 +158,7 @@ module Bank
       owners_accounts_ids = []
       account_id_owners_id_data = CSV.read(data_file)
       account_id_owners_id_data.each do |row|
-        if row[1].to_f == @id # everything needs to be numbers not strings but we bring them as strings out of the CSV file so I'm changing them back.
+        if row[1].to_f == id # everything needs to be numbers not strings but we bring them as strings out of the CSV file so I'm changing them back.
           account_id = row[0].to_f # samsies.
           owners_accounts_ids << account_id
         end
@@ -185,7 +186,7 @@ module Bank
 
       account_owners_data = CSV.read(data_file)
       account_owners_data.each do |row|
-        owner = self.new(id: row[0].to_f, last_name: row[1], first_name: row[2], street_address: row[3], city: row[4], state: row[5]) # to_f becasue ID needs to be a fixnum - per JNF's primary requirements
+        owner = self.new(id: row[0].to_f, last_name: row[1], first_name: row[2], street_address: row[3], city: row[4], state: row[5]) # to_f because ID needs to be a fixnum (well, they're floats but okay) - per JNF's primary requirements
         account_owners << owner #put it into our collection of instances! (account_owners)
       end
 
@@ -199,11 +200,11 @@ end
 
 
 account_id = Bank::Account.find("./support/accounts.csv", 1212)
-puts account_id.balance
+account_id.display_balance
 
 owner_id = Bank::Owner.find("./support/owners.csv", 14)
 puts owner_id.first_name
 
 owner_account = owner_id.return_owners_accounts("./support/account_owners.csv", "./support/accounts.csv")
 puts owner_account[0].id
-puts owner_account[0].balance
+owner_account[0].display_balance
