@@ -33,10 +33,11 @@ module Bank
       array_of_accounts = CSV.read("support/accounts.csv")
       account_info_array = []
       # this method should return an array of hashes, where each hash represents one row of data
-      # array_of_accounts.each do.... get a hash somehow {id => element[0], balance => element[1], }
-      # put those hashes into an array, and return that array to whoever calls this method
+      # array_of_accounts.each do.... make a hash {id => element[0], balance => element[1], }
+      # instantiate a new Account based on that hash, after each one shovel into an array
+      # return that array to whoever calls this method
       array_of_accounts.each do |element|
-        account_info_array << {id: element[0], balance: element[1], date_created: element[2]}
+        account_info_array << Account.new({id: element[0], balance: element[1], date_created: element[2]})
       end
       return account_info_array
     end
