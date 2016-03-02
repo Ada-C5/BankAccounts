@@ -1,38 +1,16 @@
-# PRIMARY
-# 1. Create a Bank module which will contain an Account class, and be open to any
-#    future functionality.
-# 2. Create an Account class with the following functionality:
-#       * A new account should be created with an ID and an initial balance
-#       * Should have a withdraw method that accepts a single parameter which
-#          represents the amount of money to be withdrawn. This method should
-#          return an updated account balance.
-#       * Should have a deposit method that accepts a single parameter which
-#          represents the amount of money to be deposited. This method should
-#          return the updated account balance.
-#       * Should be able to access the current balance of an account at any time.
-# 3. A new account cannot be created with an initial negative balance - this will
-#    raise an ArgumentError.
-# 4. The withdraw method does not allow the account to go negative - this will puts
-#    a warning message and then return the original un-modified balance.
-
-# BONUS
-# 1. Create an Owner class which will store information about those who own the
-#    Accounts. This should have info like name, address, and any other identifying
-#    information that an account owner would have.
-# 2. Add an owner property to each Account to track information about who owns the
-#    account. The Account can be created with an owner, OR you can create a method
-#    that will add the owner after the Account has already been created.
-
 #Module:
+
+require 'CSV'
+
 module Bank
 
   class Account
-    attr_accessor :owner_info
-    attr_reader :balance
+    attr_accessor :owner_info, :id_number, :balance, :open_date
     def initialize(account_hash)
     @owner_info = account_hash[:owner_info]
     @id_number = account_hash[:id_number]
     @balance = account_hash[:balance]
+    @open_date = account_hash[:open_date]
 
       if @balance < 0
         raise ArgumentError.new("Account balance cannot be lower than $0.")
@@ -61,33 +39,89 @@ module Bank
     def add_owner(owner)
       @owner_info = owner
     end
+
+    def self.all
+      csv_import_array = []
+      CSV.open("accounts.csv", 'r') do |csv|
+        csv.read.each do |row|
+          csv_import_array << Bank::Account.new(id_number: row[0].to_i, balance: row[1].to_i, open_date: row[2].to_i)
+        end
+      end
+      return csv_import_array
+    end
+
+    def self.find(id_num)
+      CSV.open("accounts.csv", 'r') do |csv|
+        csv.read.each do |row|
+          if row[0] == id_num
+            found_account = Bank::Account.new(id_number: row[0].to_i, balance: row[1].to_i, open_date: row[2].to_i)
+            return found_account
+          end
+        end
+      end
+    end
   end
 
   class Owner
-    attr_reader :name, :auth_users, :auth_users_relation, :address, :last_4_of_social, :mothers_maiden_name
+    attr_reader :id_number, :last_name, :first_name, :auth_users, :auth_users_relation, :address, :city, :state, :last_4_of_social, :mothers_maiden_name
     def initialize(owner)
-      @name = owner[:name]
+      @id_number = owner[:id_number]
+      @last_name = owner[:last_name]
+      @first_name = owner[:first_name]
       @auth_users = owner[:auth_users]
       @auth_users_relation = owner[:auth_users_relation]
       @address = owner[:address]
+      @city = owner[:city]
+      @state = owner[:state]
       @last_4_of_social = owner[:last_4_of_social]
       @mothers_maiden_name = owner[:mothers_maiden_name]
+    end
+
+    def self.all
+      csv_import_array = []
+      CSV.open("owners.csv", 'r') do |csv|
+        csv.read.each do |row|
+          csv_import_array << Bank::Owner.new(id_number: row[0].to_i, last_name: row[1], first_name: row[2], address: row[3], city: row[4], state: row[5])
+        end
+      end
+      return csv_import_array
+    end
+
+    def self.find(owner_id)
+      CSV.open("owners.csv", 'r') do |csv|
+        csv.read.each do |row|
+          if row[0] == owner_id
+            found_account = Bank::Owner.new(id_number: row[0].to_i, last_name: row[1], first_name: row[2], address: row[3], city: row[4], state: row[5])
+            return found_account
+          end
+        end
+      end
     end
   end
 end
 
 #First account/owner:
 account_1 = Bank::Account.new(id_number: 100, balance: 1000)
-owner_1 = Bank::Owner.new(name: "Brad Bradley", auth_users: "Chad Bradley", auth_users_relation: "Spouse", address: "123 Farts Ln, Seattle, WA 98103", last_4_of_social: "9328", mothers_maiden_name: "Acker")
+owner_1 = Bank::Owner.new(first_name: "Brad", last_name: "Bradley", auth_users: "Chad Bradley", auth_users_relation: "Spouse", address: "123 Farts Ln,", city: "Seattle", state: "WA", last_4_of_social: "9328", mothers_maiden_name: "Acker")
 
+#add_owner method working:
 account_1.add_owner(owner_1)
-puts account_1.owner_info
-
-# puts account_1.owner_info.name
 
 # test attempts:
-# account_1.withdraw(1100)
-# account_1.deposit(34)
+puts account_1.id_number
+puts account_1.owner_info.first_name
 
-### puts account_1.owner_info[0].name #this will print owner_1's name. I would like to
-### use a hash for this, but can't figure out how.
+account_1.withdraw(1100)
+account_1.deposit(34)
+
+#.all method working Account:
+Bank::Account.all
+
+#.find method working Account:
+Bank::Account.find("1215")
+
+#.all method working Owner:
+Bank::Owner.all
+
+#.find method working Owner:
+Bank::Owner.find("15")
