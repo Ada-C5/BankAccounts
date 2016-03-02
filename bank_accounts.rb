@@ -153,9 +153,10 @@ module Bank
     # write a linker that can tie an account to an owner
     class AccountLinker
 
-        def link_single_account(owner_collection, owner_id, account_collection, account_id)
-
-
+        def link_single_owner(owner_collection, owner_id, account_collection, account_id)
+            owner_to_link = Bank::Owner.find(owner_collection, owner_id)
+            account_to_link = Bank::Account.find(account_collection, account_id)
+            account_to_link.owner = owner_to_link
         end
 
         def link_accounts(path_to_csv)
