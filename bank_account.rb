@@ -25,8 +25,7 @@ module Bank
   end
 
   class Account
-    attr_reader :balance, :account_owner
-
+    attr_reader :balance, :account_owner, :all_accounts_in_bank
     def initialize(info)
       @account_type = info[:account_type]
       @id_num = info[:id_num]
@@ -38,14 +37,21 @@ module Bank
 
 
     def self.load_accounts(file_path)
+      all_accounts_in_file =[]
       CSV.open(file_path, 'r') do |csv|
         csv.read.each do |line|
-          Account.new(id_num: line[0],balance: line[1].to_f, open_date: line[2])
+          all_accounts_in_file.push(line)
         end
       end
+        #csv.read.each do |line|
+          #all_accounts_in_file.push(self.new(id_num: line[0],balance: line[1].to_f, open_date: line[2]))
+    
+      puts all_accounts_in_file
     end
 
-    
+    def self.all
+
+    end
 
 
 
@@ -85,4 +91,3 @@ end
 #@fancy_account.add_owner(@lisa)
 #puts @lisa.to_yaml
 Bank::Account.load_accounts(file_path)
-puts
