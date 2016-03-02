@@ -8,12 +8,13 @@ module Bank
     #Should be able to access the current balance of an account at any time.
     attr_reader :balance, :id
 
-    def initialize(id, balance, open_date) #intialize owner to nil
+    def initialize(id, balance, open_date, its_owner) #intialize owner to nil
       #A new account cannot be created with initial negative balance - this will raise an ArgumentError
       raise ArgumentError, "A new account cannot be created with initial negative balance." if balance < 0
       @id = id
       @balance = balance
       @open_date = open_date
+      @owner_id = its_owner
       #@account_owner = owner #link this??
     end
 
@@ -21,17 +22,24 @@ module Bank
       require 'CSV'
       all_accounts = []
       CSV.foreach(file_path, "r") do |line|
-        all_accounts << self.new(line[0].to_i, line[1].to_f, line[2])
+
+        @its_owner = ""
+        CSV.foreach("./support/account_owners.csv", "r") do |match|
+          if match[0].to_s == line[0].to_s #if in the relaitonship file the owner id is equal to the owner
+            @its_owner = match[1] #send the account id into their_accounts array
+          end
+        end
+
+
+        all_accounts << self.new(line[0].to_i, line[1].to_f, line[2], @its_owner)
       end
       return all_accounts
     end
 
     def self.find(id)
       self.all.each do |account_inst|
-        if account_inst.id == id
+        if account_inst.id.to_s == id.to_s
           return account_inst
-        else
-          return false
         end
       end
     end
@@ -91,16 +99,6 @@ module Bank
       end
       return all_owners
     end
-
-  #  def their_accounts(file_path = "./support/account_owners.csv")
-  #    require 'CSV'
-  #    all_matches = []
-  #    CSV.foreach(file_path, "r") do |line|
-  #      if line[1] ==
-  #      #all_accounts << self.new(line[0].to_i, line[1].to_f, line[2])
-  #    end
-  #    return all_accounts
-
 
   #  end
   end
