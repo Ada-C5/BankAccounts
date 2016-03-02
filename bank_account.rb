@@ -95,9 +95,9 @@ module Bank
 
     def self.find(id)
       owners = self.all
-      owners.each do |account|
-        if account.owner_id == id
-          return account
+      owners.each do |owner|
+        if owner.owner_id == id
+          return owner
         end
       end
       #puts owners
