@@ -1,6 +1,7 @@
-file_path = ARGV.first
+#file_path = ARGV.first
 require 'yaml'
 require 'csv'
+require 'awesome_print'
 module Bank
 
   class Owner
@@ -25,7 +26,7 @@ module Bank
   end
 
   class Account
-    attr_reader :balance, :account_owner, :all_accounts_in_bank
+    attr_reader :balance, :account_owner ,:all_accounts_in_file, :id_num, :account_to_find
     def initialize(info)
       @account_type = info[:account_type]
       @id_num = info[:id_num]
@@ -33,23 +34,30 @@ module Bank
       @open_date = info[:open_date]
       raise ArgumentError.new("You need money to start an account here.") if @balance < 0
       @account_owner = @name
+      @all_accounts_in_file = self.all(file_path)
     end
 
-
-    def self.load_accounts(file_path)
-      all_accounts_in_file =[]
-      CSV.open(file_path, 'r') do |csv|
-        csv.read.each do |line|
-          all_accounts_in_file.push(line)
+    def self.all(file_path)
+          @all_accounts_in_file =[]
+          CSV.open(file_path, 'r') do |csv|
+            csv.read.each do |line|
+              @all_accounts_in_file.push(Account.new(id_num: line[0],balance: line[1].to_i, open_date: line[2]))
+            end
+          end
+          ap @all_accounts_in_file
+          return @all_accounts_in_file
         end
-      end
-        #csv.read.each do |line|
-          #all_accounts_in_file.push(self.new(id_num: line[0],balance: line[1].to_f, open_date: line[2]))
-    
-      puts all_accounts_in_file
-    end
 
-    def self.all
+
+
+    def self.find(id_num)
+      @account_to_find = nil
+      @all_accounts_in_file.each do |account|
+        if account[:id_num] == id_num
+          @account_to_find = account
+        end
+        puts @account_to_find
+      end
 
     end
 
@@ -90,4 +98,4 @@ end
 #@fancy_account = Bank::Account.new(id_num:78, balance: 67)
 #@fancy_account.add_owner(@lisa)
 #puts @lisa.to_yaml
-Bank::Account.load_accounts(file_path)
+@yes = Bank::Account.all("./support/accounts.csv")
