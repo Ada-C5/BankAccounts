@@ -34,6 +34,24 @@ The data, in order in the CSV, consists of:
 ID - (Fixnum) a unique identifier for that Account
 Balance - (Fixnum) the account balance amount, in cents (i.e., 150 would be $1.50)
 OpenDate - (Datetime) when the account was opened
+
+Bonus Optional Fun Times:
+Implement the optional requirement from Wave 1
+Add the following class methods to your existing Owner class
+self.all - returns a collection of Owner instances, representing all of the Owners described in the CSV. See below for the CSV file specifications
+self.find(id) - returns an instance of Owner where the value of the id field in the CSV matches the passed parameter
+CSV Data File for Bank::Owner
+
+The data, in order in the CSV, consists of:
+
+ID - (Fixnum) a unique identifier for that Owner
+Last Name - (String) the owner's last name
+First Name - (String) the owner's first name
+Street Addess - (String) the owner's street address
+City - (String) the owner's city
+State - (String) the owner's state
+To create the relationship between the accounts and the owners use an account_owners.csv file. The data for this file, in order in the CSV, consists of: 1. Account ID - (Fixnum) a unique identifier corresponding to an Account instance. 1. Owner ID - (Fixnum) a unique identifier corresponding to an Owner instance.
+
 =end
 
 require "CSV" #data_file for this program is currently: "./support/accounts.csv"
@@ -82,6 +100,31 @@ module Bank
       return @balance = updated_balance
     end
 
+    ##### CLASS METHODS BELOW #####
+    def self.find(data_file, id) #returns an instance of Account where the value of the id field in the CSV matches the passed parameter
+
+      accounts = self.all(data_file)
+      accounts.each do |account|
+        if
+          account.id == id # didn't expect instance method to work in a class method, but I guess it does beceause we called it on an instance.
+          return account
+        end
+      end
+    end
+
+    def self.all(data_file) #returns a collection of Account instances, representing all of the Accounts described in the CSV.
+
+      accounts = [] #start as an empty array. We will fill with instances from our data file.
+
+      accounts_data = CSV.read(data_file)
+      accounts_data.each do |row|
+        account = Bank::Account.new(id: row[0].to_f, initial_balance: row[1].to_f, open_date: row[2]) # to_f becasue ID and initial balance should be numbers
+        accounts << account #put it into our collection of instances! (accounts)
+      end
+
+      return accounts
+    end
+
   end
 
   class Owner
@@ -94,33 +137,6 @@ module Bank
 
     end
   end
-
-##### CLASS METHODS BELOW #####
-
-  def self.find(data_file, id) #returns an instance of Account where the value of the id field in the CSV matches the passed parameter
-
-    accounts = self.all(data_file)
-    accounts.each do |account|
-      if
-        account.id == id # didn't expect instance method to work in a class method, but I guess it does beceause we called it on an instance.
-        return account
-      end
-    end
-  end
-
-  def self.all(data_file) #returns a collection of Account instances, representing all of the Accounts described in the CSV.
-
-    accounts = [] #start as an empty array. We will fill with instances from our data file.
-
-    accounts_data = CSV.read(data_file)
-    accounts_data.each do |row|
-      account = Bank::Account.new(id: row[0].to_f, initial_balance: row[1].to_f, open_date: row[2]) # to_f becasue ID and initial balance should be numbers
-      accounts << account #put it into our collection of instances! (accounts)
-    end
-
-    return accounts
-  end
-
 end
 
 #test run the program
@@ -128,20 +144,3 @@ end
 
 account_id = Bank::Account.find("./support/accounts.csv", 1212)
 puts account_id.balance
-
-# accounts = Bank::Account.all("./support/accounts.csv")
-# puts accounts[0].balance
-
-#account_row = ["1212","1235667","1999-03-27 11:30:09 -0800"]
-#
-#account = Bank::Account.new(id: account_row[0].to_f, initial_balance: #account_row[1].to_f, open_date: account_row[2]) #need to change numbers back to #numbers because they will come in from CSV as strings
-#puts account.balance
-#account.deposit(101)
-#puts account.balance
-#puts account.owner.date_joined_bank
-# "./support/accounts.csv"
-# account2 = Bank::Account.new(id: 1, initial_balance: 100)
-# joe = Bank::Owner.new(name: "Joe", address: "123 Seattle, WA", type: "Person", # date_joined_bank: 2007)
-#
-# account2.set_owner(joe)
-# puts account2.owner.name
