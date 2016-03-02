@@ -43,13 +43,13 @@ self.find(id) - returns an instance of Owner where the value of the id field in 
 CSV Data File for Bank::Owner
 
 The data, in order in the CSV, consists of:
-
 ID - (Fixnum) a unique identifier for that Owner
 Last Name - (String) the owner's last name
 First Name - (String) the owner's first name
 Street Addess - (String) the owner's street address
 City - (String) the owner's city
 State - (String) the owner's state
+
 To create the relationship between the accounts and the owners use an account_owners.csv file. The data for this file, in order in the CSV, consists of: 1. Account ID - (Fixnum) a unique identifier corresponding to an Account instance. 1. Owner ID - (Fixnum) a unique identifier corresponding to an Owner instance.
 
 =end
@@ -101,7 +101,7 @@ module Bank
     end
 
     ##### CLASS METHODS BELOW #####
-    def self.find(data_file, id) #returns an instance of Account where the value of the id field in the CSV matches the passed parameter
+    def self.find(data_file, id) #returns an instance of Account where the value of the id field in the CSV matches the passed parameter. "./support/accounts.csv"
 
       accounts = self.all(data_file)
       accounts.each do |account|
@@ -112,13 +112,13 @@ module Bank
       end
     end
 
-    def self.all(data_file) #returns a collection of Account instances, representing all of the Accounts described in the CSV.
+    def self.all(data_file) #returns a collection of Account instances, representing all of the Accounts described in the CSV. "./support/accounts.csv"
 
       accounts = [] #start as an empty array. We will fill with instances from our data file.
 
       accounts_data = CSV.read(data_file)
       accounts_data.each do |row|
-        account = Bank::Account.new(id: row[0].to_f, initial_balance: row[1].to_f, open_date: row[2]) # to_f becasue ID and initial balance should be numbers
+        account = self.new(id: row[0].to_f, initial_balance: row[1].to_f, open_date: row[2]) # to_f becasue ID and initial balance should be numbers
         accounts << account #put it into our collection of instances! (accounts)
       end
 
@@ -128,15 +128,45 @@ module Bank
   end
 
   class Owner
-    attr_reader :name, :address, :type, :date_joined_bank
+    attr_reader :id, :first_name
+
     def initialize(owner_properties)
-      @name = owner_properties[:name]
-      @address = owner_properties[:address]
-      @type = owner_properties[:type] #person, company, etc
-      @date_joined_bank = owner_properties[:date_joined_bank] #so we can do loyalty type stuff (member since???)
+      @id = owner_properties[:id] #fixnum
+      @last_name = owner_properties[:last_name]
+      @first_name = owner_properties[:first_name]
+      @street_address = owner_properties[:street_address]
+      @city = owner_properties[:city]
+      @state = owner_properties[:state]
 
     end
+
+    ##### CLASS METHODS BELOW #####
+
+    def self.find(data_file, id) #returns an instance of Account where the value of the id field in the CSV matches the passed parameter. "./support/owners.csv"
+
+      account_owners = self.all(data_file)
+      account_owners.each do |owner|
+        if
+          owner.id == id
+          return owner
+        end
+      end
+    end
+
+    def self.all(data_file) #returns a collection of Owner instances, representing all of the Owners described in the CSV. "./support/owners.csv"
+
+      account_owners = [] #start as an empty array. We will fill with instances from our data file.
+
+      account_owners_data = CSV.read(data_file)
+      account_owners_data.each do |row|
+        owner = self.new(id: row[0].to_f, last_name: row[1], first_name: row[2], street_address: row[3], city: row[4], state: row[5]) # to_f becasue ID needs to be a fixnum - per JNF's primary requirements
+        account_owners << owner #put it into our collection of instances! (account_owners)
+      end
+
+      return account_owners
+    end
   end
+
 end
 
 #test run the program
@@ -144,3 +174,6 @@ end
 
 account_id = Bank::Account.find("./support/accounts.csv", 1212)
 puts account_id.balance
+
+owner_id = Bank::Owner.find("./support/owners.csv", 14)
+puts owner_id.first_name
