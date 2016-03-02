@@ -8,13 +8,13 @@ module Bank
       if initial_balance < 0
         raise ArgumentError, "Initial balance must be greater than $0.00."
       end
-      @account_id = account_balance
+      @account_id = account_id
       @account_balance = initial_balance
       @open_date = open_date
       @owner_id = owner_id   #need to add an owner to the account during initialize
     end
 
-    def self.all(file)
+    def self.all(file = "support/accounts.csv")
       accounts = CSV.read(file)
       account_list = []
       accounts.each do |acct|
@@ -25,8 +25,14 @@ module Bank
       return account_list
     end
 
-    def self.find()
-
+    def self.find(id)
+      accounts = self.all
+      accounts.each do |account|
+        if account.account_id == id
+          return account
+        end
+      end
+      return nil
     end
 
     def add_owner(id) #account.add_owner(number that you get from Bank::Owner.new)
