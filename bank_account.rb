@@ -37,14 +37,15 @@ module Bank
 
     def self.all
       self.accounts
-
     end
 
-    # def self.find(find_id)
-    #   if self.accounts[0].id == find_id
-    #     puts "ok"
-    #   end
-    # end
+    def self.find(find_id)
+      if self.accounts[0].id == find_id.to_s
+        return "ok"
+      else
+        return "not ok"
+      end
+    end
 
     # Accepts a single parameter for the amount of money to be withdrawn.
     # Absolute value to input for negative numbers.
