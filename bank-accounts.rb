@@ -119,7 +119,7 @@ module Bank
 
       accounts_data = CSV.read(data_file)
       accounts_data.each do |row|
-        account = self.new(id: row[0].to_f, initial_balance: row[1].to_f, open_date: row[2]) # to_f becasue ID and initial balance should be numbers
+        account = self.new(id: row[0].to_i, initial_balance: row[1].to_f, open_date: row[2]) # to_i becasue ID and initial balance should be numbers.  ID is an integer because its a fixnum (per requirements) and intial_balance is to_f because I feel like this is more precise with money.
         accounts << account #put it into our collection of instances! (accounts)
       end
 
@@ -158,8 +158,8 @@ module Bank
       owners_accounts_ids = []
       account_id_owners_id_data = CSV.read(data_file)
       account_id_owners_id_data.each do |row|
-        if row[1].to_f == id # everything needs to be numbers not strings but we bring them as strings out of the CSV file so I'm changing them back.
-          account_id = row[0].to_f # samsies.
+        if row[1].to_i == id # everything needs to be fixnums not strings but we bring them as strings out of the CSV file so I'm changing them back.
+          account_id = row[0].to_i # samsies.
           owners_accounts_ids << account_id
         end
       end
@@ -186,7 +186,7 @@ module Bank
 
       account_owners_data = CSV.read(data_file)
       account_owners_data.each do |row|
-        owner = self.new(id: row[0].to_f, last_name: row[1], first_name: row[2], street_address: row[3], city: row[4], state: row[5]) # to_f because ID needs to be a fixnum (well, they're floats but okay) - per JNF's primary requirements
+        owner = self.new(id: row[0].to_i, last_name: row[1], first_name: row[2], street_address: row[3], city: row[4], state: row[5]) # to_f because ID needs to be a fixnum/integer - per JNF's primary requirements
         account_owners << owner #put it into our collection of instances! (account_owners)
       end
 
