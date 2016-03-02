@@ -50,7 +50,7 @@ Street Addess - (String) the owner's street address
 City - (String) the owner's city
 State - (String) the owner's state
 
-To create the relationship between the accounts and the owners use an account_owners.csv file. The data for this file, in order in the CSV, consists of: 1. Account ID - (Fixnum) a unique identifier corresponding to an Account instance. 1. Owner ID - (Fixnum) a unique identifier corresponding to an Owner instance.
+* To create the relationship between the accounts and the owners use an account_owners.csv file. The data for this file, in order in the CSV, consists of: 1. Account ID - (Fixnum) a unique identifier corresponding to an Account instance. 1. Owner ID - (Fixnum) a unique identifier corresponding to an Owner instance.
 
 =end
 
