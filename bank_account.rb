@@ -8,7 +8,7 @@ module Bank
       if initial_balance < 0
         raise ArgumentError, "Initial balance must be greater than $0.00."
       end
-      @account_id = account_id
+      @account_id = account_id.to_f
       @account_balance = initial_balance
       @open_date = open_date
       @owner_id = owner_id   #need to add an owner to the account during initialize
@@ -57,13 +57,24 @@ module Bank
       @account_balance = @account_balance + money
       return @account_balance
     end
+
+    def self.connect
+      #csv reading file
+      #store it in an array n/m
+      #loop that takes owner_id and connects it to the corresponding account
+      #.add_owner
+      #need 2 arguments for each key/value
+      #use account number to look up account using self.find(id number)
+      #set to variable, then update owner account.add_owner(12(from csv file))
+    end
+
   end
 
   class Owner
-    attr_reader :first_name, :last_name, :user_id, :city, :state
+    attr_reader :first_name, :last_name, :city, :state, :owner_id, :street_address
 
     def initialize(owner_id, last_name, first_name, street_address, city, state)
-      @owner_id = owner_id
+      @owner_id = owner_id.to_f
       @last_name = last_name
       @first_name = first_name
       @street_address = street_address
@@ -82,15 +93,44 @@ module Bank
       return owner_list
     end
 
+    def self.find(id)
+      owners = self.all
+      owners.each do |account|
+        if account.owner_id == id
+          return account
+        end
+      end
+      #puts owners
+      return nil
+    end
+
   end
 
 end
 
-y = Bank::Owner.all("support/owners.csv") #this is a method inside a class inside a module
-puts y
-x = Bank::Account.all("support/accounts.csv") #this is a method inside a class inside a module
-puts x[0].balance #this prints out the first array bank account and then the balance using the balance method
-#adriana_account = Bank::Account.new(500, "checking")
+
+#--------------------------TESTS-----------------------------------
+#y = Bank::Owner.all("support/owners.csv") #this is a method inside a class inside a module
+#puts y
+#x = Bank::Owner.find(14)
+#puts x
+#x = Bank::Owner.find(24)
+#puts x
+#z = Bank::Account.all("support/accounts.csv") #this is a method inside a class inside a module
+#puts z[0].balance #this prints out the first array bank account and then the balance using the balance method
+#a = Bank::Account.find(1217)
+#puts a
 #adriana_owner = Bank::Owner.new("adriana", "cannon", "el paso", "texas")
 # adriana_account.deposit(200)
 # #adriana_account.withdraw(100)
+
+#Adriana_account = { account_id: 1234, balance: 12345, owner_id: 0}
+# Adriana_owner = { owner_id: 12, first_name: "A" }
+# owner_id 12 owns account_id 1234
+
+#a = Bank::Account.find(1234)
+#a.add_owner(12)
+
+# 1234, 12
+# 2345, 14
+# 9999, 23
