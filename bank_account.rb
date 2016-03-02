@@ -34,7 +34,6 @@ module Bank
       @open_date = info[:open_date]
       raise ArgumentError.new("You need money to start an account here.") if @balance < 0
       @account_owner = @name
-      @all_accounts_in_file = self.all(file_path)
     end
 
     def self.all(file_path)
@@ -51,12 +50,12 @@ module Bank
 
 
     def self.find(id_num)
-      @account_to_find = nil
+      account_to_find = nil
       @all_accounts_in_file.each do |account|
-        if account[:id_num] == id_num
-          @account_to_find = account
+        if account.id_num == id_num
+          account_to_find = account
         end
-        puts @account_to_find
+        return account_to_find
       end
 
     end
