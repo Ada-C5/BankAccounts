@@ -97,7 +97,20 @@ module Bank
       @state = owner_info[:state]
     end
 
+    # return a collection of account instances that belong to a particular owner
+    def accounts
+      owners_accounts = []
+      CSV.open("./support/account_owners.csv", 'r').each do |line|
+        if @owner_id == line[1]
+          account_num = line[0]
+          owners_accounts << Bank::Account.find(account_num)
+        end
 
+      end
+
+      # return array filled with owners account instances
+      owners_accounts
+    end
 
 # return a collection of Owner instances, representing all owners described
 # in the CSV.
