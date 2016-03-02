@@ -28,7 +28,8 @@ module Bank
       # @owner = account_info[:owner] # temporary value until Owner is created
     end
 
-    def self.make_account
+    def self.all
+      # pulls in the data from the CSV file as an array of arrays
       array_of_accounts = CSV.read("support/accounts.csv")
       account_info_array = []
       # this method should return an array of hashes, where each hash represents one row of data
