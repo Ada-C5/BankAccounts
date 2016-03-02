@@ -1,46 +1,17 @@
 require 'CSV'
 require 'pp'
 
-# CSV.open("support/accounts.csv", "w") do |csv|
-#   CSV.foreach('support/accounts.csv') do |row|
-#     csv << row[0].to_i
-#     csv << row[1].to_i
-#     csv << row[2].to_datetime
-#   end
-# end
-
 module Bank
 
   class Account
 
-    attr_reader :balance
+    attr_reader :balance, :id, :open_date
     attr_accessor :owner
 
-    # CSV.open('support/accounts.csv', 'w') do |csv|
-    #   CSV.foreach('original.csv') do |row|
-    #     csv << row[0].to_i
-    #     csv << row[1].to_i
-    #     csv << row[2].to_datetime
-    #   end
-    # end
-
-    # @id = []
-    # @balance = []
-    # @open_date = []
-    # CSV.foreach("support/accounts.csv", converters: :numeric, :date_time) do |row|
-    #   @id << row[0]
-    #   @balance << row[1]
-    #   @open_date << row[2]
-    # end
-
-
-    # need to initialize CSV file and convert data types
-
     def initialize(id, balance, open_date)
-      # CSV.read("support/accounts.csv" {converters: :numeric, :date_time} )
-      @id = id
-      @balance = balance
-      @open_date = open_date
+      @id = id.to_i
+      @balance = balance.to_i
+      @open_date = DateTime.strptime(open_date, '%Y-%m-%d %H:%M:%S %z')
       @owner = owner
       if @balance < 0
           raise ArgumentError, "Balance can't be less than $0"
@@ -99,19 +70,9 @@ module Bank
 
 end
 
-accts = CSV.read("support/accounts.csv", {converters: :numeric} )
-
-puts accts
-
-# id = []
-# balance = []
-# open_date = []
-# CSV.foreach("support/accounts.csv") do |row|
-#   id << row[0]
-#   balance << row[1]
-#   open_date << row[2]
-# end
-#
-# puts id
-# puts balance
-# puts open_date
+CSV.foreach("support/accounts.csv") do |row|
+  account = Bank::Account.new(row[0], row[1], row[2])
+  puts "ID: #{account.id}"
+  puts "Initial Balance: #{account.balance}"
+  puts "Date Acct Opened: #{account.open_date}"
+end
