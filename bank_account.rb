@@ -93,6 +93,8 @@ module Bank
   end
   
   class Owner
+    #attr_accessor :id :lname :fname :street_address :city :state
+    attr_accessor :id
     # take in name and id from user_input
     def initialize(id, lname, fname, street_address, city, state)
       @id = id
@@ -101,7 +103,6 @@ module Bank
       @street_address = street_address
       @city = city
       @state = state
-     # @account = info[:account]
     end
 
     def self.create_owners(file)
@@ -121,21 +122,46 @@ module Bank
       return owners
     end
 
-    
+    def get_id
+      return @id
+    end
+
+# BROKEN: currently returning an enumerator
+    # def self.find(id)
+    #   sought_owner = nil
+    #   owners = self.create_owners("./support/owners.csv")
+    #   puts owners
+    #   owners.each do |owner|
+    #     if owner.get_id == id
+    #       puts "its a match"
+    #       sought_owner = owner
+    #     end
+    #   end
+    #   return sought_owner
+    # end
+
+    def get_id
+      return @id
+    end
 
     # print owner info
     def get_info
-      puts "#{@fname} #{@lname} lives at #{@street_address} in #{@city}, #{@state} and their bank ID is #{@id}"
+      #puts "#{@fname} #{@lname} lives at #{@street_address} in #{@city}, #{@state} and their bank ID is #{@id}"
+      puts "Get user info"
     end
   
   end
 end
 
 
-# TEST CALLS
-ownerz = Bank::Owner.create_owners("./support/accounts.csv")
-puts ownerz
-
+# # TEST CALLS
+ownerz = Bank::Owner.create_owners("./support/owners.csv")
+a = ownerz.find(14)
+puts a
+# puts a.class
+# info = ownerz.find(14).get_info
+# puts info
+# puts ownerz
 
 # accountz = Bank::Account.create_accounts("./support/accounts.csv")
 # puts accountz
