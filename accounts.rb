@@ -27,8 +27,7 @@ module Bank
     end
 
     def self.find(id)
-      all_accounts = self.all
-      all_accounts.each do |account_inst|
+      self.all.each do |account_inst|
         if account_inst.id == id
           return account_inst
         else
