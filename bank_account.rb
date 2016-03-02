@@ -14,7 +14,7 @@ module Bank
       end
     end
 
-    #????return owner instance
+    # return the owner instance for this account
     def get_owner
       owner_id = nil
       owners = Bank::Owner.create_owners("./support/owners.csv")
@@ -158,6 +158,17 @@ module Bank
     def get_info
       puts "#{@fname} #{@lname} lives at #{@street_address} in #{@city}, #{@state} and their bank ID is #{@id}"
     end
+
+    def get_account
+      account_id = nil
+      accounts = Bank::Account.create_accounts("./support/accounts.csv")
+      CSV.foreach("./support/account_owners.csv") do |line|
+        if line[1].to_i == @id
+          account_id = line[0].to_i
+        end
+      end
+      Bank::Account.find(account_id)
+    end
   
   end
 end
@@ -182,12 +193,12 @@ end
 # puts accountz
 #puts "bottom account #{accounts.find(1212)}"
 #puts accounts[0].balance
-my_account = Bank::Account.find(15154)
+###%my_account = Bank::Account.find(15154)
 #puts my_account.class
-owner = my_account.get_owner
-puts owner.get_info
+####%owner = my_account.get_owner
+###&puts owner.get_info
 #puts owner.class
-puts "THIS IS THE FINAL OWNER THAT SHOULD BE AN INSTANCE!!! #{owner}"
+######$puts "THIS IS THE FINAL OWNER THAT SHOULD BE AN INSTANCE!!! #{owner}"
 #puts Bank::Account.find(15154).balance
 ####puts my_account.balance
 # kwel_accounts = Bank::Account.all("./support/accounts.csv")
@@ -195,6 +206,10 @@ puts "THIS IS THE FINAL OWNER THAT SHOULD BE AN INSTANCE!!! #{owner}"
 
 # puts Bank::Account.find(1212).balance
 # puts Bank::Account.find(1212).deposit(10)
+
+my_owner = Bank::Owner.find(14)
+account = my_owner.get_account
+puts "THIS IS THE FINAL ACCOUNT THAT SHOULD BE AN INSTANCE!!! #{account}"
 
 
 
