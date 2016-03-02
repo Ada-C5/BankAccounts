@@ -58,7 +58,13 @@ module Bank
       return @account_balance
     end
 
-    def self.connect
+    def self.connect(file = "support/account_owners.csv")
+      mates = CSV.read(file)
+      mate_list = []
+      mates.each do |mate|
+        mate_list << self.new(mate[0].to_f, mate[1].to_f)
+        return mate_list
+      end
       #csv reading file
       #store it in an array n/m
       #loop that takes owner_id and connects it to the corresponding account
