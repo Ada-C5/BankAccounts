@@ -5,7 +5,7 @@ module Bank
 
 
   class Account
-    attr_reader :id, :owner, :accounts, :csv_data
+    attr_reader :id, :owner
     # Can set owner after account has been created.
     attr_writer :owner
 
@@ -18,32 +18,33 @@ module Bank
       @owner = owner
     end
 
-    def self.csv_data
-      @csv_data = CSV.read("./support/accounts.csv")
+    # make this take the csv file as a parameter instead of being a static path
+    def self.csv_data(file_path="./support/accounts.csv")
+      csv_data = CSV.read(file_path)
     end
 
+    # make the accounts array a method and reference it that way instead of an instance variable
     def self.accounts
-      @accounts = []
+      accounts = []
       csv_data.each_index do |i|
         id = csv_data[i][0]
         initial_balance = csv_data[i][1]
         opendate = csv_data[i][2]
-        @accounts << self.new(id, initial_balance, opendate)
+        accounts << self.new(id, initial_balance, opendate)
       end
-      return @accounts
+      return accounts
     end
 
     def self.all
-      @accounts
+      self.accounts
+
     end
 
-    def self.find(find_id)
-      @account_info.each do |i|
-        if i.id == find_id
-          return i
-        end
-      end
-    end
+    # def self.find(find_id)
+    #   if self.accounts[0].id == find_id
+    #     puts "ok"
+    #   end
+    # end
 
     # Accepts a single parameter for the amount of money to be withdrawn.
     # Absolute value to input for negative numbers.
