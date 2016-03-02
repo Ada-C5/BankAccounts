@@ -71,11 +71,11 @@ module Bank
         end
 
         #this will list all account instances that exist
-        def self.list_accounts
+        def self.all
         end
 
         # this will find an account with a specified it
-        def self.find_account(id)
+        def self.find(id)
 
         end
     end
