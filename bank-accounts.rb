@@ -31,13 +31,12 @@ For example, manually choose the data from the first line of the CSV file and en
 
 **CSV Data File for Bank::Account
 The data, in order in the CSV, consists of:
-
 ID - (Fixnum) a unique identifier for that Account
 Balance - (Fixnum) the account balance amount, in cents (i.e., 150 would be $1.50)
 OpenDate - (Datetime) when the account was opened
 =end
 
-require "CSV"
+require "CSV" #data_file for this program is currently: "./support/accounts.csv"
 
 module Bank
 
