@@ -15,12 +15,14 @@ module Bank
     end
 
     def self.all(file)
-      CSV.open
-      file = CSV.read("accounts.csv")
-      people = []
-      file.length.each do |array|
-        people << self.new(array)
+      accounts = CSV.read(file)
+      account_list = []
+      accounts.each do |acct|
+        #puts acct[0]
+        account_list << self.new(acct[1].to_f, acct[0], acct[2])
+        #puts new_account.balance
       end
+      return account_list
     end
 
     def self.find()
@@ -67,10 +69,8 @@ module Bank
 
 end
 
-peoples = Bank::Account.all("accounts.csv")
-puts peoples
-peoples.length
-
+x = Bank::Account.all("support/accounts.csv") #this is a method inside a class inside a module
+puts x[0].balance #this prints out the first array bank account and then the balance using the balance method
 #adriana_account = Bank::Account.new(500, "checking")
 #adriana_owner = Bank::Owner.new("adriana", "cannon", "el paso", "texas")
 # adriana_account.deposit(200)
