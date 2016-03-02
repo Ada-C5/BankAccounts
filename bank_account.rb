@@ -77,15 +77,29 @@ module Bank
 
   class Owner
     attr_reader :id
-    def initialize(user_hash)
-      @id = user_hash[:id]
-      @first_name = user_hash[:first_name]
-      @last_name = user_hash[:last_name]
-      @address = [user_hash[:street], user_hash[:city], user_hash[:state]]
+    def initialize(id, last_name, first_name, street, city, state)
+      @id = id
+      @last_name = last_name
+      @first_name = first_name
+      @address = [street, city, state]
     end
 
     def self.csv_data(file_path="./support/owners.csv")
       CSV.read(file_path)
+    end
+
+    def self.owners
+      owners = []
+      csv_data.each_index do |i|
+        id = csv_data[i][0]
+        last_name = csv_data[i][1]
+        first_name = csv_data[i][2]
+        street = csv_data[i][3]
+        city = csv_data[i][4]
+        state = csv_data[i][5]
+        owners << self.new(id, last_name, first_name, street, city, state)
+      end
+      return owners
     end
 
   end
