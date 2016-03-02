@@ -62,19 +62,32 @@ module Bank
   class Owner
     attr_reader :first_name, :last_name, :user_id, :city, :state
 
-    def initialize(first_name, last_name, city, state)
-      @first_name = first_name
+    def initialize(owner_id, last_name, first_name, street_address, city, state)
+      @owner_id = owner_id
       @last_name = last_name
+      @first_name = first_name
+      @street_address = street_address
       @city = city
       @state = state
-      @user_id = @first_name[0] + @last_name + rand(111...999).to_s
+    end
 
+    def self.all(file = "support/owners.csv")
+      owners = CSV.read(file)
+      owner_list = []
+      owners.each do |owner|
+        #puts acct[0]
+        owner_list << self.new(owner[0], owner[1], owner[2], owner[3], owner[4],owner[5])
+        #puts new_account.balance
+      end
+      return owner_list
     end
 
   end
 
 end
 
+y = Bank::Owner.all("support/owners.csv") #this is a method inside a class inside a module
+puts y
 x = Bank::Account.all("support/accounts.csv") #this is a method inside a class inside a module
 puts x[0].balance #this prints out the first array bank account and then the balance using the balance method
 #adriana_account = Bank::Account.new(500, "checking")
