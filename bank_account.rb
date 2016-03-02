@@ -1,4 +1,4 @@
-#file_path = ARGV.first
+
 require 'yaml'
 require 'csv'
 require 'awesome_print'
@@ -59,9 +59,7 @@ module Bank
       @open_date = info[:open_date]
       raise ArgumentError.new("You need money to start an account here.") if @balance < 0
       @account_owner = @name
-      @all_accounts_in_file = self.all(file_path)
     end
-
 
     def self.all
           all_accounts_in_file =[]
@@ -72,7 +70,6 @@ module Bank
           end
           return all_accounts_in_file
     end
-
 
 
     def self.find(id_num)
@@ -116,9 +113,3 @@ module Bank
 
 
 end
-
-#@lisa = Bank::Owner.new(name: "Lisa Neesemann", email: "lisa@brp.org", city: "Brooklyn", state: 'NY')
-#@lisa.create_account(account_type: "savings", id_num: 57, balance: 500  )
-#@fancy_account = Bank::Account.new(id_num:78, balance: 67)
-#@fancy_account.add_owner(@lisa)
-#puts @lisa.to_yaml
