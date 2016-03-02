@@ -14,7 +14,7 @@ module Bank
       @id = id
       @balance = balance
       @open_date = open_date
-      #@account_owner = owner
+      #@account_owner = owner #link this??
     end
 
     def self.all(file_path = "./support/accounts.csv")
@@ -64,12 +64,44 @@ module Bank
 
   class Owner
 
-    def initialize(owner_id, owner_name, owner_address = nil)
-      @owner_id = owner_id
-      @owner_name = owner_name
-      @owner_address = owner_address
+    def initialize(id, last_name, first_name, street_address, city, state, accounts = [])
+      @id = id
+      @last_name = last_name
+      @first_name = first_name
+      @street_address = street_address
+      @city = city
+      @state = state
+      @accounts = accounts #store the owner account ids in an array
     end
 
+    def self.all(file_path = "./support/owners.csv")
+      require 'CSV'
+      all_owners = []
+      CSV.foreach(file_path, "r") do |line|
 
+        @their_accounts = []
+        CSV.foreach("./support/account_owners.csv", "r") do |match|
+          if match[1].to_s == line[0].to_s #if in the relaitonship file the owner id is equal to the owner
+            @their_accounts << match[0] #send the account id into their_accounts array
+          end
+        end
+
+        all_owners << self.new(line[0], line[1], line[2], line[3], line[4], line[5], @their_accounts)
+
+      end
+      return all_owners
+    end
+
+  #  def their_accounts(file_path = "./support/account_owners.csv")
+  #    require 'CSV'
+  #    all_matches = []
+  #    CSV.foreach(file_path, "r") do |line|
+  #      if line[1] ==
+  #      #all_accounts << self.new(line[0].to_i, line[1].to_f, line[2])
+  #    end
+  #    return all_accounts
+
+
+  #  end
   end
 end
