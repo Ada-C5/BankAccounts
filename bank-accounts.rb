@@ -7,14 +7,14 @@ module Bank
 
   class Account
 
-    attr_reader   :balance, :id, :open_date
+    attr_reader   :balance, :account_id, :open_date
     attr_accessor :owner
 
-    def initialize(id, balance, open_date)
-      @id        = id.to_i
-      @balance   = balance.to_i
-      @open_date = open_date
-      @owner     = owner
+    def initialize(account_id, balance, open_date)
+      @account_id = account_id.to_i
+      @balance    = balance.to_i
+      @open_date  = open_date
+      @owner      = owner
 
       if @balance < 0
           raise ArgumentError, "Balance can't be less than $0"
@@ -28,14 +28,14 @@ module Bank
       CSV.foreach("support/accounts.csv") do |row|
         accounts << Bank::Account.new(row[0], row[1], row[2])
       end
-      ap accounts, options = {:index => false}
+      return accounts
     end
 
     #returns info on account when passed the id number
     def self.find(id)
       accounts = self.all
       accounts.each do |account|
-        if account.id == id
+        if account.account_id == id
           return account
         end
       end
@@ -64,12 +64,32 @@ module Bank
 
   class Owner
 
-    attr_accessor :id, :name, :street_address
+    attr_reader :owner_id, :last_name, :first_name, :street_address, :city, :state
 
-    def initialize(owner_hash)
-      @id   = owner_hash[:id]
-      @name = owner_hash[:name]
-      @street_address = owner_hash[:street_address]
+    def initialize(owner_id, last_name, first_name, street_address, city, state)
+      @owner_id   = owner_id.to_i
+      @last_name = last_name
+      @first_name = first_name
+      @street_address = street_address
+      @city = city
+      @state = state
+    end
+
+    def self.all
+      owners = []
+      CSV.foreach("support/owners.csv") do |row|
+        owners << Bank::Owner.new(row[0], row[1], row[2], row[3], row[4], row[5])
+      end
+      return owners
+    end
+
+    def self.find(id)
+      owners = self.all
+      owners.each do |owner|
+        if owner.owner_id == id
+          return owner
+        end
+      end
     end
 
   end
