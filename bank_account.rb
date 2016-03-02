@@ -1,3 +1,5 @@
+require "CSV"
+
 module Bank
   class Account
     attr_reader :account_id, :account_balance, :owner_id, :open_date
@@ -6,11 +8,18 @@ module Bank
       if initial_balance < 0
         raise ArgumentError, "Initial balance must be greater than $0.00."
       end
-      @account_id =
-      @account_balance = initial_balance.to_f.round(2)
-      @type_of_account = type_of_account
-      #need to add an owner to the account during initialize
-      @owner_id = owner_id
+      @account_id = account_balance
+      @account_balance = initial_balance
+      @open_date = open_date
+      @owner_id = owner_id   #need to add an owner to the account during initialize
+    end
+
+    def self.all()
+
+    end
+
+    def self.find()
+
     end
 
     def add_owner(id) #account.add_owner(number that you get from Bank::Owner.new)
@@ -35,6 +44,12 @@ module Bank
       @account_balance = @account_balance + money
       return @account_balance
     end
+
+    def get_files
+      file = CSV.read(accounts.csv)
+
+    end
+
   end
 
   class Owner
