@@ -20,7 +20,8 @@ module Bank
 
     end
 
-    def self.import_account
+    #returns list of all instances of accounts
+    def self.all
       accounts = []
       CSV.foreach("support/accounts.csv") do |row|
         accounts << Bank::Account.new(row[0], row[1], row[2])
@@ -28,15 +29,9 @@ module Bank
       return accounts
     end
 
-    #returns list of all instances of accounts
-    def self.all
-      accounts = self.import_account
-      return accounts
-    end
-
     #returns info on account when passed the id number
     def self.find(id)
-      accounts = self.import_account
+      accounts = self.all
       accounts.each do |account|
         if account.id == id
           return account
