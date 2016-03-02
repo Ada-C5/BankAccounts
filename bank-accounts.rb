@@ -23,13 +23,13 @@ The Account can be created with an owner, OR you can create a method that will a
 Wave 2
 
 Primary Requirements
-Update the Account class to be able to handle all of these fields from the CSV file used as input.
+* Update the Account class to be able to handle all of these fields from the CSV file used as input.
 For example, manually choose the data from the first line of the CSV file and ensure you can create a new instance of your Account using that data
-Add the following class methods to your existing Account class
-self.all - returns a collection of Account instances, representing all of the Accounts described in the CSV. See below for the CSV file specifications
-self.find(id) - returns an instance of Account where the value of the id field in the CSV matches the passed parameter
+**Add the following class methods to your existing Account class
+*self.all - returns a collection of Account instances, representing all of the Accounts described in the CSV. See below for the CSV file specifications
+*self.find(id) - returns an instance of Account where the value of the id field in the CSV matches the passed parameter
 
-CSV Data File for Bank::Account
+**CSV Data File for Bank::Account
 The data, in order in the CSV, consists of:
 
 ID - (Fixnum) a unique identifier for that Account
@@ -42,7 +42,7 @@ require "CSV"
 module Bank
 
   class Account
-    attr_reader :owner
+    attr_reader :owner, :id
 
     def initialize(account_information)
       @id = account_information[:id]
@@ -53,23 +53,7 @@ module Bank
       raise ArgumentError.new("An account cannot be created with an initial negative balance.") if @initial_balance < 0
     end
 
-    def self.all(data_file) #returns a collection of Account instances, representing all of the Accounts described in the CSV.
 
-      accounts = [] #start as an empty array. We will fill with instances from our data file.
-
-      accounts_data = CSV.read(data_file)
-      accounts_data.each do |row|
-        account = Bank::Account.new(id: row[0].to_f, initial_balance: row[1].to_f, open_date: row[2]) # to_f becasue ID and initial balance should be numbers
-        accounts << account #put it into our collection of instances! (accounts)
-      end
-
-      return accounts
-
-    end
-
-    def self.find
-        # self.find(id) - returns an instance of Account where the value of the id field in the CSV matches the passed parameter
-    end
 
     def set_owner(owner_object)
       @owner = owner_object
@@ -112,12 +96,42 @@ module Bank
     end
   end
 
+##### CLASS METHODS BELOW #####
+
+  def self.find(data_file, id) #returns an instance of Account where the value of the id field in the CSV matches the passed parameter
+
+    accounts = self.all(data_file)
+    accounts.each do |account|
+      if
+        account.id == id # didn't expect instance method to work in a class method, but I guess it does beceause we called it on an instance.
+        return account
+      end
+    end
+  end
+
+  def self.all(data_file) #returns a collection of Account instances, representing all of the Accounts described in the CSV.
+
+    accounts = [] #start as an empty array. We will fill with instances from our data file.
+
+    accounts_data = CSV.read(data_file)
+    accounts_data.each do |row|
+      account = Bank::Account.new(id: row[0].to_f, initial_balance: row[1].to_f, open_date: row[2]) # to_f becasue ID and initial balance should be numbers
+      accounts << account #put it into our collection of instances! (accounts)
+    end
+
+    return accounts
+  end
+
 end
 
 #test run the program
 
-accounts = Bank::Account.all("./support/accounts.csv")
-puts accounts[0].balance
+
+account_id = Bank::Account.find("./support/accounts.csv", 1212)
+puts account_id.balance
+
+# accounts = Bank::Account.all("./support/accounts.csv")
+# puts accounts[0].balance
 
 #account_row = ["1212","1235667","1999-03-27 11:30:09 -0800"]
 #
