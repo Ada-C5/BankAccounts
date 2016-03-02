@@ -6,7 +6,7 @@ module Bank
     
     # this class creates accounts, we can store account related things in it.
     class Account
-        # attr_accessor
+        attr_reader :id_number
 
         # resetting initializer to use a hash, because I am indecisive about the best
         # method to do the thing I want to do. I will hate this again in an hour. 
@@ -20,23 +20,6 @@ module Bank
                 raise ArgumentError.new("You think we give credit here? HAH!")
             end
         end
-
-        # make a Class method that will instantiate accounts from a csv
-        def self.make_accounts(path_to_csv)
-            id_num = nil
-            balance = nil
-            open_date = nil
-            # this needs to iterate through the CSV
-            CSV.foreach(path_to_csv) do |row|
-                id_num = row[0]
-                balance = row[1]
-                open_date = row[2]
-                Bank::Account.new(id_num: id_num, balance: balance, open_date: open_date)
-            end
-            # then it needs to pass the data from the line to the account
-            # 
-        end
-
 
         # withdraw method
         def withdraw(amount)
@@ -66,6 +49,30 @@ module Bank
         # this will allow you to give a 
         def add_owner(owner_object_name)
             @owner = owner_object_name
+        end
+
+
+        # make a Class method that will instantiate accounts from a csv
+        def self.make_accounts(path_to_csv)
+            id_num = nil
+            balance = nil
+            open_date = nil
+            # this needs to iterate through the CSV
+            CSV.foreach(path_to_csv) do |row|
+                id_num = row[0]
+                balance = row[1].to_i
+                open_date = row[2]
+                account_starter = {id_num: id_num, balance: balance, open_date: open_date}
+                Bank::Account.new(account_starter)
+            end
+        end
+
+        #this will list all account instances that exist
+        def self.list_accounts
+        end
+
+        # this will find an account with a specified it
+        def self.find_account(id)
         end
     end
 
