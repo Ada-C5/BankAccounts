@@ -57,13 +57,15 @@ module Bank
             id_num = nil
             balance = nil
             open_date = nil
+            account_list = []
+            
             # this needs to iterate through the CSV
             CSV.foreach(path_to_csv) do |row|
                 id_num = row[0]
                 balance = row[1].to_i
                 open_date = row[2]
                 account_starter = {id_num: id_num, balance: balance, open_date: open_date}
-                Bank::Account.new(account_starter)
+                self.new(account_starter)
             end
         end
 
@@ -73,6 +75,7 @@ module Bank
 
         # this will find an account with a specified it
         def self.find_account(id)
+
         end
     end
 
