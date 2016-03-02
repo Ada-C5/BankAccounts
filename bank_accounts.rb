@@ -9,7 +9,8 @@ module Bank
         #can I set constants here?
         CENTS_IN_A_DOLLAR = 100.0
 
-        attr_reader :id_number, :owner
+        attr_reader :id_number 
+        attr_accessor :owner
 
         # resetting initializer to use a hash, because I am indecisive about the best
         # method to do the thing I want to do. I will hate this again in an hour. 
@@ -91,7 +92,8 @@ module Bank
 
     # this will create owner objects. We can store info about account owners in it.
     class Owner
-        attr_reader :id_number, :accounts
+        attr_reader :id_number
+        attr_accessor: :accounts
         
         # this method sets the parameters for instantiating a new owner.
         def initialize(owner_info)
@@ -159,11 +161,10 @@ module Bank
             account_to_link.owner = owner_to_link
         end
 
-        def link_accounts(path_to_csv)
-            path_to_csv.foreach do |row|
-
-            end
-
+        def link_single_account(account_collection, account_id, owner_collection, owner_id)
+            owner_to_link = Bank::Owner.find(owner_collection, owner_id)
+            account_to_link = Bank::Account.find(account_collection, account_id)
+            owner_to_link.accounts = account_to_link
         end
 
         # def link_accounts(collection_of_accounts, collection_of_owners)
