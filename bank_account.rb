@@ -45,10 +45,12 @@ module Bank
       return @balance
     end
 
+    # shot id
     def get_id
       return @id
     end
 
+    # show date
     def date
       return @date
     end
@@ -69,12 +71,17 @@ module Bank
       @accounts
     end
     
+    # return info about all accounts in array
     def self.all
+      all = []
       @accounts.each do |account|
-        puts "#{account.get_id}, #{account.balance}, #{account.date}"
+        #puts "#{account.get_id}, #{account.balance}, #{account.date}"
+        all << account
       end
+      puts all
     end
 
+    # return info about account with passed id
     def self.find(id)
       sought_id = nil
       # look through accounts for desired id number
