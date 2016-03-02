@@ -1,5 +1,7 @@
 require 'CSV'
-require 'pp'
+require 'awesome_print'
+
+
 
 module Bank
 
@@ -11,7 +13,7 @@ module Bank
     def initialize(id, balance, open_date)
       @id        = id.to_i
       @balance   = balance.to_i
-      @open_date = DateTime.strptime(open_date, '%Y-%m-%d %H:%M:%S %z')
+      @open_date = open_date
       @owner     = owner
 
       if @balance < 0
@@ -26,7 +28,7 @@ module Bank
       CSV.foreach("support/accounts.csv") do |row|
         accounts << Bank::Account.new(row[0], row[1], row[2])
       end
-      return accounts
+      ap accounts, options = {:index => false}
     end
 
     #returns info on account when passed the id number
