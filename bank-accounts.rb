@@ -4,6 +4,9 @@ require 'CSV'
 module Bank
 	
 	class Account
+		def initialize
+			@accounts = []
+		end
 
 		# check to see if initial balance is less than 0
 		def check_new_account(initial_balance)
@@ -67,11 +70,22 @@ module Bank
 			csv.each do |row|
 				accounts << row
 			end
-			return accounts	
+			
+			@accounts = accounts
+			return @accounts	
 		end 
 
 		def self.get_all(file)
 			all_accounts = self.read_csv(file)
+		end
+		
+		def self.find(id)
+			accounts = @accounts
+			accounts.each_index do |i|
+				if accounts[i][0] == id
+					return accounts[i]
+				end
+			end
 		end
 	end 
 
@@ -84,7 +98,15 @@ end
 #
 # Testing Below
 #
-accounts = Bank::Account.get_all('./support/accounts.csv')
-pp accounts[0][0] # account ID
-pp accounts[1][0] # account ID
+test = Bank::Account.get_all('./support/accounts.csv')
+pp test
+
+test.each_index do |x|
+	if test[x][0] == "1216" # pass in id
+		pp test[x]
+	end
+end
+
+test2 = Bank::Account.find("15151")
+pp test2
 
