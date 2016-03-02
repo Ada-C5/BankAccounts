@@ -36,12 +36,12 @@ Balance - (Fixnum) the account balance amount, in cents (i.e., 150 would be $1.5
 OpenDate - (Datetime) when the account was opened
 
 Bonus Optional Fun Times:
-Implement the optional requirement from Wave 1
-Add the following class methods to your existing Owner class
-self.all - returns a collection of Owner instances, representing all of the Owners described in the CSV. See below for the CSV file specifications
-self.find(id) - returns an instance of Owner where the value of the id field in the CSV matches the passed parameter
-CSV Data File for Bank::Owner
+* Implement the optional requirement from Wave 1
+**Add the following class methods to your existing Owner class
+*self.all - returns a collection of Owner instances, representing all of the Owners described in the CSV. See below for the CSV file specifications
+*self.find(id) - returns an instance of Owner where the value of the id field in the CSV matches the passed parameter
 
+**CSV Data File for Bank::Owner
 The data, in order in the CSV, consists of:
 ID - (Fixnum) a unique identifier for that Owner
 Last Name - (String) the owner's last name
@@ -140,6 +140,32 @@ module Bank
 
     end
 
+    def return_owners_accounts(account_owners_data_file, account_data_file) #returns the instances of all the owner's accounts after get_owners_accounts_ids gets the ids to use in the class method find. account_owners_data_file = "./support/account_owners.csv", account_data_file = "./support/accounts.csv"
+
+      owners_accounts = []
+
+      get_owners_accounts_ids(account_owners_data_file).each do |account_id|
+        account = Bank::Account.find(account_data_file, account_id)
+        owners_accounts << account
+      end
+      return owners_accounts
+    end
+
+    def get_owners_accounts_ids(data_file) #associates owner with their accounts based on mutual IDs "./support/account_owners.csv"
+
+      #first I want to make an array of the owner's account ids.  Then I can use the find ID method to look up what instances these accounts are.
+      owners_accounts_ids = []
+      account_id_owners_id_data = CSV.read(data_file)
+      account_id_owners_id_data.each do |row|
+        if row[1].to_f == @id # everything needs to be numbers not strings but we bring them as strings out of the CSV file so I'm changing them back.
+          account_id = row[0].to_f # samsies.
+          owners_accounts_ids << account_id
+        end
+      end
+
+      return owners_accounts_ids
+    end
+
     ##### CLASS METHODS BELOW #####
 
     def self.find(data_file, id) #returns an instance of Account where the value of the id field in the CSV matches the passed parameter. "./support/owners.csv"
@@ -177,3 +203,7 @@ puts account_id.balance
 
 owner_id = Bank::Owner.find("./support/owners.csv", 14)
 puts owner_id.first_name
+
+owner_account = owner_id.return_owners_accounts("./support/account_owners.csv", "./support/accounts.csv")
+puts owner_account[0].id
+puts owner_account[0].balance
