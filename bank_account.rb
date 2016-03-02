@@ -3,7 +3,6 @@ require 'CSV'
 
 module Bank
   class Account
-
     def initialize(id, balance, date)
       @id = id
       @balance = balance
@@ -23,7 +22,6 @@ module Bank
     def money_convert(balance)
       print_bal = balance.to_s
       print_bal = print_bal.insert -3, "."
-      # return print_bal
     end
 
     # withdraw money from account
@@ -41,12 +39,12 @@ module Bank
     # deposit money in account
     def deposit(amount)
       @balance += amount
-      return @balance
+      return money_convert(@balance)
     end
 
     # show current balance
     def balance
-      return @balance
+      return money_convert(@balance)
     end
 
     # shot id
@@ -92,33 +90,55 @@ module Bank
       end
       return sought_account
     end
-
-
   end
   
   class Owner
     # take in name and id from user_input
-    def initialize(info)
-      @fname = info[:fname]
-      @lname = info[:lname]
-      @id = info[:id]
-      @address = info[:address]
-      @city = info[:city]
-      @state = info[:state]
-      @account = info[:account]
+    def initialize(id, lname, fname, street_address, city, state)
+      @id = id
+      @fname = fname
+      @lname = lname
+      @street_address = street_address
+      @city = city
+      @state = state
+     # @account = info[:account]
     end
+
+    def self.create_owners(file)
+      owners = []
+      CSV.foreach(file) do |line|
+        #save info to vars
+        id = line[0].to_i
+        lname = line[1]
+        fname = line[2]
+        street_address = line[3]
+        city = line[4]
+        state = line[5]
+        #initialize new instances of owners with vars
+        owners << self.new(id, lname, fname, street_address, city, state)
+      end
+      # return array with each owner instance created from file
+      return owners
+    end
+
+    
 
     # print owner info
     def get_info
-      puts "#{@fname} #{@lname} lives at #{@address} in #{@city}, #{@state} and their bank ID is #{@id}"
+      puts "#{@fname} #{@lname} lives at #{@street_address} in #{@city}, #{@state} and their bank ID is #{@id}"
     end
+  
   end
 end
 
 
 # TEST CALLS
-accountz = Bank::Account.create_accounts("./support/accounts.csv")
-puts accountz
+ownerz = Bank::Owner.create_owners("./support/accounts.csv")
+puts ownerz
+
+
+# accountz = Bank::Account.create_accounts("./support/accounts.csv")
+# puts accountz
 #puts "bottom account #{accounts.find(1212)}"
 #puts accounts[0].balance
 # my_account = Bank::Account.find(15154)
