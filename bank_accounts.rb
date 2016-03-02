@@ -2,31 +2,42 @@
 # for example, if a user enters 10, it will convert to 1000 for the money gem, which will then convert it to $10.00
 # require "money"
 
-require "CSV"
-
+require 'csv'
 module Bank
 
   class Account
     # For bank employee eyes only! I would remove the attr_reader if I was going
     # to expose this code anywhere public.
-    attr_reader :id, :balance, :owner, :account_info
+    attr_reader :id, :balance, :date_created
 
     def initialize(account_info)
       # manually choose the data from the first line of the CSV file and ensure
       # you can create a new instance of your Account using that data
 
-      # @all_account_info = CSV.read("accounts.csv")
-
       # create a hash with keys id, balance, date_created and get those values
       # from reading accounts.csv (which turns it into an array), and use indexes
       # of given array to shovel into account_info hash?
 
-      if account_info[:balance] < 1
-        raise ArgumentError.new("You must have at least $1 to open an account.")
-      end
+      #if account_info[:balance] < 1
+      #  raise ArgumentError.new("You must have at least $1 to open an account.")
+      #end
       @id = account_info[:id]
       @balance = account_info[:balance]
-      @owner = account_info[:owner] # temporary value until Owner is created
+      @date_created = account_info[:date_created]
+      # ADD THIS BACK IN LATER
+      # @owner = account_info[:owner] # temporary value until Owner is created
+    end
+
+    def self.make_account
+      array_of_accounts = CSV.read("support/accounts.csv")
+      account_info_array = []
+      # this method should return an array of hashes, where each hash represents one row of data
+      # array_of_accounts.each do.... get a hash somehow {id => element[0], balance => element[1], }
+      # put those hashes into an array, and return that array to whoever calls this method
+      array_of_accounts.each do |element|
+        account_info_array << {id: element[0], balance: element[1], date_created: element[2]}
+      end
+      return account_info_array
     end
 
     # If the owner has already been created in the Owner class, the method should be called like so:
@@ -73,3 +84,7 @@ module Bank
     end
   end
 end
+
+new_account = Bank::Account.new(id: "", balance: "", date_created: "")
+
+#@array_of_accounts = CSV.open("accounts.csv", "r")
