@@ -41,7 +41,7 @@ module Bank
     end
 
     def accounts
-      
+
     end
 
     def create_account(info)
@@ -59,7 +59,9 @@ module Bank
       @open_date = info[:open_date]
       raise ArgumentError.new("You need money to start an account here.") if @balance < 0
       @account_owner = @name
+      @all_accounts_in_file = self.all(file_path)
     end
+
 
     def self.all
           all_accounts_in_file =[]
@@ -70,6 +72,7 @@ module Bank
           end
           return all_accounts_in_file
     end
+
 
 
     def self.find(id_num)
@@ -119,5 +122,3 @@ end
 #@fancy_account = Bank::Account.new(id_num:78, balance: 67)
 #@fancy_account.add_owner(@lisa)
 #puts @lisa.to_yaml
-
-#@all_the_peeps = Bank::Owner.all
