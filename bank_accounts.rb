@@ -4,10 +4,13 @@ require 'csv'
 
 module Bank
   class Account
-    def initialize(id=0, money=0)
-      @id = id
-      @money = money
-      @initial_money = money
+    attr_reader :id
+    def initialize(stupid_hash)
+      @id = stupid_hash[:id]
+      @money = stupid_hash[:money]
+      @start_date = stupid_hash[:start_date]
+
+
       if @money < 0
         raise ArgumentError.new("Only positive numbers are allowed in the bank.")
       end
@@ -36,36 +39,51 @@ module Bank
     #  sprintf("%0.02f", total/100)
      puts "Current balance: $#{var}"
     end
+
+    def self.find(id)
+      var = self.account_info
+      var.each do |num|
+        if num.id == id
+          return num
+        end
+      end
+    end
+
+
+
+    def self.account_info
+      accounts = CSV.read('accounts.csv')
+      account_info = []
+
+      CSV.foreach("accounts.csv") do |row|
+        info = self.new(id: row[0].to_f, money: row[1].to_f, start_date: row[2])
+        account_info << info
+      end
+      return account_info
+    end
+
   end
 
   class Owner
     # attr_accessor :name, :address,
-    def initialize
-      # @owner_hash = hash
-
-      @info_hash = {:list_num => "", :last_name => "",:first_name => "",
-        :street =>"", :city => "", :state => "", :id => "", :initial_balance => ""}
-
-      @accounts = CSV.read('accounts.csv')
-      @account_owners = CSV.read('account_owners.csv')
-      @owners = CSV.read('owners.csv')
+    def initialize(info_hash)
+      @list_num = info_hash[:list_num]
+      @last_name = info_hash[:last_name]
+      @first_name = info_hash[:first_name]
+      @street = info_hash[:street]
+      @city = info_hash[:city]
+      @state = info_hash[:state]
     end
 
-    def info
-      num = 0
-      hashes = []
+    def self.owner_info
+      owners = CSV.read('owners.csv')
+      owner_info = []
       CSV.foreach("owners.csv") do |row|
-        # puts row[1] #gets the second column
-         hashes[num]= @info_hash
-        (0..(@owners[0].length)-1).each do |col|
-          puts row[col]
-          puts "MEOW"
-          hashes[num][@info_hash.keys[col]] = @owners[num][col]
-        end
-        num += 1
+        info = self.new(list_num: row[0], last_name: row[1], first_name: row[2],
+          street: row[3], city: row[4], state: row[5])
+          owner_info << info
       end
-
-      puts @info_hash
+      return owner_info
     end
 
   end
