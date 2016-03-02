@@ -1,10 +1,10 @@
 module Bank
 require "CSV"
   class Account
-		attr_accessor :balance, :ACCOUNT_ID, :open_date
+		attr_reader :balance, :ACCOUNT_ID, :open_date
 
 		def initialize (id, balance, open_date)
-			@id = id
+			@account_id = id
 			@balance = balance
 			@open_date = open_date
 
@@ -12,21 +12,21 @@ require "CSV"
 		end
 
 		def self.all 
-			CSV.read("./support/accounts.csv", "r").each do |line|
-      	all = []
+      all =[]
+			CSV.foreach("./support/accounts.csv", "r") do |line|
         all << self.new(line [0], line[1].to_f, line [2])
-  		  return all
       end
+      return all
   	end
 
     def self.find(id)
-      array = []
+      find = []
    		CSV.read("./support/accounts.csv", "r").each do |line|
         if line [0] == id.to_s
-          array = self.new(line [0], line[1].to_f, line [2])
-          return array
+          find = self.new(line [0], line[1].to_f, line [2])
         end
       end
+      return find
     end
 
 		def withdraw(debit)
@@ -44,15 +44,15 @@ require "CSV"
 		end
 
 		#def add_owner(customer)
-			#@customer = customer
+		#	@customer = customer
 		#end
 	end
 	
   class Owner
-		attr_accessor :OWNER_ID, :first, :last, :address, :city, :state
+		attr_reader :OWNER_ID, :first, :last, :address, :city, :state
 
-		def initialize 
-			@OWNER_ID = OWNER_ID
+		def initialize (id, last, first, address, city, state)
+			@owner_id = id
 			@first = first
 			@last = last
 			@address = address
@@ -60,10 +60,22 @@ require "CSV"
 			@state = state
 		end
 
+    def self.all 
+      owner_all= []
+      CSV.read("./support/owners.csv", "r").each do |line|
+        owner_all << self.new(line[0], line[1], line[2], line[3], line[4], line[5])
+      end
+      return owner_all
+    end
+
+    def self.find(id)
+      owner_find = []
+      CSV.read("./support/owners.csv", "r").each do |line|
+        if line [0] == id.to_s
+          owner_find = self.new(line[0], line[1], line[2], line[3], line[4], line[5])
+        end
+      end
+      return owner_find
+    end
 	end
 end
-
-
-#jim = Bank::Owner.new(name: "Jim", state:"Vancouver")
-#my_account = Bank::Account.new(id: 2, balance: 10000)
-#my_account.add_owner(jim)
