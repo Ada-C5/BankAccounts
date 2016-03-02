@@ -31,11 +31,10 @@ module Bank
                 id_num = row[0]
                 balance = row[1]
                 open_date = row[2]
+                Bank::Account.new(id_num: id_num, balance: balance, open_date: open_date)
             end
-            puts id_num #debugging statement
-
             # then it needs to pass the data from the line to the account
-            # Bank::Account.new(id_num: id_num, balance: balance, open_date: open_date)
+            # 
         end
 
 
