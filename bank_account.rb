@@ -23,27 +23,25 @@ module Bank
     end
 
     # make the accounts array a method and reference it that way instead of an instance variable
-    def self.accounts
-      accounts = []
+    def self.create_accounts
+      create_accounts = []
       csv_data.each_index do |i|
         id = csv_data[i][0]
         initial_balance = csv_data[i][1].to_f
         opendate = csv_data[i][2]
-        accounts << self.new(id, initial_balance, opendate)
+        create_accounts << self.new(id, initial_balance, opendate)
       end
-      return accounts
+      return create_accounts
     end
 
     def self.all
-      self.accounts
+      self.create_accounts
     end
 
     def self.find(find_id)
-      self.accounts.each_index do |i|
-        if self.accounts[i].id == find_id.to_s
-          return self.accounts[i]
-        else
-          return "ID not found."
+      self.create_accounts.each_index do |i|
+        if self.create_accounts[i].id == find_id.to_s
+          return self.create_accounts[i]
         end
       end
     end
@@ -76,7 +74,7 @@ module Bank
   end
 
   class Owner
-    attr_reader :id, :first_name, :last_name :address
+    attr_reader :id, :first_name, :last_name, :address
     def initialize(owner_hash)
       @id = owner_hash[:id]
       @last_name = owner_hash[:last_name]
@@ -88,8 +86,8 @@ module Bank
       CSV.read(file_path)
     end
 
-    def self.owners
-      owners = []
+    def self.create_owners
+      create_owners = []
       csv_data.each_index do |i|
       owner = {
         id: csv_data[i][0],
@@ -99,33 +97,23 @@ module Bank
         city: csv_data[i][4],
         state: csv_data[i][5]
       }
-        owners << self.new(owner)
+        create_owners << self.new(owner)
       end
-      return owners
+      return create_owners
+    end
 
+    def self.all
+      self.create_owners
+    end
 
-      # owners = []
-      # csv_data.each_index do |i|
-      #   id = csv_data[i][0]
-      #   last_name = csv_data[i][1]
-      #   first_name = csv_data[i][2]
-      #   street = csv_data[i][3]
-      #   city = csv_data[i][4]
-      #   state = csv_data[i][5]
-      #   owners << self.new(id, last_name, first_name, street, city, state)
-      # end
-      # return owners
+    def self.find(find_id)
+      self.create_owners.each_index do |i|
+        if self.create_owners[i].id == find_id.to_s
+          return self.create_owners[i]
+        end
+      end
     end
 
   end
 
 end
-
-# csv_info = CSV.read("./support/accounts.csv")
-# #account_info = {}
-# csv_info.each_index do |i|
-#   id = csv_info[i][0]
-#   initial_balance = csv_info[i][1]
-#   opendate = csv_info[i][2]
-#   Bank::Account.new(id, initial_balance, opendate)
-# end
