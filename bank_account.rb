@@ -1,3 +1,5 @@
+require 'CSV'
+
 module Bank
 
   class Account
@@ -5,11 +7,17 @@ module Bank
     # Can set owner after account has been created.
     attr_writer :owner
 
-    def initialize(id, initial_balance, owner=nil)
-      raise ArgumentError, "Starting balance must be a number." unless initial_balance.is_a? Numeric
-      raise ArgumentError, "You must not have a negative starting balance." unless initial_balance > 0
-      @id = id
-      @balance = initial_balance
+    def initialize(owner=nil)
+      # raise ArgumentError, "Starting balance must be a number." unless initial_balance.is_a? Numeric
+      # raise ArgumentError, "You must not have a negative starting balance." unless initial_balance > 0
+      @csv_info = CSV.read("./support/accounts.csv")
+      @account_info = {}
+      @csv_info.each_index do |i|
+        @id = @csv_info[i][0]
+        @balance = @csv_info[i][1]
+        @opendate = @csv_info[i][2]
+        @account_info[@id] = [@balance, @opendate]
+      end
       @owner = owner
     end
 
