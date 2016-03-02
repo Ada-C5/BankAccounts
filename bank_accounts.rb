@@ -42,6 +42,21 @@ module Bank
       return account_info_array
     end
 
+    def self.find(given_id)
+      #returns an instance of Account where the value of the id field in the CSV
+      #matches the passed parameter
+
+      # iterate over the Account instances until you find the instance with the matching id
+      # all the account instances are listed in account_info_array
+      Bank::Account.all.each do |account|
+        if account.id == given_id
+          return account
+        else
+          puts "Not found."
+        end
+      end
+    end
+
     # If the owner has already been created in the Owner class, the method should be called like so:
     # account_instance.add_owner(owner_instance.name)
     # If owner does not exist, the method should be called like so:
