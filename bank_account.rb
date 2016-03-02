@@ -5,19 +5,44 @@ require 'awesome_print'
 module Bank
 
   class Owner
-    attr_accessor :name, :email, :accounts
+    attr_accessor :last_name,:first_name, :owner_id, :email, :all_owner_info, :owner_to_find
 
     def initialize(owner_info)
-
-      @name = owner_info[:name]
+      @owner_id = owner_info[:owner_id]
+      @last_name = owner_info[:last_name]
+      @first_name = owner_info[:first_name]
       @email = owner_info[:email]
       @street_address = owner_info[:street_address]
       @city = owner_info[:city]
       @state = owner_info[:state]
       @cell_phone = owner_info[:cell_phone]
-      @accounts = []
     end
 
+    def self.all
+      all_owner_info =[]
+      CSV.open("./support/owners.csv", 'r') do |csv|
+        csv.read.each do |line|
+          all_owner_info.push(Owner.new(owner_id: line[0], last_name: line[1], first_name: line[2], street_address: line[3], city:line[4], state: line[5]))
+        end
+      end
+      return all_owner_info
+    end
+
+
+    def self.find(owner_id)
+      all_owners = self.all
+      owner_to_find = nil
+      all_owners.each do |owner|
+        if owner.owner_id == owner_id
+          owner_to_find = owner
+        end
+        return owner_to_find
+      end
+    end
+
+    def accounts
+      
+    end
 
     def create_account(info)
       @accounts.push(Bank::Account.new(info))
@@ -30,36 +55,33 @@ module Bank
     def initialize(info)
       @account_type = info[:account_type]
       @id_num = info[:id_num]
-      @balance = info[:balance]
+      @balance = info[:balance]/100
       @open_date = info[:open_date]
       raise ArgumentError.new("You need money to start an account here.") if @balance < 0
       @account_owner = @name
     end
 
-    def self.all(file_path)
-          @all_accounts_in_file =[]
-          CSV.open(file_path, 'r') do |csv|
+    def self.all
+          all_accounts_in_file =[]
+          CSV.open("./support/accounts.csv", 'r') do |csv|
             csv.read.each do |line|
-              @all_accounts_in_file.push(Account.new(id_num: line[0],balance: line[1].to_i, open_date: line[2]))
+              all_accounts_in_file.push(Account.new(id_num: line[0],balance: line[1].to_i, open_date: line[2]))
             end
           end
-          ap @all_accounts_in_file
-          return @all_accounts_in_file
-        end
-
+          return all_accounts_in_file
+    end
 
 
     def self.find(id_num)
+      files = self.all
       account_to_find = nil
-      @all_accounts_in_file.each do |account|
+      files.each do |account|
         if account.id_num == id_num
           account_to_find = account
         end
         return account_to_find
       end
-
     end
-
 
 
     def add_owner(owner)
@@ -67,12 +89,12 @@ module Bank
     end
 
     def withdraw(amount)
-      if @balance - amount.to_f < 0
+      if @balance - amount < 0
         puts "Sorry, but you don't have that much money in your account to withdraw."
         printf("Your current balance is $%.2f." , @balance)
 
       else
-        @balance -= amount.to_f
+        @balance -= amount
         printf("$%.2f has been withdrawn. Your current balance is $%.2f." ,amount ,@balance)
       end
 
@@ -83,7 +105,7 @@ module Bank
     end
 
     def deposit(amount)
-      @balance += amount.to_f
+      @balance += amount
       printf("$%.2f has been deposited. Your current balance is $%.2f." ,amount ,@balance)
     end
 
@@ -97,4 +119,5 @@ end
 #@fancy_account = Bank::Account.new(id_num:78, balance: 67)
 #@fancy_account.add_owner(@lisa)
 #puts @lisa.to_yaml
-@yes = Bank::Account.all("./support/accounts.csv")
+
+#@all_the_peeps = Bank::Owner.all
