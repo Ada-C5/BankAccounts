@@ -72,8 +72,9 @@ module Bank
 
         #this will list all account instances that exist
         def self.all
-            ObjectSpace.each_object(Bank::Account) {|account| p account }
+
         end
+
 
         # this will find an account instance with a specified id
         # ids are kept as strings and so must be passed as strings
@@ -92,16 +93,68 @@ module Bank
 
     # this will create owner objects. We can store info about account owners in it.
     class Owner
+        attr_reader :id
         
         # this method sets the parameters for instantiating a new owner.
-        def initialize(name)
-            @name = name
+        def initialize(owner_info)
+            @id_number = owner_info[:id_num]
+            @last_name = owner_info[:last_name]
+            @first_name = owner_info[:first_name]
+            @name = @first_name + " " + @last_name
+            @street_address = owner_info[:street_address]
+            @city = owner_info[:city]
+            @state = owner_info[:state]
             @accounts = []
         end
 
         # this adds accounts to the owner's list of accounts
         def add_account(account)
             @accounts.push(account)
+        end
+
+        # make a Class method that will instantiate accounts from a csv
+        def self.make_owners(path_to_csv)
+            id_num = nil
+            last_name = nil
+            first_name = nil
+            street_address = nil
+            city = nil
+            state = nil
+
+            owner_list = []
+            # this needs to iterate through the CSV
+            CSV.foreach(path_to_csv) do |row|
+                id_num = row[0]
+                last_name = row[1]
+                first_name = row[2]
+                street_address = row[3]
+                city = row[4]
+                state = row[5]
+
+                owner_starter = {id_num: id_num, last_name: last_name, first_name: first_name, street_address: street_address, city: city, state: state}
+                owner_list << self.new(owner_starter)
+            end
+            owner_list
+        end
+
+        #this will list all account instances that exist
+        def self.all
+
+        end
+
+
+        # this will find an account instance with a specified id
+        # ids are kept as strings and so must be passed as strings
+        # because of that, I'll convert ids (using to_s).
+        # this allows more extensible code because it enables
+        # ids to use alphabet characters too (and it's got the same
+        # cost as converting IDs to Fixnums.
+        def self.find(collection_to_search, id)
+            collection_to_search.each do |account|
+                if account.id_number == id.to_s
+                    return account
+                end
+            end
         end
     end
 
