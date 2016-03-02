@@ -58,24 +58,24 @@ module Bank
     # method to create new accounts from csv information
     def self.create_accounts(file)
       #open and read file
-      @accounts = []
+      accounts = []
       CSV.foreach(file) do |line|
         #save info to vars
         id = line[0].to_i
         balance = line[1].to_i
         date = line[2].to_i
         #initialize new instances of accounts with vars
-        @accounts << self.new(id, balance, date)
+        accounts << self.new(id, balance, date)
       end
       # return array with each account instance created from file
-      @accounts
+      return accounts
     end
     
-    # return info about all accounts in array
-    def self.all
+    # return all instances in array
+    def self.all(file)
       all = []
-      @accounts.each do |account|
-        #puts "#{account.get_id}, #{account.balance}, #{account.date}"
+      instances = self.create_accounts(file)
+      instances.each do |account|
         all << account
       end
       puts all
@@ -83,14 +83,14 @@ module Bank
 
     # return info about account with passed id
     def self.find(id)
-      sought_id = nil
+      sought_account = nil
       # look through accounts for desired id number
       @accounts.each do |account|
         if account.get_id == id
-          sought_id = account
+          sought_account = account
         end
       end
-      puts "#{sought_id.get_id} has a balance of #{sought_id.balance} and opened their account on #{sought_id.date}."
+      return sought_account
     end
 
 
@@ -119,7 +119,7 @@ accounts = Bank::Account.create_accounts("./support/accounts.csv")
 #puts "bottom account #{accounts.find(1212)}"
 #puts accounts[0].balance
 #Bank::Account.find(15154)
-Bank::Account.all
+Bank::Account.all("./support/accounts.csv")
 
 
 
