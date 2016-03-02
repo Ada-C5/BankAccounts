@@ -72,6 +72,7 @@ module Bank
 
         #this will list all account instances that exist
         def self.all
+            ObjectSpace.each_object(Bank::Account) {|account| p account }
         end
 
         # this will find an account with a specified it
