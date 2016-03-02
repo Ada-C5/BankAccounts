@@ -44,33 +44,12 @@ module Bank
 
    def self.find(id)
      self.all.each do |account|
-       if account[0] = id
+       if account[0] == id
          return account
        end
      end
    end
 
-   def self.find_owner_number(id) #search accounts by id number
-     owner_list = CSV.read('./support/account_owners.csv')
-     owner_list.each do |account|
-      if account[0] = id
-        return account[1]
-      end
-    end
-   end
-
-  def self.find_owner_info_with_number(id) #USER COMMAND TO FIND OWNER
-    owner_number = self.find_owner_number(id)
-    owner_list = CSV.read('./support/account_owners.csv')
-    puts owner_list
-    puts "read CSV"
-    puts owner_number
-    owner_list.each do |owner|
-      if owner[1] == owner_number
-        return owner_number
-      end
-    end
-  end
  end
 
 
@@ -79,10 +58,10 @@ module Bank
 
    def initialize(owner_hash)
      @name = owner_hash[:first_name] + owner_hash[:last_name]
-     @id = owner_hash[:id]
+     @owner_number = owner_hash[:customer_number]
      @address = owner_hash[:address]
-     @city = city
-     @state = state
+     @city = owner_hash[:city]
+     @state = owner_hash[:state]
    end
 
    def self.pull_from_csv
@@ -93,19 +72,52 @@ module Bank
      owners_hash = {}
      self.pull_from_csv.each do |account|
        new_owner = {
-         id: account[0],
+         customer_number: account[0],
          first_name: account[2],
          last_name: account[1],
          address: account[3],
          city: account[4],
          state: account[5]
        }
+       owner_number = account[0]
        new_account = Bank::Owner.new(new_owner)
-       owners_hash[id] = new_account
+       owners_hash[owner_number] = new_account
      end
-       owners_hash
+      return owners_hash
    end
-   
+
+   def self.find(id)
+     owner_number = self.find_owner_number(id)
+     puts owner_number
+     self.all.each do |key, value|
+       if key == owner_number
+         return value
+       end
+     end
+   end
+
+   def self.find_owner_number(id) #search accounts by id number
+     owner_list = CSV.read('./support/account_owners.csv')
+     owner_list.each do |account|
+       puts account
+      if account[0] == id.to_s
+        puts "This is the number associated with #{id}'s account"
+        return account[1] #returns owner number
+      end
+    end
+   end
+
+    # def self.find_owner_info_with_number(id) #USER COMMAND TO FIND OWNER
+    #   owner_number = self.find_owner_number(id)
+    #   owner_list = CSV.read('./support/account_owners.csv')
+    #   owner_list.each do |owner|
+    #     if owner[1] == owner_number
+    #       return owner_number
+    #       puts "OWNER ID #{id} belongs to owner #{owner_number}"
+    #     end
+    #   end
+    # end
+
  end
 
 
