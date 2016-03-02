@@ -85,7 +85,7 @@ module Bank
     def self.find(id)
       sought_account = nil
       # look through accounts for desired id number
-      @accounts.each do |account|
+      accounts.each do |account|
         if account.get_id == id
           sought_account = account
         end
