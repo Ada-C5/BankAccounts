@@ -5,7 +5,7 @@ module Bank
 
 
   class Account
-    attr_reader :id, :owner, :account_info, :account_array
+    attr_reader :id, :owner, :accounts, :csv_data
     # Can set owner after account has been created.
     attr_writer :owner
 
@@ -18,16 +18,23 @@ module Bank
       @owner = owner
     end
 
-    def self.all
-      csv_info = CSV.read("./support/accounts.csv")
-      @account_info = []
-      csv_info.each_index do |i|
-        id = csv_info[i][0]
-        initial_balance = csv_info[i][1]
-        opendate = csv_info[i][2]
-        @account_info << self.new(id, initial_balance, opendate)
+    def self.csv_data
+      @csv_data = CSV.read("./support/accounts.csv")
+    end
+
+    def self.accounts
+      @accounts = []
+      csv_data.each_index do |i|
+        id = csv_data[i][0]
+        initial_balance = csv_data[i][1]
+        opendate = csv_data[i][2]
+        @accounts << self.new(id, initial_balance, opendate)
       end
-      return @account_info
+      return @accounts
+    end
+
+    def self.all
+      @accounts
     end
 
     def self.find(find_id)
