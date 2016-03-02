@@ -43,17 +43,21 @@ module Bank
     #Account.all
     def self.all
         accounts = []
-        array = CSV.read("./support/accounts.csv").each do |array|
+        CSV.read("./support/accounts.csv").each do |array|
         accounts << self.new(array[0],array[1],array[2])
          accounts
       end
     end
 
-    def method_name
-
+    def self.find(id)
+      CSV.read("./support/accounts.csv").each do |csv|
+        csv.each do |second|
+          if second.include? id.to_s
+            return self.new(csv[0],csv[1].to_f / 100,csv[2])
+          end
+        end
+      end
     end
-
-
   end
 
   class Owner
