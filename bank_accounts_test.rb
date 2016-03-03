@@ -11,9 +11,24 @@ require_relative 'bank_account.rb'
 # my_account = Bank::SavingsAccount.new(2, 15, 2005)
 # puts my_account.withdraw(4)
 
+# # # # # # TESTS FOR CHECKINGACCOUNT # # # # #
+### test for withdraw
+# my_account = Bank::CheckingAccount.new(44, 500, 1999)
+# puts my_account.withdraw(510)
+
+### test for withdraw_using_check
+my_account = Bank::CheckingAccount.new(33, 600, 2003)
+puts my_account.withdraw_using_check(100)
+puts my_account.withdraw_using_check(100)
+puts my_account.withdraw_using_check(100)
+puts my_account.withdraw_using_check(100)
+puts my_account.withdraw_using_check(100)
+puts my_account.withdraw_using_check(100)
+puts my_account.withdraw_using_check(100)
+
 ### test for add_interest method
-my_account = Bank::SavingsAccount.new(2, 10000, 2005)
-puts my_account.add_interest(0.25) #10025.0
+# my_account = Bank::SavingsAccount.new(2, 10000, 2005)
+# puts my_account.add_interest(0.25) #10025.0
 
 
 # # # # # TESTS FOR OWNER CLASS # # # # #
