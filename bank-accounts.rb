@@ -100,12 +100,34 @@ module Bank
 	end 
 	class SavingsAccount < Account
 
-	# magic number! Account balance cannot be less than $10 or an error is raised,
+	# magic number! Account balance cannot be less than $10 or an error is raised
 	ALLOWED_BALANCE = 10
+	# magic number! All savings account withdrawals incur a $2 fee 
+	WITHDRAW_FEE = 2.00
 
 		def check_new_account(initial_balance)
 			if @balance < ALLOWED_BALANCE 
 				raise ArgumentError.new("Balance of account may not be less than $10.")
+			end
+		end
+		def withdraw_money(amount)
+		check_entry = check_entry(amount)
+			if check_entry == false
+				puts "*** ERROR ***"
+				puts "That is not a valid amount to withdraw." 
+				show_balance
+			end
+			new_balance = @balance - amount - WITHDRAW_FEE
+			if new_balance < 10
+				puts "*** ERROR ***"
+				puts "Insufficent Funds."
+				new_balance = @balance + amount + WITHDRAW_FEE
+				show_balance
+			else 
+				puts format("Removing $%.2f from #{@account_id} with a balance of $%.2f", amount, @balance)
+				puts format("Savings Accounts incur a $%.2f fee per withdrawal transation", WITHDRAW_FEE)
+				@balance = new_balance
+				show_balance
 			end
 		end
 
@@ -164,7 +186,9 @@ account = Bank::Account.find(1212, accounts)
 
 
 savings_accounts = Bank::SavingsAccount.get_all('./support/savings_accounts.csv')
-pp savings_accounts
+
+savings_account = Bank::SavingsAccount.find(1112, savings_accounts).withdraw_money(10)
+pp savings_account
 
 # owners = Bank::Owner.get_all('./support/owners.csv') 
 
