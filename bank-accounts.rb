@@ -4,6 +4,8 @@ module Bank
 
   class Account
 
+    WITHDRAWAL_FEE = 0
+
     attr_reader   :balance, :account_id, :open_date
     attr_accessor :owner
 
@@ -45,11 +47,11 @@ module Bank
     end
 
     def withdraw(withdraw_amount)
-      if @balance - withdraw_amount < 0
+      if @balance - withdraw_amount - WITHDRAWAL_FEE < 0
         puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
         return "Account balance: #{@balance}"
       else
-        @balance -= withdraw_amount
+        @balance -= withdraw_amount - WITHDRAWAL_FEE
         return "Account balance: #{@balance}"
       end
     end
@@ -73,7 +75,7 @@ module Bank
       if @balance < 10
           raise ArgumentError, "Balance can't be less than $10.00"
       end
-      puts "A savings account will incur a $#{WITHDRAWAL_FEE} fee per transaction."
+      puts "A savings account will incur a $#{WITHDRAWAL_FEE} fee per withdrawal."
     end
 
     def withdraw(withdraw_amount)
@@ -89,6 +91,7 @@ module Bank
     def add_interest(rate)
       @interest = @balance * rate/100
       return "Amount added: $#{@interest}"
+      #figure out why interest is not added to balance when calling balance method
       @balance += @interest
     end
   end
@@ -115,12 +118,22 @@ module Bank
 
     def initialize(account_id, balance, open_date)
       super
-      puts "A checking account will incur a $#{WITHDRAWAL_FEE} fee per transaction."
+      puts "A checking account will incur a $#{WITHDRAWAL_FEE} fee per withdrawal."
     end
 
+    # figure out how to make withdraw use super and inherit from base class
+    # how to replace constant variable in base class with value in subclass
     def withdraw(withdraw_amount)
-
+      if @balance - withdraw_amount - WITHDRAWAL_FEE < 0
+        puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
+        return "Account balance: #{@balance}"
+      else
+        @balance -= withdraw_amount - WITHDRAWAL_FEE
+        return "Account balance: #{@balance}"
+      end
     end
+
+    
   end
 
 
