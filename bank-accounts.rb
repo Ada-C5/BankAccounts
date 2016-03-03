@@ -1,7 +1,4 @@
 require 'CSV'
-require 'awesome_print'
-
-
 
 module Bank
 
@@ -21,7 +18,7 @@ module Bank
       end
 
     end
-
+    
     #returns list of all instances of accounts
     def self.all
       accounts = []
@@ -34,10 +31,16 @@ module Bank
     #returns info on account when passed the id number
     def self.find(id)
       accounts = self.all
+      found = nil
       accounts.each do |account|
         if account.account_id == id
-          return account
+          found = account
         end
+      end
+      if found == nil
+        return "ID not found!"
+      else
+        return found
       end
     end
 
@@ -75,16 +78,6 @@ module Bank
       @state = state
     end
 
-    def accounts(owner_id)
-      CSV.foreach("support/owners_owners.csv") do |row|
-        if row[0] == owner_id
-            row[1] = account_id
-            Bank::Account.find(account_id)
-        end
-      end
-    end
-
-    end
     def self.all
       owners = []
       CSV.foreach("support/owners.csv") do |row|
@@ -95,10 +88,16 @@ module Bank
 
     def self.find(id)
       owners = self.all
+      found = nil
       owners.each do |owner|
         if owner.owner_id == id
-          return owner
+          found = owner
         end
+      end
+      if found == nil
+        return "Account owner not found!"
+      else
+        return found
       end
     end
 
