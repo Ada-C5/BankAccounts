@@ -9,38 +9,25 @@ module Bank
     end
 
     def one
-      # user = []
       total = CSV.read('support/accounts.csv')
       total = total.first
       @id = total[0]
-      @balance = total[1]
+      @balance = total[1].to_f
       @date = total[2]
-      # user << @id
-      # user << @balance
-      # user << @date
-      # puts "id: #{@id} - balance: #{@balance} - use since #{@date}"
-      # puts user
-      # puts user
-      # return total
+      return total
     end
-
-        # Class method One before deciding to chanfe to initializer
-        # def self.one
-        #   total = CSV.read('support/accounts.csv').first
-        #   @id = total[0]
-        #   @balance = total[1]
-        #   @data = total[2]
-        #   self.new
-        # end
 
     def self.all
       array_accounts = []
-      CSV.read('support/accounts.csv').each do |i|
-        i = self.new
-        array_accounts << i
+      total = CSV.read('support/accounts.csv')
+      total.each do |row|
+        @id = row[0]
+        @balance = row[1].to_f
+        @date = row[2]
+        one_account = self.new
+        array_accounts << one_account
       end
-        # puts array_accounts
-        # puts array_accounts[2]
+        return array_accounts #look this up!!!!!!
     end
 
     # def withdraw(withdraw)
@@ -49,17 +36,17 @@ module Bank
     #     @balance = @balance + withdraw
     #     puts "You dont have all that money"
     #   end
-    #   balance
+    #   balance_printed
     # end
     #
-    # def deposit(money)
-    #   @balance = @balance + money
-    #   balance
-    # end
-    #
-    # def balance
-    #   puts "#{@balance} is your new balance"
-    # end
+    def deposit(money)
+      @balance = @balance + money
+      balance_printed
+    end
+
+    def balance_printed
+      puts "#{@balance} is your new balance"
+    end
 
   end
 
@@ -76,11 +63,14 @@ module Bank
 
 end
 
-clients = Bank::Account.new
-puts clients.one
-puts clients.class
-puts clients
-puts clients.balance
-# melissa_account = Bank::Account.one
-# puts melissa_account
-# melissa_account.deposit(400)
+# clients = Bank::Account.new
+# puts clients.one
+# puts clients.class
+# puts clients
+# puts clients.balance
+# clients.deposit(200)
+# puts clients.balance
+
+f = Bank::Account.new
+puts f.one
+puts Bank::Account.all
