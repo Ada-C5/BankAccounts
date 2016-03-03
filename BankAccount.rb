@@ -44,10 +44,35 @@ module Bank
         account_array.each do |account| # local variable you can use within your loop,
           account_hash = {id: account[0], initial_balance: account[1], creation_date: account[2]}
             #making new bank account from my account_hash, need to save it somewhere, see below
-           final_accounts << Bank::Account.new(account_hash)  #converting the hash into a bank account(with the .new so its running through the initialize method here BEFORE the next step), storing it in a new array 
+           final_accounts << Bank::Account.new(account_hash)  #converting the hash into a bank account(with the .new so its running through the initialize method here BEFORE the next step), storing it in a new array
         end
         return final_accounts  #this is an array of Bank:: Account instances
     end
+
+
+    # Now....find the bank account array where id matches the user-requested id
+
+
+     #ap allaccounts ??????
+
+
+    def self.find(id)
+        account_array = []
+        account_array = CSV.read("./support/accounts.csv", 'r')
+        #same as above to create an array of the csv file
+        #iterate through this array and set each index in each inner array as these things below:
+          account_array.each do |id_requested|
+            if id_requested[0] == id #???????? how do i say the argument ????
+              @id = id_requested[0]
+              @initial_balance = id_requested[1]
+              @creation_date = id_requested[2]
+              your_acct = Bank::Account.new( )#?????????? what to put here since I didnt save these instance varaibles as another array or varaible? Should i?
+                # Could i do "Bank ID: #{@id}, Balance: #{@initial_balance}, Creation Date: #{@creation_date}"
+              return your_acct
+            end
+          end
+    end
+
 
 
      #How on earth can we initiate a new instance of an account using this info???
