@@ -35,8 +35,11 @@ module Bank
 
       all_accts.length.times do |n|
         if all_accts[n].include?"#{id_num}"
-          acctmatch = Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
-          puts acctmatch #why doesn't this display?
+          id = all_accts[n][0].to_i
+          bal = all_accts[n][1].to_i
+          date = all_accts[2]
+        acctmatch = Bank::Account.new(id, bal, date)
+        puts acctmatch #why doesn't this display? OWELLZ
         end
       end
     end
