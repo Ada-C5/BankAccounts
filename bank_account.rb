@@ -129,15 +129,27 @@ module Bank
       return @balance
     end
 
+    # rate as decimal percentage 25% => 0.25
     def add_interest(rate)
       @balance += @balance * (rate/100)
       return @balance
     end
-
-
   end
 
   class CheckingAccount < Account
+    MIN_BAL = 0
+    WITHDRAW_FEE = 1
+    def withdraw(amount)
+      temp_balance = @balance - amount
+      temp_balance -= WITHDRAW_FEE
+      # make sure result is positive
+      if temp_balance < MIN_BAL
+        puts "You don't have enough money to complete this withdrawl."
+      else 
+        @balance = temp_balance
+      end
+      return @balance
+    end
   end
   
   class Owner
