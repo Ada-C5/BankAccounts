@@ -156,6 +156,10 @@ module Bank
         WITHDARAWL_FEE_IN_DOLLARS = 1
         CHECK_FEE_IN_DOLLARS = 2
         checks_used_in_the_month = 0
+
+        def initialize
+            super
+        end
         
         # It should include the following updated functionality:
         # Updated withdrawal functionality:
