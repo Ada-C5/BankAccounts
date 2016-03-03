@@ -98,6 +98,39 @@ module Bank
   end
 
   class CheckingAccount < Account
+    attr_accessor :checknum
+
+    def initialize(id, balance, opendate)
+      super
+      @checknum = 3
+    end
+
+    def withdraw(amount)
+      @amount = amount + 1
+      if @balance - @amount < 0
+        puts "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
+      elsif @balance - @amount >= 0
+      @balance = @balance - @amount
+      puts "Withdrawal processed. Your current balance is: $#{@balance}."
+      end
+    end
+
+    def withdraw_using_check(amount)
+      puts @checknum
+      if @balance - amount >= -10 && @checknum > 0
+        @balance = @balance - amount
+        @checknum = @checknum - 1
+        return @balance
+      elsif @balance - amount >= -10 && @checknum <= 0
+        @balance = @balance - (amount+2)
+        @checknum = @checknum - 1
+        return @balance
+      else
+        puts "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
+      end
+
+    end
+
   end
 
 end
