@@ -143,19 +143,22 @@ module Bank
     def self.find(id)
       id = id.to_s #lets the user enter id as a string/fixnum/float, and method still works.
       # find the entry in the csv where id matches the user-requested id
-      read_csv.("./support/accounts.csv")each do |entry|
+      read_csv("./support/accounts.csv").each do |entry|
         if entry[0] == id
-        return entry
+          return entry
         end
       end
     end
+
   end
 
 
   class SavingsAccount < Account
     # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
-    if @init_balance < 10
-      raise ArgumentError.new("Minimum balance to open a savings account is $10.")
+    def init_balance
+      if @init_balance < 10
+        raise ArgumentError.new("Minimum balance to open a savings account is $10.")
+      end
     end
 
       # Updated withdrawal functionality:
@@ -179,11 +182,11 @@ module Bank
     # Example: If the interest rate is 0.25% and the balance is $10,000, then the interest that is returned is $25 and the new balance becomes $10,025.
     # defining interest_rate in isolated, easily changed method.
     def interest_rate
-      interest_rate = .25
+      interest_rate = (0.25)
     end
 
-    # calculating interest on a specific balance. User can specify interest_rate or default to interest_rate method.
-    def calc_interest(interest_rate = nil)
+    # calculating interest on a specific balance. 
+    def calc_interest
       @balance * (interest_rate / 100)
     end
 
@@ -270,19 +273,20 @@ module Bank
     # Step 1... Associate account_owners.csv and owners.csv
     # Step 2... Add method to return all accounts that belong to a specific owner.
 
-    def self.link_csvs_by_id(ownerID)
-
-      ownerinfo[:ownerID] == ownerID
-      assoc_accts = []
-      owner = read_csv("./support/accounts.csv")[ownerID]
-      read_csv("./support/accounts.csv").each do |acct|
-      if acct[0] == read_csv("./support/accounts.csv")[n][ownerID]
-        assoc_accts << acct
-      end
-    end
-
-    def owner_from_csv
-    end
+    # def self.link_csvs_by_id(ownerID)
+    #
+    #   ownerinfo[:ownerID] == ownerID
+    #   assoc_accts = []
+    #   owner = read_csv("./support/accounts.csv")[ownerID]
+    #   read_csv("./support/accounts.csv").each do |acct|
+    #   if acct[0] == read_csv("./support/accounts.csv")[n][ownerID]
+    #     assoc_accts << acct
+    #     end
+    #   end
+    # end
+    #
+    # def owner_from_csv
+    # end
 
 
   end
