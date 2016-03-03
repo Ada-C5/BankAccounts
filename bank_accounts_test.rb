@@ -3,28 +3,32 @@ require_relative 'bank_account.rb'
 ## TEST FOR SELF.ALL METHOD   ###
 # puts Bank::Account.all("./support/accounts.csv")
 
+### TEST FOR MONEY_CONVERT ####
+# my_account = Bank::Account.new(4, 50000, 2009)
+# my_account.withdraw(1000)
+
 # # # #  TESTS FOR SAVINGS_ACCOUNT CLASS # # # # #
 ### test initialize
 # puts Bank::SavingsAccount.new(2, 5, 2005)
 
 ### test for withdraw method
-# my_account = Bank::SavingsAccount.new(2, 15, 2005)
-# puts my_account.withdraw(4)
+# my_account = Bank::SavingsAccount.new(2, 2000, 2005)
+# puts my_account.withdraw(400)
 
 # # # # # # TESTS FOR CHECKINGACCOUNT # # # # #
 ### test for withdraw
-# my_account = Bank::CheckingAccount.new(44, 500, 1999)
-# puts my_account.withdraw(510)
+# my_account = Bank::CheckingAccount.new(44, 50000, 1999)
+# my_account.withdraw(5100)
 
 ### test for withdraw_using_check
-my_account = Bank::CheckingAccount.new(33, 600, 2003)
-puts my_account.withdraw_using_check(100)
-puts my_account.withdraw_using_check(100)
-puts my_account.withdraw_using_check(100)
-puts my_account.withdraw_using_check(100)
-puts my_account.withdraw_using_check(100)
-puts my_account.withdraw_using_check(100)
-puts my_account.withdraw_using_check(100)
+my_account = Bank::CheckingAccount.new(33, 60000, 2003)
+puts my_account.withdraw_using_check(10000)
+puts my_account.withdraw_using_check(10000)
+puts my_account.withdraw_using_check(10000)
+puts my_account.withdraw_using_check(10000)
+puts my_account.withdraw_using_check(10000)
+puts my_account.withdraw_using_check(10000)
+puts my_account.withdraw_using_check(10000)
 
 ### test for add_interest method
 # my_account = Bank::SavingsAccount.new(2, 10000, 2005)
