@@ -70,6 +70,7 @@ module Bank
 
   class Account
     MINIMUM_BALANCE = 0
+    TRANSACTION_FEE = 0
     attr_reader :balance, :account_owner ,:all_accounts_in_file, :id_num, :account_to_find
     def initialize(info)
       @account_type = info[:account_type]
@@ -108,13 +109,13 @@ module Bank
     end
 
     def withdraw(amount)
-
       if @balance - amount < self.class::MINIMUM_BALANCE
         puts "Sorry, but you can't withdraw that amount. You must maintain a mimimum balance of $#{self.class::MINIMUM_BALANCE}."
         printf("Your current balance is $%.2f." , @balance)
 
       else
         @balance -= amount
+        @balance -= self.class::TRANSACTION_FEE
         printf("$%.2f has been withdrawn. Your current balance is $%.2f." ,amount ,@balance)
       end
 
@@ -133,12 +134,13 @@ module Bank
 
   class SavingsAccount < Account
     MINIMUM_BALANCE = 10
+    TRANSACTION_FEE = 2
 
     def withdraw(amount)
       if @balance - amount >= 12
         super
       else
-        puts "Sorry, you don't have enough money in your account to make a withdraw."
+        printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.", @balance)
       end
     end
 
@@ -151,6 +153,17 @@ module Bank
       return "You just earned $#{interest} in interest."
     end
 
+  end
+
+  class CheckingAccount < Account
+      TRANSACTION_FEE = 1
+      def withdraw(amount)
+        if @balance - amount >= 1
+          super
+        else
+          printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.", @balance)
+        end
+      end
   end
 
 
