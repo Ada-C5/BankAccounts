@@ -2,6 +2,21 @@ require 'csv'
 module Bank
   class Account
 
+    def self.one
+      user = []
+      total = CSV.read('support/accounts.csv')
+      total = total.first
+      @id = total[0]
+      @balance = total[1]
+      @data = total[2]
+      user << @id
+      user << @balance
+      user << @data
+      # puts "id: #{@id} - balance: #{@balance} - use since #{@date}"
+      puts user
+      user = self.new
+      puts user
+    end
 
     def self.all
       array_accounts = []
@@ -10,27 +25,26 @@ module Bank
         array_accounts << i
       end
         # puts array_accounts
+        # puts array_accounts[2]
     end
 
-    def withdraw(withdraw)
-      @balance = @balance - withdraw
-      if @balance < 0
-        @balance = @balance + withdraw
-        puts "You dont have all that money"
-      end
-      balance
-    end
-
-    def deposit(deposit)
-      @balance = @balance + deposit
-      balance
-    end
-
-    def balance
-      puts "#{@balance} is your new balance"
-    end
-
-
+    # def withdraw(withdraw)
+    #   @balance = @balance - withdraw
+    #   if @balance < 0
+    #     @balance = @balance + withdraw
+    #     puts "You dont have all that money"
+    #   end
+    #   balance
+    # end
+    #
+    # def deposit(money)
+    #   @balance = @balance + money
+    #   balance
+    # end
+    #
+    # def balance
+    #   puts "#{@balance} is your new balance"
+    # end
 
   end
 
@@ -47,7 +61,8 @@ module Bank
 
 end
 
-melissa_account = Bank::Account.new
-melissa_account.deposit(100)
-# melissa = Bank::Owner.new(name: "Melissa", last_name: "Jimison", email: "mjimison@gmail.com")
-# melissa = Bank::Owner.new(name: "David", last_name: "Quintero", email: "djimison@gmail.com")
+# clients = Bank::Account.all
+# puts clients[1]
+melissa_account = Bank::Account.one
+puts melissa_account
+# melissa_account.deposit(400)
