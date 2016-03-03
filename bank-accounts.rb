@@ -73,7 +73,7 @@ module Bank
       if @balance < 10
           raise ArgumentError, "Balance can't be less than $10.00"
       end
-      puts "A savings account will incur a $2 fee per transaction."
+      puts "A savings account will incur a $#{WITHDRAWAL_FEE} fee per transaction."
     end
 
     def withdraw(withdraw_amount)
@@ -111,7 +111,16 @@ module Bank
 # #reset_checks: Resets the number of checks used to zero
 
   class CheckingAccount < Account
-    
+    WITHDRAWAL_FEE = 1
+
+    def initialize(account_id, balance, open_date)
+      super
+      puts "A checking account will incur a $#{WITHDRAWAL_FEE} fee per transaction."
+    end
+
+    def withdraw(withdraw_amount)
+
+    end
   end
 
 
