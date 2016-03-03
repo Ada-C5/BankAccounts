@@ -18,7 +18,7 @@ module Bank
       end
 
     end
-    
+
     #returns list of all instances of accounts
     def self.all
       accounts = []
@@ -31,16 +31,16 @@ module Bank
     #returns info on account when passed the id number
     def self.find(id)
       accounts = self.all
-      found = nil
+      found_id = nil
       accounts.each do |account|
         if account.account_id == id
-          found = account
+          found_id = account
         end
       end
-      if found == nil
+      if found_id == nil
         return "ID not found!"
       else
-        return found
+        return found_id
       end
     end
 
@@ -70,12 +70,12 @@ module Bank
     attr_reader :owner_id, :last_name, :first_name, :street_address, :city, :state
 
     def initialize(owner_id, last_name, first_name, street_address, city, state)
-      @owner_id   = owner_id.to_i
-      @last_name = last_name
-      @first_name = first_name
+      @owner_id       = owner_id.to_i
+      @last_name      = last_name
+      @first_name     = first_name
       @street_address = street_address
-      @city = city
-      @state = state
+      @city           = city
+      @state          = state
     end
 
     def self.all
@@ -88,16 +88,16 @@ module Bank
 
     def self.find(id)
       owners = self.all
-      found = nil
+      found_id = nil
       owners.each do |owner|
         if owner.owner_id == id
-          found = owner
+          found_id = owner
         end
       end
-      if found == nil
+      if found_id == nil
         return "Account owner not found!"
       else
-        return found
+        return found_id
       end
     end
 
