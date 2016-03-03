@@ -1,14 +1,5 @@
 #Wave 3 Requirements
 
-#-It should include the following updated functionality:
-
-#-It should include the following new methods:
-# => add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
-# =>    - Input rate is assumed to be a percentage (i.e. 0.25).
-# =>    - The formula for calculating interest is balance * rate/100
-# =>    - Example: If the interest rate is 0.25% and the balance is $10,000, then the interest that is returned is $25 and the new balance becomes $10,025.
-
-#2. Create a CheckingAccount class which should inherit behavior from the Account class.
 #- It should include the following updated functionality:
 # => - Updated withdrawal functionality:
 # =>    - Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. Returns the updated account balance.
@@ -113,8 +104,30 @@ module Bank
       end                                             #a constant but got an error-_-
     end
 
+    # => add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
+    # =>    - Input rate is assumed to be a percentage (i.e. 0.25).
+    # =>    - The formula for calculating interest is balance * rate/100
+    def add_interest(rate)
+      interest_amount = @balance * rate / 100
+      @balance = @balance + interest_amount
+      return interest_amount
+    end
+
 
   end #SavingsAccount class end.
+
+  class CheckingAccount < Account
+
+    def withdraw(amount_to_withdraw)
+#      WITHDRAW_FEE == 1    This returned an error stating uninitialized constant??
+      if @balance - amount_to_withdraw <= 0 #cannot go below $0 balance
+        puts "You may not withdraw that amount as the account must maintain a balance above $0. Your current balance is $#{@balance}. Please select a different amount to withdraw."
+        @balance  # Not sure super - WITHDRAW_FEE will work since it would still
+      else        # deduct the withdraw fee even if they get negative balance error
+        @balance = @balance - amount_to_withdraw - 1  #$1 withdrawal fee. Tried using
+      end                                             #a constant but got an error-_-
+    end
+  end #CheckingAccount class end.
 
 
 end # Module end.
