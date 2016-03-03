@@ -151,7 +151,7 @@ module Bank
       return sought_owner
     end
 
-    # get corresponding account instance for an owner
+    # get corresponding account/s instance for an owner
     def get_account
       account_id_array = []
       account_id = nil
@@ -159,8 +159,8 @@ module Bank
       CSV.foreach("./support/account_owners.csv") do |line|
         if line[1].to_i == @id
           account_id = line[0].to_i
-          a = Bank::Account.find(account_id)
-          account_id_array << a
+          instance_of_account = Bank::Account.find(account_id)
+          account_id_array << instance_of_account
         end
       end
       return account_id_array
@@ -174,7 +174,7 @@ module Bank
 end
 
 
-# # TEST CALLS
+# # TEST CALLS (working on migrating these to test file)
 # kwel = Bank::Owner.find(14).get_info
 # puts kwel
 # puts kwel.get_id
