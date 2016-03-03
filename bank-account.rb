@@ -11,6 +11,7 @@ module Bank
     attr_reader :id, :owner, :creation_date
     TRANSACTION_FEE = 0
     LOWER_BALANCE_LIMIT = 0
+    INITIAL_BALANCE_LIMIT = 0
     
     def initialize(account_info)
       @id = account_info[:id]
@@ -20,8 +21,8 @@ module Bank
       is_balance_enough(LOWER_BALANCE_LIMIT) # checks if balance meets criteria (is there enough money in it?)
     end
 
-    def withdraw(money, fee = TRANSACTION_FEE)
-      if money <= @balance
+    def withdraw(money, fee = TRANSACTION_FEE, limit = LOWER_BALANCE_LIMIT)
+      if @balance >= (money + limit + fee) # if balance will stay above the lower limit after money is withdrawn
         @balance -= (money + fee)
       else
         puts "Insufficient funds. Withdrawal canceled."
@@ -83,6 +84,7 @@ module Bank
         end
       end
 
+      # if no account is found that matches the id, return nil
       return nil
     end
   end
@@ -141,7 +143,8 @@ module Bank
       found_owner = nil
       self.all.each do |line|
         if id == line.owner_id
-          return line
+          found_owner = line
+          return found_owner
         end
       end
 
@@ -153,14 +156,25 @@ module Bank
 
   class SavingsAccount < Account
     TRANSACTION_FEE = 200 # $2.00 transaction fee (200 in cents)
-    LOWER_BALANCE_LIMIT = 1000 # $10.00 initial lower balance limit
+    LOWER_BALANCE_LIMIT = 1000 # $10.00 lower balance limit
+    INITIAL_BALANCE_LIMIT = 1000
+    INTEREST_RATE = 0.25
     
     def is_balance_enough(limit)
       super(LOWER_BALANCE_LIMIT)
     end
 
     def withdraw(money)
-      super(money, TRANSACTION_FEE)
+      super(money, TRANSACTION_FEE, LOWER_BALANCE_LIMIT)
+    end
+
+    def add_interest(rate)
+      interest = calculate_interest(rate)
+      @balance += interest
+    end
+
+    def calculate_interest(rate)
+      interest = balance * rate / 100
     end
 
   end
