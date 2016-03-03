@@ -182,21 +182,26 @@ module Bank
     class AccountLinker
 
         # this will link all accounts to their owners
-        # okay. this is me writing the smallest amount of jerk code (it passes but it's cheating)
-        # to scaffold this in my head.
         def link_accounts(path_to_csv)
+            # set variables outside the iteration 
             account_to_link = ""
             owner_to_link = ""
+            iteration_count = 0
 
             owner_collection = Bank::Owner.all("./support/owners.csv")
             account_collection = Bank::Account.all("./support/accounts.csv")
 
+            # iterate through the CSV with the linkages
             CSV.foreach(path_to_csv) do |row|
                 account_to_link = row[0]
                 owner_to_link = row[1]
-                
-                if account_to_link == account_collection[0].id_number
-                    puts "Yay this is doing the thing."
+
+                # set the linkages by comparing ID numbers. really this should be two methods
+                # one to set owners and one to set accounts.
+                if account_to_link == account_collection[iteration_count].id_number
+                    account_collection[iteration_count].owner = owner_to_link
+                    owner_collection[iteration_count].accounts << account_to_link
+                    iteration_count += 1
                 end
             end
         end
