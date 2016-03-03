@@ -7,7 +7,6 @@ module Bank
   class Account
     #Should be able to access the current balance of an account at any time.
     attr_reader :balance, :id
-
     def initialize(id, balance, open_date, its_owner) #intialize owner to nil
       #A new account cannot be created with initial negative balance - this will raise an ArgumentError
       raise ArgumentError, "A new account cannot be created with initial negative balance." if balance < 0
@@ -65,13 +64,45 @@ module Bank
       return @balance
     end
 
-    def add_owner(owner_inst)
-      @account_owner = owner_inst
+    def add_owner(id)
+      @owner_id = id
     end
   end
 
-  class Owner
+  class SavingsAccount < Bank::Account
+    attr_reader :balance, :id
+    WITHDRAW_FEE = 2
+    def initialize(id, balance, open_date, its_owner = nil)
+      raise ArgumentError, "A new account cannot be created with initial negative balance." if balance < 10
+      @id = id
+      @balance = balance
+      @open_date = open_date
+      @owner_id = its_owner
+      #@account_owner = owner #link this??
+    end
 
+    def withdraw(amount)
+      if amount < @balance
+        new_balance = @balance - amount - WITHDRAW_FEE
+        if new_balance < 10
+          puts "WARNING: The account cannot go below $10. Withdrawal refused."
+          return @balance
+        else
+          @balance = new_balance
+          return @balance
+        end
+      else
+        puts "WARNING: The amount requested is greater than the account's balance."
+        return @balance
+      end
+    end
+
+
+
+  end
+
+  class Owner
+    attr_reader :id
     def initialize(id, last_name, first_name, street_address, city, state, accounts = [])
       @id = id
       @last_name = last_name
@@ -98,6 +129,14 @@ module Bank
 
       end
       return all_owners
+    end
+
+    def self.find(id)
+      self.all.each do |owner_inst|
+        if owner_inst.id.to_s == id.to_s
+          return owner_inst
+        end
+      end
     end
 
   #  end
