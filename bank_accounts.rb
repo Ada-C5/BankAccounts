@@ -6,7 +6,9 @@ module Bank
     
     # this class creates accounts, we can store account related things in it.
     class Account
-        #can I set constants here?
+        # I set a constant for cents in a dollar because balances in the CSV are delivered in cents.
+        # this constant allows me to set a balance in dollars which is more human understandable
+        # and will be how withdrawals and deposits are presumably handled.
         CENTS_IN_A_DOLLAR = 100.0
 
         attr_reader :id_number 
@@ -103,8 +105,16 @@ module Bank
 
     # add a savings account class that inherits from account
     class SavingsAccount < Account
+        
+        # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
+        def initialize
+            super
+            if @balance < 10
+                raise ArgumentError.new("You think we give credit here? HAH!")
+            end
+        end
     # It should include the following updated functionality:
-    # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
+    
     # Updated withdrawal functionality:
     # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
     # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
