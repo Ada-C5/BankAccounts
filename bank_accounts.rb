@@ -25,6 +25,7 @@ module Bank
     end
 
     def self.all
+      # this is what you'd do if working from a CSV file... not related to the instances we've initialized for testing
       # pulls in the data from the CSV file as an array of arrays
       array_of_accounts = CSV.read("support/accounts.csv")
       account_info_array = []
@@ -63,8 +64,6 @@ module Bank
 
     # If the owner has already been created in the Owner class, the method should be called like so:
     # account_instance.add_owner(owner_instance.name)
-    # If owner does not exist, the method should be called like so:
-    # account_instance = Bank::Owner.new("Barbara Thompson", "545-665-5535", "looploop@loo.org", "5545 Apple Drive Issaquah, WA 98645")
     def add_owner(owner_name)
       @owner = owner_name
       #Bank::Owner.name
@@ -94,10 +93,22 @@ module Bank
 
   end
 
-  class CheckingAccount
+  class CheckingAccount < Account
   end
 
-  class SavingsAccount
+  class SavingsAccount < Account
+    # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
+    def initialize(account_info)
+      if account_info[:balance] < 10
+        raise ArgumentError.new("You must have at least $10 to open a savings account.")
+      end
+      super
+    end
+
+    # Updated withdrawal functionality:
+    # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
+    # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
+
   end
 
 
@@ -112,3 +123,9 @@ module Bank
     end
   end
 end
+
+# for testing the different methods in IRB?
+@checking_instance = Bank::CheckingAccount.new({id: "1001", balance: 120045, date_created: "March 5, 2016"})
+@savings_instance = Bank::SavingsAccount.new({id: "1000", balance: 503030, date_created: "March 5, 2016"})
+
+@owner_instance = Bank::Owner.new("Barbara Thompson", "545-665-5535", "looploop@loo.org", "5545 Apple Drive Issaquah, WA 98645")
