@@ -27,16 +27,17 @@ module Bank
     end
 
     def self.find(id_num)
-    id_num=id_num.to_s
+      id_num=id_num.to_s
 
-    all_accts = CSV.read("./support/accounts.csv")
+      all_accts = CSV.read("./support/accounts.csv")
 
-    all_accts.length.times do |n|
-      if all_accts[n].include?"#{id_num}"
-        # search_result = Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
-        puts "YAY!"
+      all_accts.length.times do |n|
+        if all_accts[n].include?"#{id_num}"
+          puts all_accts[n][0]
+          acctmatch = Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
+          puts acctmatch #why doesn't this display?
+        end
       end
-    end
     end
 
     def withdraw(amount)
@@ -60,21 +61,3 @@ module Bank
     end
   end
 end
-
-###
-
-# def self.find(id_num)
-# id_num=id_num.to_s
-#
-# all_accts = CSV.read("./support/accounts.csv")
-#
-# all_accts.each do |n|
-# n = 0
-#   if id_num == all_accts[n][0]
-#     Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
-#     puts "YAY"
-#   else
-#     n = n + 1
-#   end
-# end
-# end
