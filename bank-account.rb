@@ -18,7 +18,6 @@ module Bank
       if @balance < 0
         raise ArgumentError.new("You can't open an account with no money!")
       end
-
     end
 
     def withdraw(money)
@@ -28,7 +27,6 @@ module Bank
         puts "Insufficient funds. Withdrawal canceled."
         @balance # return balance without altering it if withdrawal amount is higher than balance
       end
-
     end
 
     def deposit(money)
@@ -77,11 +75,9 @@ module Bank
           found_account = line
           return found_account
         end
-
       end
-
+      return nil
     end
-
   end
 
 
@@ -105,7 +101,6 @@ module Bank
           account_num = line[0]
           owners_accounts << Bank::Account.find(account_num)
         end
-
       end
 
       # return array filled with owners account instances
@@ -141,13 +136,10 @@ module Bank
         if id == line.owner_id
           return line
         end
-
       end
-
+      return nil
     end
-
   end
-
 end
 
 
