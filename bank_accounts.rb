@@ -161,25 +161,7 @@ module Bank
             super
             @checks_used_in_month = 0
         end
-        
-        # It should include the following updated functionality:
-        # Updated withdrawal functionality:
-        # Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. 
-        # Returns the updated account balance.
-        # def withdraw(amount)
-        # # changed the check here to make sure there would be $10 left in the account after.
-        #     if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS)) >= 0
-        #         @balance = @balance - ( amount + WITHDARAWL_FEE_IN_DOLLARS )
-        #         puts "After withdrawing #{ amount } and the withdrawal fee the balance for account #{ @id_number } is #{ @balance }."
-        #         return @balance
-        #     elsif (@balance - amount) < 0
-        #         puts "HEY! That is unpossible because this account MUST not go below $0!"
-        #         puts "The balance for account #{ @id_number } is still #{ @balance }."
-        #         return @balance
-        #     else
-        #         puts "You can't do that operation on a bank account."
-        #     end     
-        # end
+
 
         # #withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. 
         # Returns the updated account balance.
