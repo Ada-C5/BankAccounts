@@ -49,8 +49,32 @@ First Name - (String) the owner's first name
 Street Addess - (String) the owner's street address
 City - (String) the owner's city
 State - (String) the owner's state
-
 * To create the relationship between the accounts and the owners use an account_owners.csv file. The data for this file, in order in the CSV, consists of: 1. Account ID - (Fixnum) a unique identifier corresponding to an Account instance. 1. Owner ID - (Fixnum) a unique identifier corresponding to an Owner instance.
+
+Wave 3: Inheritance
+
+Primary Requirements
+
+Create a SavingsAccount class which should inherit behavior from the Account class.
+It should include the following updated functionality:
+** The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
+**Updated withdrawal functionality:
+*Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
+*Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
+It should include the following new methods:
+#add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
+Input rate is assumed to be a percentage (i.e. 0.25).
+The formula for calculating interest is balance * rate/100
+Example: If the interest rate is 0.25% and the balance is $10,000, then the interest that is returned is $25 and the new balance becomes $10,025.
+Create a CheckingAccount class which should inherit behavior from the Account class.
+It should include the following updated functionality:
+Updated withdrawal functionality:
+Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. Returns the updated account balance.
+Does not allow the account to go negative. Will output a warning message and return the original un-modified balance.
+#withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
+Allows the account to go into overdraft up to -$10 but not any lower
+The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
+#reset_checks: Resets the number of checks used to zero
 
 =end
 
@@ -142,6 +166,13 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
     MINIMUM_BALANCE = 10.00 # SavingsAccount cannot be opened with less than 10 dollars.  The account balance cannot fall below $10.
     TRANSACTION_FEE = 2 # transaction fee for withdrawls is 2.
 
+    def add_interest(rate = 0.25) #IDK if I like that instance variable!!!
+      interest = balance * rate / 100 # interest rate as a percentage
+      @balance += interest # add interest to balance to update balance
+      return interest #per method requirements
+
+    end
+
   end
 
 
@@ -215,9 +246,11 @@ end
 
 #test run the program
 
-#savings_account = Bank::SavingsAccount.new(initial_balance: 10000)
-#savings_account.withdraw(10)
-#savings_account.display_balance
+savings_account = Bank::SavingsAccount.new(initial_balance: 10000)
+savings_account.withdraw(10)
+savings_account.display_balance
+puts savings_account.add_interest
+savings_account.display_balance
 
 # account_id = Bank::Account.find(1212)
 # account_id.display_balance
