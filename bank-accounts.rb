@@ -14,7 +14,7 @@ module Bank
       @account_id = account_id.to_i
       @balance    = balance.to_i
       @open_date  = open_date
-      @owner      = owner
+      @owner_id   = owner
 
       if @balance < 0
           raise ArgumentError, "Balance can't be less than $0"
@@ -75,6 +75,15 @@ module Bank
       @state = state
     end
 
+    def accounts(owner_id)
+      CSV.foreach("support/owners_owners.csv") do |row|
+        if row[0] == owner_id
+
+        end
+      end
+    end
+
+    end
     def self.all
       owners = []
       CSV.foreach("support/owners.csv") do |row|
