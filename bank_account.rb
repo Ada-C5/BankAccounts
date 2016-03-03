@@ -35,9 +35,16 @@ module Bank
       return nil
     end
 
-    def connect
-      
+    def connect(file = "./support/account_owners.csv")
+      CSV.read(file).each do |acct_id, own_id|
+        if acct_id == @account_id
+          @owner_id = own_id
+        end
+      end
     end
+
+    
+    #Find an account by id, add owner to that account, add to mates array
 
     # def self.connect(file = "support/account_owners.csv") #does all or none
     #   mates = CSV.read(file)  #csv reading file
