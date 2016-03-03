@@ -191,7 +191,7 @@ module Bank
             owner_collection = Bank::Owner.all("./support/owners.csv")
             account_collection = Bank::Account.all("./support/accounts.csv")
 
-            if account_to_link == account_collection[0][0]
+            if account_to_link == account_collection[0].id_number
                 puts "yay! THIS DOES WHAT IT SHOULD!"
             end
         end
