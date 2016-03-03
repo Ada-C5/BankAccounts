@@ -10,6 +10,7 @@ module Bank
         # this constant allows me to set a balance in dollars which is more human understandable
         # and will be how withdrawals and deposits are presumably handled.
         CENTS_IN_A_DOLLAR = 100.0
+        WITHDARAWL_FEE_IN_DOLLARS = 0
 
         attr_reader :id_number 
         attr_accessor :owner
@@ -152,10 +153,27 @@ module Bank
 
     # checking account class that inherits from account
     class CheckingAccount < Account
-    # Create a CheckingAccount class which should inherit behavior from the Account class.
+        WITHDARAWL_FEE_IN_DOLLARS = 1
     # It should include the following updated functionality:
     # Updated withdrawal functionality:
-    # Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. Returns the updated account balance.
+    # Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. 
+    # Returns the updated account balance.
+            def withdraw(amount)
+            # changed the check here to make sure there would be $10 left in the account after.
+            if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS)) >= 10
+                @balance = @balance - ( amount + WITHDARAWL_FEE_IN_DOLLARS )
+                puts "After withdrawing #{ amount } and the withdrawal fee the balance for account #{ @id_number } is #{ @balance }."
+                return @balance
+            elsif (@balance - amount) < 10
+                puts "HEY! That is unpossible because this account MUST have $10 in it!"
+                puts "The balance for account #{ @id_number } is still #{ @balance }."
+                return @balance
+            else
+                puts "You can't do that operation on a bank account."
+            end     
+        end
+
+
     # Does not allow the account to go negative. Will output a warning message and return the original un-modified balance.
     # #withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
     # Allows the account to go into overdraft up to -$10 but not any lower
