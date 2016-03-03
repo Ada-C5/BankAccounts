@@ -13,9 +13,9 @@
         @id = account[:id]
         @initial_balance = account[:initial_balance]
         @current_balance = account[:current_balance]
-        @owner = account[:owner]
         @start_date = account[:start_date]
         @all_accounts = account[:all_accounts]
+        @owner = nil
         raise ArgumentError, "We cannot deposit negative amounts. Please enter your deposit amount." unless @current_balance.to_i >= 0
       end
     end
@@ -41,6 +41,20 @@
       end
     end
 
+    def self.connect(filename = "./support/account_owners.csv")
+      test_array = []
+      CSV.open(filename, 'r') do |csv|
+        csv.read.each do |line|
+          instance_variable_of_account = Bank::Account.find(line[0])
+          instance_variable_of_owner = Bank::Owner.find line[1]
+          instance_variable_of_owner.account = instance_variable_of_account
+          instance_variable_of_account.owner = instance_variable_of_owner
+          test_array.push(instance_variable_of_owner)
+          puts instance_variable_of_account
+        end
+      end
+      ap test_array
+    end
 
     def withdraw(money)
       if @current_balance < money
@@ -63,14 +77,10 @@
     def balance
       return @current_balance
     end
-
-    def add_owner(owner)
-      @owner = owner
-    end
   end
 
   class Owner
-    attr_accessor :id, :first_name, :last_name, :street_address, :city, :state
+    attr_accessor :id, :first_name, :last_name, :street_address, :city, :state, :account
 
     def initialize(owner)
       @owner_number = owner[:owner_number]
@@ -79,6 +89,7 @@
       @street_address = owner[:street_address]
       @city = owner[:city]
       @state = owner[:state]
+      @account = nil
     end
 
     def self.all(filename = "./support/owners.csv")
@@ -101,7 +112,6 @@
             #self.new(id: line[0], initial_balance: line[1].to_f, start_date: line[2])
       end
     end
-
   end
 end
 
@@ -110,8 +120,10 @@ end
 #my_account.pass_owner_info(owner) #to pass owner info into Account
 
 #to test the self and csv method
-test = Bank::Owner.all
-ap test
+owners = Bank::Owner.all
+ap owners
 
+account = Bank::Account.all
+ap account
 #Bank::Account.find(1212, "./support/accounts.csv")
 #puts accounts[0]
