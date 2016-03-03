@@ -81,13 +81,24 @@ module Bank
         # this allows more extensible code because it enables
         # ids to use alphabet characters too (and it's got the same
         # cost as converting IDs to Fixnums.
-        def self.find(collection_to_search, id)
-            collection_to_search.each do |account|
+        def self.find(id)
+            accounts_to_search = []
+            accounts_to_search = Bank::Owner.all("./support/owners.csv")
+
+            accounts_to_seach.each do |account|
                 if account.id_number == id.to_s
                     return account
                 end
             end
         end
+
+        # def self.find(collection_to_search, id)
+        #     collection_to_search.each do |account|
+        #         if account.id_number == id.to_s
+        #             return account
+        #         end
+        #     end
+        # end
     end
 
     # this will create owner objects. We can store info about account owners in it.
@@ -144,29 +155,27 @@ module Bank
         # ids to use alphabet characters too (and it's got the same
         # cost as converting IDs to Fixnums.
         
-        # commented out for a minute
-        # def self.find(id)
-        #     accounts_to_search = []
-        #     accounts_to_search = Bank::Owner.all("./support/owners.csv")
-# 
-#         #     accounts_to_seach.each do |account|
-#         #         if account.id_number == id.to_s
-#         #             return account
-#         #         end
-#         #     end
-# 
-        # end
+        def self.find(id)
+            owners_to_search = []
+            owners_to_search = Bank::Owner.all("./support/owners.csv")
+
+            owners_to_search.each do |owner|
+                if owner.id_number == id.to_s
+                    return owner
+                end
+            end
+        end
 
 
 
         # commented out because it works, but it's using the wrong method signature 
-        def self.find(collection_to_search, id)
-            collection_to_search.each do |account|
-                if account.id_number == id.to_s
-                    return account
-                end
-            end
-        end
+        # def self.find(collection_to_search, id)
+        #     collection_to_search.each do |account|
+        #         if account.id_number == id.to_s
+        #             return account
+        #         end
+        #     end
+        # end
     end
 
     # write a linker that can tie an account to an owner
