@@ -46,6 +46,7 @@ module Bank
         def deposit(amount)
             @balance = @balance + amount
             puts "Congrats account #{ @id_number }, your new balance is #{ @balance }!"
+            return @balance
         end
 
         # show the balance
@@ -141,6 +142,12 @@ module Bank
     # Input rate is assumed to be a percentage (i.e. 0.25).
     # The formula for calculating interest is balance * rate/100
     # Example: If the interest rate is 0.25% and the balance is $10,000, then the interest that is returned is $25 and the new balance becomes $10,025.
+        def interest_rate(rate)
+            interest = @balance * rate
+            @balance += interest
+            puts "After compounding interest, your balance is: $#{@balance}!"
+            return interest
+        end
     end
 
     # checking account class that inherits from account
