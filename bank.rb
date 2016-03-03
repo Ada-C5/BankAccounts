@@ -1,21 +1,27 @@
 require 'csv'
 module Bank
   class Account
+    attr_accessor :id, :balance, :date
+    def initialize
+      @id = nil
+      @balance = nil
+      @date = nil
+    end
 
-    def self.one
-      user = []
+    def one
+      # user = []
       total = CSV.read('support/accounts.csv')
       total = total.first
       @id = total[0]
       @balance = total[1]
-      @data = total[2]
-      user << @id
-      user << @balance
-      user << @data
+      @date = total[2]
+      # user << @id
+      # user << @balance
+      # user << @date
       # puts "id: #{@id} - balance: #{@balance} - use since #{@date}"
-      puts user
-      user = self.new
-      puts user
+      # puts user
+      # # user = self.new
+      # puts user
     end
 
     def self.all
@@ -63,6 +69,6 @@ end
 
 # clients = Bank::Account.all
 # puts clients[1]
-melissa_account = Bank::Account.one
-puts melissa_account
+# melissa_account = Bank::Account.one
+# puts melissa_account
 # melissa_account.deposit(400)
