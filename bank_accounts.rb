@@ -110,7 +110,7 @@ module Bank
         WITHDARAWL_FEE_IN_DOLLARS = 2
         
         # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
-        def initialize
+        def initialize(account_info)
             super
             if @balance < 10
                 raise ArgumentError.new("You think we give credit here? HAH!")
@@ -123,7 +123,7 @@ module Bank
     # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
         def withdraw(amount)
             # changed the check here to make sure there would be $10 left in the account after.
-            if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS) >= 10
+            if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS)) >= 10
                 @balance = @balance - ( amount + WITHDARAWL_FEE_IN_DOLLARS )
                 puts "After withdrawing #{ amount } and the withdrawal fee the balance for account #{ @id_number } is #{ @balance }."
                 return @balance
