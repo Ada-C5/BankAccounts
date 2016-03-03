@@ -230,6 +230,17 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
     end
   end
 
+  class MoneyMarketAccount < Account
+
+    MINIMUM_BALANCE = 10000 # CheckingAccount  dollars balance cannot fall below $0. (Unless by a check withdrawl)
+    TRANSACTION_FEE = 100 # transaction fee for withdrawls is 1. Withdrawls using ehcks have a separate fee schedule.
+    def initialize(account_information)
+      super
+      @transactions = 0 # the MoneyMarketAccount counts any transactions (withdrawl or deposit)
+    end
+  end
+
+
   class Owner
     attr_reader :id, :first_name
 
@@ -300,11 +311,14 @@ end
 
 #test run the program
 
-checking_account = Bank::CheckingAccount.new(initial_balance: 10000)
-checking_account.withdraw(10)
-checking_account.withdraw_using_check(10)
-puts checking_account.check_count
-checking_account.withdraw_using_check(10)
+checking_account = Bank::SavingsAccount.new(initial_balance: 900)
+checking_account.display_balance
+
+#checking_account = Bank::CheckingAccount.new(initial_balance: 10000)
+#checking_account.withdraw(10)
+#checking_account.withdraw_using_check(10)
+#puts checking_account.check_count
+#checking_account.withdraw_using_check(10)
 
 
 # account_id = Bank::Account.find(1212)
