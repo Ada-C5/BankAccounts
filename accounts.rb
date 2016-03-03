@@ -24,7 +24,7 @@ module Bank
           id = all_accts[n][0].to_i
           bal = all_accts[n][1].to_i
           date = all_accts[2]
-          new_acct = Bank::Account.new(id, bal, date)
+          Bank::Account.new(id, bal, date)
         end
     end
 
@@ -39,6 +39,8 @@ module Bank
           bal = all_accts[n][1].to_i
           date = all_accts[n][2]
           return Bank::Account.new(id, bal, date)
+        else
+          return nil
         end
       end
     end
@@ -46,21 +48,21 @@ module Bank
     def withdraw(amount)
       @amount = amount
       if @balance - @amount < 0
-        puts "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
+        return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
       elsif @balance - @amount >= 0
       @balance = @balance - @amount
-      puts "Withdrawal processed. Your current balance is: $#{@balance}."
+      return "Withdrawal processed. Your current balance is: $#{@balance}."
       end
     end
 
     def deposit(amount)
       @amount = amount
       @balance = @balance + @amount
-      puts "Deposit processed. Your current balance is $#{@balance}."
+      return "Deposit processed. Your current balance is $#{@balance}."
     end
 
     def check_balance
-      puts "Your current balance is $#{@balance}."
+      return "Your current balance is $#{@balance}."
     end
   end
 
@@ -80,17 +82,16 @@ module Bank
     def withdraw(amount)
       @amount = amount+2
       if @balance - @amount < 10
-        puts "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
+        return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
       elsif @balance - @amount >= 10
       @balance = @balance - @amount
-      puts "Withdrawal processed. Your current balance is: $#{@balance}."
+      return "Withdrawal processed. Your current balance is: $#{@balance}."
       end
     end
 
     def add_interest(rate)
       interest = @balance * rate/100
       @balance = @balance + interest
-      puts @balance
       return interest
     end
 
