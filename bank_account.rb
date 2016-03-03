@@ -48,14 +48,12 @@ module Bank
       CSV.read(file_path)
     end
 
-    # def account_owners_hash
-    #
-    # end
-
     def self.find_owner(account_id)
-        if csv_owner_data[0][0] == account_id.to_s
-          return Bank::Owner.find(csv_owner_data[0][1])
+      csv_owner_data.each_index do |i|
+        if csv_owner_data[i][0] == account_id.to_s
+          return Bank::Owner.find(csv_owner_data[i][1])
         end
+      end
     end
 
     # Accepts a single parameter for the amount of money to be withdrawn.
