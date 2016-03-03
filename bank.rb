@@ -20,9 +20,18 @@ module Bank
       # user << @date
       # puts "id: #{@id} - balance: #{@balance} - use since #{@date}"
       # puts user
-      # # user = self.new
       # puts user
+      # return total
     end
+
+        # Class method One before deciding to chanfe to initializer
+        # def self.one
+        #   total = CSV.read('support/accounts.csv').first
+        #   @id = total[0]
+        #   @balance = total[1]
+        #   @data = total[2]
+        #   self.new
+        # end
 
     def self.all
       array_accounts = []
@@ -67,8 +76,11 @@ module Bank
 
 end
 
-# clients = Bank::Account.all
-# puts clients[1]
+clients = Bank::Account.new
+puts clients.one
+puts clients.class
+puts clients
+puts clients.balance
 # melissa_account = Bank::Account.one
 # puts melissa_account
 # melissa_account.deposit(400)
