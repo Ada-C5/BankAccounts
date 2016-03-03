@@ -54,7 +54,7 @@ State - (String) the owner's state
 
 =end
 
-require "CSV" #data_file for this program is currently: "./support/accounts.csv"
+require "CSV"
 
 module Bank
 
@@ -104,7 +104,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
     end
 
     ##### CLASS METHODS BELOW #####
-    def self.find(data_file, id) # returns an instance of Account where the value of the id field in the CSV matches the passed parameter. "./support/accounts.csv"
+    def self.find(data_file = "./support/accounts.csv", id) # returns an instance of Account where the value of the id field in the CSV matches the passed parameter.
 
       accounts = self.all(data_file)
       accounts.each do |account|
@@ -115,7 +115,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       end
     end
 
-    def self.all(data_file) #returns a collection of Account instances, representing all of the Accounts described in the CSV. "./support/accounts.csv"
+    def self.all(data_file =  "./support/accounts.csv") #returns a collection of Account instances, representing all of the Accounts described in the CSV.
 
       accounts = [] #start as an empty array. We will fill with instances from our data file.
 
@@ -143,7 +143,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
 
     end
 
-    def return_owners_accounts(account_owners_data_file, account_data_file) #returns the instances of all the owner's accounts after get_owners_accounts_ids gets the ids to use in the class method find. account_owners_data_file = "./support/account_owners.csv", account_data_file = "./support/accounts.csv"
+    def return_owners_accounts(account_owners_data_file = "./support/account_owners.csv", account_data_file = "./support/accounts.csv") #returns the instances of all the owner's accounts after get_owners_accounts_ids gets the ids to use in the class method find.
 
       owners_accounts = []
 
@@ -154,7 +154,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       return owners_accounts
     end
 
-    def get_owners_accounts_ids(data_file) #associates owner with their accounts based on mutual IDs "./support/account_owners.csv"
+    def get_owners_accounts_ids(data_file = "./support/account_owners.csv") #associates owner with their accounts based on mutual IDs
 
       #first I want to make an array of the owner's account ids.  Then I can use the find ID method to look up what instances these accounts are.
       owners_accounts_ids = []
@@ -171,7 +171,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
 
     ##### CLASS METHODS BELOW #####
 
-    def self.find(data_file, id) #returns an instance of Account where the value of the id field in the CSV matches the passed parameter. "./support/owners.csv"
+    def self.find(data_file = "./support/owners.csv", id) #returns an instance of Account where the value of the id field in the CSV matches the passed parameter.
 
       account_owners = self.all(data_file)
       account_owners.each do |owner|
@@ -182,7 +182,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       end
     end
 
-    def self.all(data_file) #returns a collection of Owner instances, representing all of the Owners described in the CSV. "./support/owners.csv"
+    def self.all(data_file = "./support/owners.csv") #returns a collection of Owner instances, representing all of the Owners described in the CSV.
 
       account_owners = [] #start as an empty array. We will fill with instances from our data file.
 
@@ -201,12 +201,12 @@ end
 #test run the program
 
 
-account_id = Bank::Account.find("./support/accounts.csv", 1212)
+account_id = Bank::Account.find(1212)
 account_id.display_balance
 
-owner_id = Bank::Owner.find("./support/owners.csv", 14)
+owner_id = Bank::Owner.find(14)
 puts owner_id.first_name
 
-owner_account = owner_id.return_owners_accounts("./support/account_owners.csv", "./support/accounts.csv")
+owner_account = owner_id.return_owners_accounts
 puts owner_account[0].id
 owner_account[0].display_balance
