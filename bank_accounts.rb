@@ -101,6 +101,15 @@ module Bank
         # end
     end
 
+    # add a savings account class that inherits from account
+    class SavingsAccount < Account
+    end
+
+    # checking account class that inherits from account
+    def CheckingAccount < Account
+    end
+
+
     # this will create owner objects. We can store info about account owners in it.
     class Owner
         attr_reader :id_number
