@@ -154,12 +154,14 @@ module Bank
     # checking account class that inherits from account
     class CheckingAccount < Account
         WITHDARAWL_FEE_IN_DOLLARS = 1
-    # It should include the following updated functionality:
-    # Updated withdrawal functionality:
-    # Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. 
-    # Returns the updated account balance.
-            def withdraw(amount)
-            # changed the check here to make sure there would be $10 left in the account after.
+        checks_used_in_the_month = 0
+        
+        # It should include the following updated functionality:
+        # Updated withdrawal functionality:
+        # Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. 
+        # Returns the updated account balance.
+        def withdraw(amount)
+        # changed the check here to make sure there would be $10 left in the account after.
             if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS)) >= 10
                 @balance = @balance - ( amount + WITHDARAWL_FEE_IN_DOLLARS )
                 puts "After withdrawing #{ amount } and the withdrawal fee the balance for account #{ @id_number } is #{ @balance }."
@@ -173,11 +175,22 @@ module Bank
             end     
         end
 
+        # #withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. 
+        # Returns the updated account balance.
+        # Allows the account to go into overdraft up to -$10 but not any lower
+        # The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
+        def withdraw_with_check(amount)
+            if (@balance - amount) > -10
+                @balance -= amount
+                puts "Your new balance is $#{@balance}"
+                checks_used_in_the_month += 1
+                return @balance
+            else
+                puts "You don't have enough money to write that check. Your balance is $#{@balance}"
+                return @balance
+            end
+        end
 
-    # Does not allow the account to go negative. Will output a warning message and return the original un-modified balance.
-    # #withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
-    # Allows the account to go into overdraft up to -$10 but not any lower
-    # The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
     # #reset_checks: Resets the number of checks used to zero
     end
 
