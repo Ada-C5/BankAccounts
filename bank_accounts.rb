@@ -59,7 +59,7 @@ module Bank
     end
 
     def convert_cents(money)
-      @balance = Money.new(money, "USD")
+      Money.new(money, "USD")
     end
 
     # If the owner has already been created in the Owner class, the method should be called like so:
@@ -74,21 +74,21 @@ module Bank
         raise ArgumentError.new("This withdrawal would cause a negative balance.
         Do not attempt.")
       end
-      #@balance = @balance - amount_to_withdraw
       @balance = @balance - amount_to_withdraw
       show_balance
+      return @balance
     end
 
     def deposit(amount_to_deposit)
       @balance = @balance + amount_to_deposit
       show_balance
+      return @balance
     end
 
     # displays the balance in a nice user-friendly way, but also returns it to the other methods
     def show_balance
-      convert_cents(@balance)
-      puts "The balance for this account is currently $#{@balance}."
-      return @balance
+      pretty_money = convert_cents(@balance)
+      puts "The balance for this account is currently $#{pretty_money}."
     end
 
   end
@@ -97,7 +97,9 @@ module Bank
   end
 
   class SavingsAccount < Account
-    # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
+    TRANSACTION_FEE = 200
+
+    # The initial balance cannot be less than $10.
     def initialize(account_info)
       if account_info[:balance] < 10
         raise ArgumentError.new("You must have at least $10 to open a savings account.")
@@ -107,6 +109,12 @@ module Bank
 
     # Updated withdrawal functionality:
     # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
+    def withdraw(amount_to_withdraw)
+      @balance = super - TRANSACTION_FEE
+      show_balance
+      return @balance
+    end
+
     # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
 
   end
