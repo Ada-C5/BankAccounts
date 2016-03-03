@@ -90,6 +90,12 @@ module Bank
       return @balance
     end
 
+    def add_interest(rate)
+      INTEREST_RATE = 0.25%
+      interest = @balance * INTEREST_RATE/100
+      @balance = @balance + interest
+      return interest
+    end
   end
 
   class Owner #< Account
