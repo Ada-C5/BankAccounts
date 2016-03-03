@@ -155,10 +155,11 @@ module Bank
     class CheckingAccount < Account
         WITHDARAWL_FEE_IN_DOLLARS = 1
         CHECK_FEE_IN_DOLLARS = 2
-        checks_used_in_the_month = 0
+        
 
-        def initialize
+        def initialize(account_info)
             super
+            @checks_used_in_month = 0
         end
         
         # It should include the following updated functionality:
@@ -185,15 +186,15 @@ module Bank
         # Allows the account to go into overdraft up to -$10 but not any lower
         # The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
         def withdraw_with_check(amount)
-            if (@balance - amount) > -10 && checks_used_in_the_month < 3
+            if (@balance - amount) > -10 && @checks_used_in_month < 3
                 @balance -= amount
                 puts "Your new balance is $#{@balance}"
-                checks_used_in_the_month += 1
+                @checks_used_in_month += 1
                 return @balance
-            elsif (@balance - amount) > -10 && checks_used_in_the_month >= 3
+            elsif (@balance - amount) > -10 && @checks_used_in_month >= 3
                 @balance -= (amount + CHECK_FEE_IN_DOLLARS)
                 puts "Your new balance is $#{@balance}"
-                checks_used_in_the_month += 1
+                @checks_used_in_month += 1
                 return @balance
             else
                 puts "You don't have enough money to write that check. Your balance is $#{@balance}"
@@ -203,7 +204,7 @@ module Bank
 
         # reset_checks: Resets the number of checks used to zero
         def reset_checks
-            checks_used_in_the_month = 0
+            @checks_used_in_month = 0
         end
 
     end
