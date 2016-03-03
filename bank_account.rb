@@ -16,11 +16,12 @@ module Bank
       @owner = owner
     end
 
+    # Creates an array containing data from "./support/accounts.csv" or another file
     def self.csv_data(file_path="./support/accounts.csv")
       CSV.read(file_path)
     end
 
-    # make the accounts array a method and reference it that way instead of an instance variable
+    # Created an array containing account instances from the data in csv_data csv file
     def self.create_accounts
       create_accounts = []
       csv_data.each_index do |i|
@@ -32,10 +33,12 @@ module Bank
       return create_accounts
     end
 
+    # Right now this just returns the accounts array created in create_accounts, idk mang
     def self.all
       self.create_accounts
     end
 
+    # Find and return an Account instance when you pass in its account ID number
     def self.find(find_id)
       self.create_accounts.each_index do |i|
         if self.create_accounts[i].id == find_id.to_s
@@ -44,10 +47,12 @@ module Bank
       end
     end
 
+    # Create and array from the data in "./support/account_owners.csv" or other file
     def self.csv_owner_data(file_path="./support/account_owners.csv")
       CSV.read(file_path)
     end
 
+    # Call on Bank::Account and pass in an account ID to get the associated Owner
     def self.find_owner(account_id)
       csv_owner_data.each_index do |i|
         if csv_owner_data[i][0] == account_id.to_s
@@ -92,10 +97,13 @@ module Bank
       @address = [owner_hash[:street], owner_hash[:city], owner_hash[:state]]
     end
 
+    # Create an array from the data in "./support/owners.csv" or another file
     def self.csv_data(file_path="./support/owners.csv")
       CSV.read(file_path)
     end
 
+    # Creates an array of Owner instances, each of which was created from the data
+    # in csv_data after it was placed in owner hash
     def self.create_owners
       create_owners = []
       csv_data.each_index do |i|
@@ -112,10 +120,12 @@ module Bank
       return create_owners
     end
 
+    # Right now this just returns the accounts array created in create_owners, idk mang
     def self.all
       self.create_owners
     end
 
+    # Finds and returns an Owner instance if you pass in its ID number
     def self.find(find_id)
       self.create_owners.each_index do |i|
         if self.create_owners[i].id == find_id.to_s
