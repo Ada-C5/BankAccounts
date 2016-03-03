@@ -5,9 +5,7 @@ module Bank
 
 
   class Account
-    attr_reader :id, :owner
-    # Can set owner after account has been created.
-    attr_writer :owner
+    attr_reader :id
 
     def initialize(id, initial_balance, opendate, owner=nil)
       # raise ArgumentError, "Starting balance must be a number." unless initial_balance.is_a? Numeric
@@ -44,6 +42,20 @@ module Bank
           return self.create_accounts[i]
         end
       end
+    end
+
+    def self.csv_owner_data(file_path="./support/account_owners.csv")
+      CSV.read(file_path)
+    end
+
+    # def account_owners_hash
+    #
+    # end
+
+    def self.find_owner(account_id)
+        if csv_owner_data[0][0] == account_id.to_s
+          return Bank::Owner.find(csv_owner_data[0][1])
+        end
     end
 
     # Accepts a single parameter for the amount of money to be withdrawn.
@@ -113,7 +125,6 @@ module Bank
         end
       end
     end
-
   end
 
 end
