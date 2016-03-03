@@ -191,7 +191,11 @@ module Bank
             end
         end
 
-    # #reset_checks: Resets the number of checks used to zero
+        # reset_checks: Resets the number of checks used to zero
+        def reset_checks
+            checks_used_in_the_month = 0
+        end
+
     end
 
     class MoneyMarketAccount < Account
