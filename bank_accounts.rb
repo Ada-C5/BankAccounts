@@ -154,20 +154,22 @@ module Bank
 
   class SavingsAccount < Account
     # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
-    @init_balance = accountdata[:init_balance].to_f #float
-      if @init_balance < 0
-        raise ArgumentError.new("Account cannot be initialized with a negative balance.")
-      end
+    if @init_balance < 10
+      raise ArgumentError.new("Minimum balance to open a savings account is $10.")
+    end
 
       # Updated withdrawal functionality:
       # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
       # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
       # It should include the following new methods:
+    def withdrawal_fee
+      withdrawal_fee = 2
+    end
+
     def withdraw(withdrawal)
-      if @balance - withdrawal >= 0
-        @balance -= withdrawal
-      else puts "Withdrawal cannot be completed with available funds."
-        balance
+      if @balance - (withdrawal + withdrawal_fee) >= 10
+        @balance -= withdrawal - withdrawal_fee
+      else puts "Savings account balance must be above $10. Current balance $#{@balance}. Insufficient funds for this withdrawal."
       end
     end
 
@@ -175,8 +177,19 @@ module Bank
     # Input rate is assumed to be a percentage (i.e. 0.25).
     # The formula for calculating interest is balance * rate/100
     # Example: If the interest rate is 0.25% and the balance is $10,000, then the interest that is returned is $25 and the new balance becomes $10,025.
-    def add_interest_rate
+    # defining interest_rate in isolated, easily changed method.
+    def interest_rate
+      interest_rate = .25
+    end
 
+    # calculating interest on a specific balance. User can specify interest_rate or default to interest_rate method.
+    def calc_interest(interest_rate = nil)
+      @balance * (interest_rate / 100)
+    end
+
+    # adding calculated interest to balance.
+    def add_interest
+      @balance += calc_interest
     end
 
   end
