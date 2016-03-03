@@ -207,9 +207,14 @@ module Bank
       withdrawal_fee = 2
     end
 
-    def withdraw(withdrawal)
-        @balance -= withdrawal - withdrawal_fee
-    end
+   def withdraw(withdrawal)
+     if @balance - withdrawal >= 0
+       @balance -= (withdrawal + withdrawal_fee)
+         else puts "Withdrawal cannot be completed with available funds."
+       balance
+     end
+   end
+
 
     # #withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
     # Allows the account to go into overdraft up to -$10 but not any lower
