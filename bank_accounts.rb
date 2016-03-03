@@ -185,14 +185,22 @@ module Bank
         # okay. this is me writing the smallest amount of jerk code (it passes but it's cheating)
         # to scaffold this in my head.
         def link_accounts(path_to_csv)
-            account_to_link = "1212"
-            owner_to_link = "it doesn't matter"
+            account_to_link = ""
+            owner_to_link = ""
 
             owner_collection = Bank::Owner.all("./support/owners.csv")
             account_collection = Bank::Account.all("./support/accounts.csv")
 
-            if account_to_link == account_collection[0].id_number
-                puts "yay! THIS DOES WHAT IT SHOULD!"
+            CSV.foreach(path_to_csv) do |row|
+                account_to_link = row[0]
+                owner_to_link = row[1]
+                
+                puts account_to_link
+                puts owner_to_link
+                # commented out while I work through my problems.
+                # if account_to_link == account_collection[0].id_number
+                #     puts "yay! THIS DOES WHAT IT SHOULD!"
+                # end
             end
         end
     end
