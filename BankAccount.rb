@@ -1,10 +1,10 @@
-#require 'csv'
+require 'csv'
 
 module Bank
   class Account
     attr_accessor :id, :balance, :creation_date #these are like the instance variables
 
-    def initialize (account_info)   #initialize is actually a class method 
+    def initialize (account_info)   #initialize is actually a class method
       @id = account_info[:id].to_i
       @balance = account_info[:initial_balance].to_i
         if @balance < 0
@@ -21,7 +21,7 @@ module Bank
      #since each line in the csv file is a seperate array, i want to return the ______
 
     # def create_new(csv_index)
-    #    account_array = []
+    #     account_array = []
     #    account_array = CSV.read("./support/accounts.csv", 'r')
     #     #So this is going through the file and it's saying that whatever the person choses for the csv_index,
     #     #look at that index and go through that index and assign each of the internal indexes to instance variables****
@@ -33,6 +33,21 @@ module Bank
     # end
 
 
+    def self.all
+        final_accounts = []
+        account_array = []
+        account_array = CSV.read("./support/accounts.csv", 'r') #this is reading the csv file and creating and array of arrays
+         #at this point we could say
+         #account_array[0][0] to get the ID bc its an array still so we can call on the index,
+
+          #iterating through the array and setting each index within the inner array to the hash below
+        account_array.each do |account| # local variable you can use within your loop,
+          account_hash = {id: account[0], initial_balance: account[1], creation_date: account[2]}
+            #making new bank account from my account_hash, need to save it somewhere, see below
+           final_accounts << Bank::Account.new(account_hash)  #converting the hash into a bank account(with the .new so its running through the initialize method here BEFORE the next step), storing it in a new array 
+        end
+        return final_accounts  #this is an array of Bank:: Account instances
+    end
 
 
      #How on earth can we initiate a new instance of an account using this info???
