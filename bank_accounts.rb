@@ -93,7 +93,7 @@ module Bank
     # this will create owner objects. We can store info about account owners in it.
     class Owner
         attr_reader :id_number
-        # attr_accessor :accounts
+        attr_accessor :accounts
         
         # this method sets the parameters for instantiating a new owner.
         def initialize(owner_info)
@@ -144,28 +144,29 @@ module Bank
         # ids to use alphabet characters too (and it's got the same
         # cost as converting IDs to Fixnums.
         
-        def self.find(id)
-            accounts_to_search = []
-            accounts_to_search = Bank::Owner.all("./support/owners.csv")
-
-            accounts_to_seach.each do |account|
-                if account.id_number == id.to_s
-                    return account
-                end
-            end
-
-        end
+        # commented out for a minute
+        # def self.find(id)
+        #     accounts_to_search = []
+        #     accounts_to_search = Bank::Owner.all("./support/owners.csv")
+# 
+#         #     accounts_to_seach.each do |account|
+#         #         if account.id_number == id.to_s
+#         #             return account
+#         #         end
+#         #     end
+# 
+        # end
 
 
 
         # commented out because it works, but it's using the wrong method signature 
-        # def self.find(collection_to_search, id)
-        #     collection_to_search.each do |account|
-        #         if account.id_number == id.to_s
-        #             return account
-        #         end
-        #     end
-        # end
+        def self.find(collection_to_search, id)
+            collection_to_search.each do |account|
+                if account.id_number == id.to_s
+                    return account
+                end
+            end
+        end
     end
 
     # write a linker that can tie an account to an owner
@@ -203,10 +204,6 @@ module Bank
                 link_single_account(account_collection, account_to_link, owner_collection, owner_to_link)
                 link_single_owner(owner_collection, owner_to_link, account_collection, account_to_link)
             end
-
-            owner_collection
-            account_collection
-
         end
     end
 
