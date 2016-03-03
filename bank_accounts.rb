@@ -185,7 +185,7 @@ module Bank
       interest_rate = (0.25)
     end
 
-    # calculating interest on a specific balance. 
+    # calculating interest on a specific balance.
     def calc_interest
       @balance * (interest_rate / 100)
     end
@@ -203,12 +203,12 @@ module Bank
     # Updated withdrawal functionality:
     # Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. Returns the updated account balance.
     # Does not allow the account to go negative. Will output a warning message and return the original un-modified balance.
+    def withdrawal_fee
+      withdrawal_fee = 2
+    end
+
     def withdraw(withdrawal)
-      if @balance - withdrawal >= 0
-        @balance -= withdrawal
-      else puts "Withdrawal cannot be completed with available funds."
-        balance
-      end
+        @balance -= withdrawal - withdrawal_fee
     end
 
     # #withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
