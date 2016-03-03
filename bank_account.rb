@@ -182,6 +182,34 @@ module Bank
   end
 
   class MoneyMarketAccount < Account
+    MIN_BAL = 1000000
+    WITHDRAW_FEE = 100
+    
+    def initialize(id, balance, date)
+      super
+      @transactions = 0
+      if balance < MIN_BAL
+        raise ArgumentError.new("New Money Market Accounts must have at least $10,000 starting balance.")
+      end
+    end
+
+    def withdraw(amount)
+      if @balance < 1000000
+        temp_balance = @balance - amount
+        # make sure result is positive
+        if temp_balance < MIN_BAL
+          puts "You're balance is under $10,000, no more withdrawls are possible."
+          @balance -= WITHDRAW_FEE
+        else 
+          @balance = temp_balance
+        end
+        @transactions += 1
+        puts "#{money_convert(@balance)}"
+        return @balance
+      else
+        puts "Sorry, your account must be over $10,000 to make a withdrawl."
+      end
+    end
 
   end
   
