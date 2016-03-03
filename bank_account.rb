@@ -1,5 +1,6 @@
 
 require 'CSV'
+
 # input for withdraw and deposit must include cents without decimal ($1.50 - input at 150)
 
 module Bank
@@ -203,11 +204,7 @@ end
 # puts Bank::Account.find(1212).balance
 # puts Bank::Account.find(1212).deposit(10)
 
-# # # # TESTS FOR OWNER CLASS # # # # #
-###   TEST FOR GET_ACCOUNT METHOD   ###
-my_owner = Bank::Owner.find(14)
-account = my_owner.get_account
-puts account
+
 
 
 
