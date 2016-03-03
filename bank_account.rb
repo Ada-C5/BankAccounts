@@ -69,13 +69,14 @@ module Bank
   end
 
   class Account
+    MINIMUM_BALANCE = 0
     attr_reader :balance, :account_owner ,:all_accounts_in_file, :id_num, :account_to_find
     def initialize(info)
       @account_type = info[:account_type]
       @id_num = info[:id_num]
       @balance = info[:balance]/100
       @open_date = info[:open_date]
-      raise ArgumentError.new("You need money to start an account here.") if @balance < 0
+      raise ArgumentError.new("You need an initial balance of $#{self.class::MINIMUM_BALANCE} to start an account here.") if @balance < self.class::MINIMUM_BALANCE
       @account_owner = @name
     end
 
@@ -107,8 +108,9 @@ module Bank
     end
 
     def withdraw(amount)
-      if @balance - amount < 0
-        puts "Sorry, but you don't have that much money in your account to withdraw."
+
+      if @balance - amount < self.class::MINIMUM_BALANCE
+        puts "Sorry, but you can't withdraw that amount. You must maintain a mimimum balance of $#{self.class::MINIMUM_BALANCE}."
         printf("Your current balance is $%.2f." , @balance)
 
       else
@@ -128,6 +130,31 @@ module Bank
     end
 
   end
+
+  class SavingsAccount < Account
+    MINIMUM_BALANCE = 10
+
+    def withdraw(amount)
+      if @balance - amount >= 12
+        super
+      else
+        puts "Sorry, you don't have enough money in your account to make a withdraw."
+      end
+    end
+
+    def add_interest(rate)
+      interest = @balance * rate/100
+      @balance += interest
+      if interest.round == interest
+        interest = interest.round
+      end
+      return "You just earned $#{interest} in interest."
+    end
+
+  end
+
+
+
 
 
 end
