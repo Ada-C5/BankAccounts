@@ -3,6 +3,7 @@ require "CSV"
 module Bank
   class Account
     attr_reader :account_id, :account_balance, :owner_id, :open_date
+    attr_writer :owner_id
 
     def initialize(initial_balance, account_id, open_date, owner_id = nil)#owner_id = 0 by default
       if initial_balance < 0
@@ -35,15 +36,23 @@ module Bank
       return nil
     end
 
-    def connect(file = "./support/account_owners.csv")
-      CSV.read(file).each do |acct_id, own_id|
-        if acct_id == @account_id
-          @owner_id = own_id
-        end
-      end
-    end
+    # def connect(file = "./support/account_owners.csv")
+    #   CSV.read(file).each do |acct_id, own_id|
+    #     #puts acct_id
+    #     #puts own_id
+    #     Bank::Account.find(acct_id)
+    #     if @account_id == acct_id
+    #       @owner_id = own_id
+    #     end
+    #   end
+    #   return @owner_id
+    # end
+    #
+    # def owner
+    #   puts Bank::Owner.find(connect)
+    # end
 
-    
+
     #Find an account by id, add owner to that account, add to mates array
 
     # def self.connect(file = "support/account_owners.csv") #does all or none
