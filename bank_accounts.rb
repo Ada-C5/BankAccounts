@@ -200,6 +200,19 @@ module Bank
 
 
   class CheckingAccount < Account
+
+    def initialize(accountdata)
+    # @owner = accountdata[:owner] # string
+    @id = accountdata[:id] # fixnum? provided from csv?
+    @init_balance = accountdata[:init_balance].to_f #float
+      if @init_balance < 0
+        raise ArgumentError.new("Account cannot be initialized with a negative balance.")
+      end
+    @balance = accountdata[:balance].to_f # float
+    # set @balance to value of @init_balance
+    @balance = @init_balance
+    @checktally = 0
+    end
     # Updated withdrawal functionality:
     # Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. Returns the updated account balance.
     # Does not allow the account to go negative. Will output a warning message and return the original un-modified balance.
@@ -219,17 +232,31 @@ module Bank
     # #withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
     # Allows the account to go into overdraft up to -$10 but not any lower
     # The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
+    def check_withdrawal_fee
+      check_withdrawal_fee = 2
+    end
+
+    def checking_min_balance(withdrawal)
+      checking_min_balance = ((@balance - withdrawal) >= -10)
+    end
+
     def withdraw_using_check(withdrawal)
-      if @balance - withdrawal >= -10
-        @balance -= withdrawal + withdrawal_fee
-      else puts "Checking account must maintain minimum balance of $-10. Withdrawal cannot be completed with available funds."
-        balance
+      if @checktally >= 3 && checking_min_balance(withdrawal)
+        @balance -= (withdrawal + check_withdrawal_fee)
+        @checktally += 1
+        return @balance
+      elsif @checktally < 3 && checking_min_balance(withdrawal)
+        @balance -= withdrawal
+        @checktally += 1
+        return @balance
+      elsif (checking_min_balance(withdrawal) == false)
+        puts "Checking account must maintain minimum balance of $-10. Withdrawal cannot be completed with available funds."
       end
     end
 
     #reset_checks: Resets the number of checks used to zero
     def reset_checks
-
+      @checktally = 0
     end
   end
 
