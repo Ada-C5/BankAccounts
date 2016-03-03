@@ -58,19 +58,21 @@ require "CSV" #data_file for this program is currently: "./support/accounts.csv"
 
 module Bank
 
+CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other files may give us money information in other denominations, in which case make a new constant)
+
   class Account
     attr_reader :id, :balance, :owner #moved initial_balance and balance into their own explicit methods below. Initial_balance moved for adjustment from cents to dollars.
 
     def initialize(account_information)
       @id = account_information[:id]
       @initial_balance = account_information[:initial_balance]
-      @balance = initial_balance(100) #will start out at initial balance and then be updated as we add/withdraw money.  1 dollar = 100 cents for this particular CSV file. Consider keeping this "constant" somewhere else so other files/banks can changes this?
+      @balance = initial_balance(CENTS_IN_DOLLAR) #will start out at initial balance and then be updated as we add/withdraw money.
       @open_date = account_information[:open_date]
       @owner = account_information[:owner]
       raise ArgumentError.new("An account cannot be created with an initial negative balance.") if @initial_balance < 0
     end
 
-    def initial_balance(currency_changer = 1) #CSV data comes in cents - I want to play in dollars so I am converting to dollars.  Maybe a good idea to defaul to one if we don't have to convert?
+    def initial_balance(currency_changer = 1) #CSV data comes in cents - I want to play in dollars so I am converting to dollars (see CENTS_IN_DOLLAR constant).  Maybe a good idea to defaul to one if we don't have to convert.
       @initial_balance/currency_changer
     end
 
@@ -90,7 +92,7 @@ module Bank
         return @balance = updated_balance # I think I need an instance variable here becuase we do need to update the running balance. Can't do this through a reader. Should I make an attr_accesssor for balance instead?
       else
         puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }.00.  This is more than your current balance of $#{ sprintf("%.2f", balance) }."
-        #don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
+        # don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
       end
     end
 
@@ -102,7 +104,7 @@ module Bank
     end
 
     ##### CLASS METHODS BELOW #####
-    def self.find(data_file, id) #returns an instance of Account where the value of the id field in the CSV matches the passed parameter. "./support/accounts.csv"
+    def self.find(data_file, id) # returns an instance of Account where the value of the id field in the CSV matches the passed parameter. "./support/accounts.csv"
 
       accounts = self.all(data_file)
       accounts.each do |account|
@@ -187,7 +189,7 @@ module Bank
       account_owners_data = CSV.read(data_file)
       account_owners_data.each do |row|
         owner = self.new(id: row[0].to_i, last_name: row[1], first_name: row[2], street_address: row[3], city: row[4], state: row[5]) # to_f because ID needs to be a fixnum/integer - per JNF's primary requirements
-        account_owners << owner #put it into our collection of instances! (account_owners)
+        account_owners << owner #put it into our collection of instances!
       end
 
       return account_owners
