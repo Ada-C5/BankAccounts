@@ -88,7 +88,14 @@ module Bank
       end
     end
 
-  end 
+    def add_interest(rate)
+      interest = @balance * rate/100
+      @balance = @balance + interest
+      puts @balance
+      return interest
+    end
+
+  end
 
   class CheckingAccount < Account
   end
