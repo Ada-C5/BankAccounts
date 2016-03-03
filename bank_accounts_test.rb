@@ -3,6 +3,17 @@ require_relative 'bank_account.rb'
 ## TEST FOR SELF.ALL METHOD   ###
 # puts Bank::Account.all("./support/accounts.csv")
 
+# # # #  TESTS FOR SAVINGS_ACCOUNT CLASS # # # # #
+### test initialize
+# puts Bank::SavingsAccount.new(2, 5, 2005)
+
+### test for withdraw method
+# my_account = Bank::SavingsAccount.new(2, 15, 2005)
+# puts my_account.withdraw(4)
+
+### test for add_interest method
+my_account = Bank::SavingsAccount.new(2, 10000, 2005)
+puts my_account.add_interest(0.25) #10025.0
 
 
 # # # # # TESTS FOR OWNER CLASS # # # # #
@@ -20,8 +31,8 @@ require_relative 'bank_account.rb'
 
 ###   TEST FOR GET_ACCOUNT METHOD   ###
 # get balance of first account with owner id
-my_owner = Bank::Owner.find(14)
-puts my_owner.get_account[0].balance
+# my_owner = Bank::Owner.find(14)
+# puts my_owner.get_account[0].balance
 
 # ### TEST FOR GET_INFO METHOD ###
 # my_owner = Bank::Owner.find(14)
