@@ -155,7 +155,6 @@ module Bank
 
 
   class SavingsAccount < Account
-    attr_reader :balance
     TRANSACTION_FEE = 200 # $2.00 transaction fee (200 in cents)
     LOWER_BALANCE_LIMIT = 1000 # $10.00 lower balance limit
     INITIAL_BALANCE_LIMIT = 1000
@@ -174,11 +173,18 @@ module Bank
     end
 
     def calculate_interest(rate)
-      interest = balance * rate / 100
+      interest = @balance * rate / 100
+    end
+  end
+
+  class CheckingAccount < Account
+    TRANSACTION_FEE = 100
+
+    def withdraw(money)
+      super(money, TRANSACTION_FEE)
     end
 
   end
-
 
 end
 
