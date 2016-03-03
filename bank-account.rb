@@ -15,9 +15,7 @@ module Bank
       @owner = account_info[:owner]
       @creation_date = account_info[:creation_date]
       @balance = account_info[:initial_balance]
-      if @balance < 0
-        raise ArgumentError.new("You can't open an account with no money!")
-      end
+      is_balance_enough # checks if balance meets criteria (is there enough money in it?)
     end
 
     def withdraw(money)
@@ -40,6 +38,12 @@ module Bank
     # turn balance into a Money object.  Format: $X.XX
     def get_balance
       Money.new(@balance).format
+    end
+
+    def is_balance_enough
+      if @balance < 0
+        raise ArgumentError.new("You can't open an account with no money!")
+      end
     end
 
     # return a collection of Account instances, representing all of the
@@ -76,6 +80,7 @@ module Bank
           return found_account
         end
       end
+
       return nil
     end
   end
@@ -137,9 +142,18 @@ module Bank
           return line
         end
       end
+
       return nil
     end
+
   end
+
+
+  class SavingsAccount < Account
+
+  end
+
+
 end
 
 
