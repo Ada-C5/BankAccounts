@@ -154,6 +154,7 @@ module Bank
     # checking account class that inherits from account
     class CheckingAccount < Account
         WITHDARAWL_FEE_IN_DOLLARS = 1
+        CHECK_FEE_IN_DOLLARS = 2
         checks_used_in_the_month = 0
         
         # It should include the following updated functionality:
@@ -180,8 +181,13 @@ module Bank
         # Allows the account to go into overdraft up to -$10 but not any lower
         # The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
         def withdraw_with_check(amount)
-            if (@balance - amount) > -10
+            if (@balance - amount) > -10 && checks_used_in_the_month < 3
                 @balance -= amount
+                puts "Your new balance is $#{@balance}"
+                checks_used_in_the_month += 1
+                return @balance
+            elsif (@balance - amount) > -10 && checks_used_in_the_month >= 3
+                @balance -= (amount + CHECK_FEE_IN_DOLLARS)
                 puts "Your new balance is $#{@balance}"
                 checks_used_in_the_month += 1
                 return @balance
