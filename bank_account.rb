@@ -184,7 +184,7 @@ module Bank
   class MoneyMarketAccount < Account
     MIN_BAL = 1000000
     WITHDRAW_FEE = 100
-    
+
     def initialize(id, balance, date)
       super
       @transactions = 0
@@ -209,6 +209,17 @@ module Bank
       else
         puts "Sorry, your account must be over $10,000 to make a withdrawl."
       end
+    end
+
+    def deposit(amount)
+      new_bal = super
+      if new_bal - amount < 1000000
+        @transactions += 1
+      end
+    end
+
+    def reset_transactions
+      @transactions = 0
     end
 
   end
