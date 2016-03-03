@@ -1,22 +1,22 @@
-  require 'CSV'
-  require 'awesome_print'
+require 'CSV'
+require 'awesome_print'
 
-  module Bank
+module Bank
   class Account
+  BALANCE_MINIMUM = 0
 
-    attr_reader :current_balance, :all_accounts
-    attr_accessor :id, :initial_balance, :owner
-
+  attr_reader :current_balance, :all_accounts
+  attr_accessor :id, :initial_balance, :owner
 
     def initialize(account)
       if account != nil
         @id = account[:id]
         @initial_balance = account[:initial_balance]
-        @current_balance = account[:current_balance]
+        @current_balance = account[:initial_balance]
         @start_date = account[:start_date]
         @all_accounts = account[:all_accounts]
         @owner = nil
-        raise ArgumentError, "We cannot deposit negative amounts. Please enter your deposit amount." unless @current_balance.to_i >= 0
+        raise ArgumentError, "We cannot process your transaction-you need a minimum $#{self.class::BALANCE_MINIMUM} amount." unless @initial_balance.to_i >= self.class::BALANCE_MINIMUM
       end
     end
 
@@ -113,17 +113,26 @@
       end
     end
   end
+
+  class SavingsAccount < Account
+    BALANCE_MINIMUM = 10
+  end
 end
 
+#########TESTS
 #@sue = Bank::Owner.new(name: "Suzanne Harrison", street_address_2: "4726 Thackeray Pl NE", city: "Seattle", zip_code: "98105")
 #@sue = Bank::Account.new()
 #my_account.pass_owner_info(owner) #to pass owner info into Account
 
 #to test the self and csv method
-owners = Bank::Owner.all
-ap owners
+#owners = Bank::Owner.all
+#ap owners
 
-account = Bank::Account.all
-ap account
+#account = Bank::Account.all
+#ap account
+
 #Bank::Account.find(1212, "./support/accounts.csv")
 #puts accounts[0]
+
+#To make nw savings account and give initial balance
+#sue = Bank::SavingsAccount.new(initial_balance: 7)
