@@ -6,7 +6,7 @@ module Bank
   class Account
     MINIMUM_BALANCE = 0
     WITHDRAW_FEE = 0
-    attr_reader :id
+    attr_reader :id, :balance
 
     def initialize(id, initial_balance, opendate, owner=nil)
       # raise ArgumentError, "Starting balance must be a number." unless initial_balance.is_a? Numeric
@@ -78,7 +78,7 @@ module Bank
       else
         @balance = @balance - (amount + @withdraw_fee)
       end
-      return @balance
+      return balance
     end
 
     # Accepts a single parameter for the amount of money to be deposited.
@@ -99,10 +99,17 @@ module Bank
   class SavingsAccount < Account
     MINIMUM_BALANCE = 10
     WITHDRAW_FEE = 2
+    attr_reader :balance
     def initialize(id, initial_balance, opendate, owner=nil)
       super
       @minimum_balance = MINIMUM_BALANCE
       @withdraw_fee = WITHDRAW_FEE
+    end
+
+    def add_interest(rate)
+      interest = balance * rate/100
+      @balance = @balance + interest
+      return interest
     end
 
   end
