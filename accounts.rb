@@ -37,8 +37,8 @@ module Bank
         if all_accts[n].include?"#{id_num}"
           id = all_accts[n][0].to_i
           bal = all_accts[n][1].to_i
-          date = all_accts[2]
-          acctmatch = Bank::Account.new(id, bal, date)
+          date = all_accts[n][2]
+          return Bank::Account.new(id, bal, date)
         end
       end
     end
@@ -67,7 +67,6 @@ module Bank
   class SavingsAccount < Account
 
     def initialize(id, balance, opendate)
-
       unless balance.is_a?(Integer) && balance >= 10
         raise ArgumentError.new("New accounts must begin with a balance of $10 or more.")
       end
@@ -116,7 +115,6 @@ module Bank
     end
 
     def withdraw_using_check(amount)
-      puts @checknum
       if @balance - amount >= -10 && @checknum > 0
         @balance = @balance - amount
         @checknum = @checknum - 1
@@ -128,7 +126,10 @@ module Bank
       else
         puts "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
       end
+    end
 
+    def reset_checks
+      @checknum = 3
     end
 
   end
