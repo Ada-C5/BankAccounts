@@ -2,43 +2,55 @@ require 'csv'
 module Bank
   class Account
     attr_accessor :id, :balance, :date
-    def initialize
-      @id = nil
-      @balance = nil
-      @date = nil
+    def initialize (id, balance, date)
+      @id = id
+      @balance = balance
+      @date = date
     end
 
-    def one
+    def self.one
       total = CSV.read('support/accounts.csv')
       total = total.first
-      @id = total[0]
-      @balance = total[1].to_f
-      @date = total[2]
-      return total
+      id_local = total[0]
+      balance_local = total[1].to_i
+      date_local = total[2]
+      return self.new(id_local, balance_local, date_local)
     end
 
     def self.all
+      csv_array = CSV.read('support/accounts.csv')
       array_accounts = []
-      total = CSV.read('support/accounts.csv')
-      total.each do |row|
-        @id = row[0]
-        @balance = row[1].to_f
-        @date = row[2]
-        one_account = self.new
+      csv_array.each do |row|
+        one_account = self.new(row[0],row[1].to_i,row[2])
         array_accounts << one_account
+        # puts "accounts"
       end
-        return array_accounts #look this up!!!!!!
+        return array_accounts
+        # => [[@id="1212", @balance="1235667", @date = "1999-03-27 11:30:09 -0800"],
+        #     [@id="1213", @balance="66367", @date = "2010-12-21 12:21:12 -0800"],
+        # =>  [@id="1214", @balance="9876890", @date = "2007-09-22 11:53:00 -0800"], ["1215", "919191", "2011-10-31 13:55:55 -0800"], ["1216", "100022", "2000-07-07 15:07:55 -0800"], ["1217", "12323", "2003-11-07 11:34:56 -0800"], ["15151", "9844567", "1993-01-17 13:30:56 -0800"], ["15152", "34343434343", "1999-02-12 14:03:00 -0800"], ["15153", "2134", "2013-11-07 09:04:56 -0800"], ["15154", "43567", "1996-04-17 08:44:56 -0800"], ["15155", "999999", "1990-06-10 13:13:13 -0800"], ["15156", "4356772", "1994-11-17 14:04:56 -0800"]]
     end
 
-    # def withdraw(withdraw)
-    #   @balance = @balance - withdraw
-    #   if @balance < 0
-    #     @balance = @balance + withdraw
-    #     puts "You dont have all that money"
-    #   end
-    #   balance_printed
-    # end
-    #
+    def self.find_with_id(id)
+      all_accounts = Bank::Account.all
+      all_accounts.each do |account|
+        puts account.id
+         puts account.id.class, id.class
+        if account.id == id.to_s
+          return account
+        end
+      end
+    end
+
+    def withdraw(withdraw)
+      @balance = @balance - withdraw
+      if @balance < 0
+        @balance = @balance + withdraw
+        puts "You dont have all that money"
+      end
+      balance_printed
+    end
+
     def deposit(money)
       @balance = @balance + money
       balance_printed
@@ -63,7 +75,8 @@ module Bank
 
 end
 
-# clients = Bank::Account.new
+# clients = Bank::Account.all
+# puts Bank::Account.find_with_id(1214)
 # puts clients.one
 # puts clients.class
 # puts clients
@@ -71,6 +84,4 @@ end
 # clients.deposit(200)
 # puts clients.balance
 
-f = Bank::Account.new
-puts f.one
-puts Bank::Account.all
+# Bank::Account.find_with_id(1212)
