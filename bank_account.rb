@@ -139,6 +139,8 @@ module Bank
   class CheckingAccount < Account
     MIN_BAL = 0
     WITHDRAW_FEE = 1
+    CHECK_FEE = 2
+    @@check_count = 0
     def withdraw(amount)
       temp_balance = @balance - amount
       temp_balance -= WITHDRAW_FEE
@@ -150,6 +152,28 @@ module Bank
       end
       return @balance
     end
+
+    def withdraw_using_check(amount)
+      # tracks checks used per month, 3 free the rest +$2
+      overdraft = -10
+      check_fee = 2
+      ### cut and just call method if withdraw(amount, fee)
+      temp_balance = @balance - amount
+      if @@check_count >= 3
+        temp_balance -= CHECK_FEE
+      end
+      # make sure result is positive
+      if temp_balance < overdraft
+        puts "You don't have enough money to complete this withdrawl."
+      else 
+        @balance = temp_balance
+      end
+      @@check_count += 1
+      puts "Current check count is #{@@check_count}"
+      return @balance
+    end
+
+
   end
   
   class Owner
