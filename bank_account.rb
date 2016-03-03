@@ -43,28 +43,21 @@ module Bank
       else 
         @balance = temp_balance
       end
+      puts "#{money_convert(@balance)}"
       return @balance
     end
 
     # deposit money in account
     def deposit(amount)
       @balance += amount
+      puts "#{money_convert(@balance)}"
       return @balance
     end
 
     # show current balance
     def balance
+      puts "#{money_convert(@balance)}"
       return @balance
-    end
-
-    # show id
-    def get_id
-      return @id
-    end
-
-    # show date
-    def date
-      return @date
     end
 
     # create new accounts from csv information
@@ -104,9 +97,9 @@ module Bank
 
   class SavingsAccount < Account
     # minimum balance to open account
-    MIN_BAL = 10
+    MIN_BAL = 1000
     # withdraw fee
-    WITHDRAW_FEE = 2
+    WITHDRAW_FEE = 200
     # initialize new instance with at least $10 in account
     def initialize(id, balance, date)
       super
@@ -124,20 +117,22 @@ module Bank
       else 
         @balance = temp_balance
       end
+      puts "#{money_convert(@balance)}"
       return @balance
     end
 
     # rate as decimal percentage 25% => 0.25
     def add_interest(rate)
       @balance += @balance * (rate/100)
+      puts "#{money_convert(@balance)}"
       return @balance
     end
   end
 
   class CheckingAccount < Account
     MIN_BAL = 0
-    WITHDRAW_FEE = 1
-    CHECK_FEE = 2
+    WITHDRAW_FEE = 100
+    CHECK_FEE = 200
 
     def initialize(id, balance, date)
       super
@@ -150,16 +145,19 @@ module Bank
       # make sure result is positive
       if temp_balance < MIN_BAL
         puts "You don't have enough money to complete this withdrawl."
+        # if a check keeps trying to clear but you don't have the funds
+        # check count goes up but there is currently no fee for each try
       else 
         @balance = temp_balance
       end
+      puts "#{money_convert(@balance)}"
       return @balance
     end
 
     def withdraw_using_check(amount)
       # tracks checks used per month, 3 free the rest +$2
-      overdraft = -10
-      check_fee = 2
+      overdraft = -1000
+      check_fee = 200
       ### cut and just call method if withdraw(amount, fee)
       temp_balance = @balance - amount
       if @check_count >= 3
@@ -173,6 +171,7 @@ module Bank
       end
       @check_count += 1
       puts "Current check count is #{@check_count}"
+      puts "#{money_convert(@balance)}"
       return @balance
     end
 
@@ -180,7 +179,9 @@ module Bank
     def reset_checks
       @check_count = 0
     end
+  end
 
+  class MoneyMarketAccount < Account
 
   end
   
@@ -255,44 +256,3 @@ module Bank
     end
   end
 end
-
-
-# # TEST CALLS (working on migrating these to test file)
-# kwel = Bank::Owner.find(14).get_info
-# puts kwel
-# puts kwel.get_id
-#Bank::Owner.create_owners("./support/owners.csv")
-# kwel_ownerz = Bank::Account.all("./support/owners.csv")
-# puts kwel_ownerz[0].get_id
-#a = ownerz.find(14)
-#puts ownerz
-# puts a.class
-# info = ownerz.find(14).get_info
-# puts info
-# puts ownerz
-
-# accountz = Bank::Account.create_accounts("./support/accounts.csv")
-
-# puts accountz
-#puts "bottom account #{accounts.find(1212)}"
-#puts accounts[0].balance
-###%my_account = Bank::Account.find(15154)
-#puts my_account.class
-####%owner = my_account.get_owner
-###&puts owner.get_info
-#puts owner.class
-######$puts "THIS IS THE FINAL OWNER THAT SHOULD BE AN INSTANCE!!! #{owner}"
-#puts Bank::Account.find(15154).balance
-####puts my_account.balance
-# kwel_accounts = Bank::Account.all("./support/accounts.csv")
-# puts kwel_accounts
-
-# puts Bank::Account.find(1212).balance
-# puts Bank::Account.find(1212).deposit(10)
-
-
-
-
-
-
-
