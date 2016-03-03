@@ -7,11 +7,9 @@ module Bank
 
     def initialize(id, balance, opendate)
 
-      #Right now this error breaks the loop Bank::Account.all
-      #It breaks because the loop creates strings, not integers
-      # unless balance.is_a?(Integer) && balance >= 0
-      #   raise ArgumentError.new("New accounts must begin with a balance of 0 or more.")
-      # end
+      unless balance.is_a?(Integer) && balance >= 0
+        raise ArgumentError.new("New accounts must begin with a balance of 0 or more.")
+      end
 
       @id = id
       @balance = balance
@@ -23,7 +21,10 @@ module Bank
       all_accts = CSV.read("./support/accounts.csv")
       all_accts.each do |n|
       n=0
-      new_acct = Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
+       id = all_accts[n][0].to_i
+       bal = all_accts[n][1].to_i
+       date = all_accts[2]
+      new_acct = Bank::Account.new(id, bal, date)
       end
     end
 
