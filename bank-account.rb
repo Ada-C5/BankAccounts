@@ -9,18 +9,20 @@ I18n.enforce_available_locales = false # need this not to trip an I18n error!
 module Bank
   class Account
     attr_reader :id, :owner, :creation_date
+    TRANSACTION_FEE = 0
+    LOWER_BALANCE_LIMIT = 0
     
     def initialize(account_info)
       @id = account_info[:id]
       @owner = account_info[:owner]
       @creation_date = account_info[:creation_date]
       @balance = account_info[:initial_balance]
-      is_balance_enough # checks if balance meets criteria (is there enough money in it?)
+      is_balance_enough(LOWER_BALANCE_LIMIT) # checks if balance meets criteria (is there enough money in it?)
     end
 
-    def withdraw(money)
+    def withdraw(money, fee = TRANSACTION_FEE)
       if money <= @balance
-        @balance -= money
+        @balance -= (money + fee)
       else
         puts "Insufficient funds. Withdrawal canceled."
         @balance # return balance without altering it if withdrawal amount is higher than balance
@@ -40,9 +42,9 @@ module Bank
       Money.new(@balance).format
     end
 
-    def is_balance_enough
-      if @balance < 0
-        raise ArgumentError.new("You can't open an account with no money!")
+    def is_balance_enough(limit)
+      if @balance < limit
+        raise ArgumentError.new("Not enough money!!")
       end
     end
 
@@ -150,10 +152,15 @@ module Bank
 
 
   class SavingsAccount < Account
-    def is_balance_enough
-      if @balance < 1000 #is the balance less than $10 (1000 cents)
-        raise ArgumentError.new("You need more than $10.00 to open a savings account!")
-      end
+    TRANSACTION_FEE = 200 # $2.00 transaction fee (200 in cents)
+    LOWER_BALANCE_LIMIT = 1000 # $10.00 initial lower balance limit
+    
+    def is_balance_enough(limit)
+      super(LOWER_BALANCE_LIMIT)
+    end
+
+    def withdraw(money)
+      super(money, TRANSACTION_FEE)
     end
 
   end
