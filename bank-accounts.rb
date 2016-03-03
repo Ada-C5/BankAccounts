@@ -96,29 +96,15 @@ module Bank
     end
   end
 
-#Updated withdrawal functionality:
-# Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance.
-  #Returns the updated account balance.
-
-# Does not allow the account to go negative. Will output a warning message and
-  #return the original un-modified balance.
-
-# #withdraw_using_check(amount): The input amount gets taken out of the account
-  # as a result of a check withdrawal. Returns the updated account balance.
-
-# Allows the account to go into overdraft up to -$10 but not any lower
-
-# The user is allowed three free check uses in one month, but any subsequent use
-  # adds a $2 transaction fee
-
-# #reset_checks: Resets the number of checks used to zero
-
   class CheckingAccount < Account
     WITHDRAWAL_FEE = 1
+    CHECK_FEE = 2
 
     def initialize(account_id, balance, open_date)
       super
       puts "A checking account will incur a $#{WITHDRAWAL_FEE} fee per withdrawal."
+
+      @check_count = 0
     end
 
     # figure out how to make withdraw use super and inherit from base class
@@ -133,7 +119,27 @@ module Bank
       end
     end
 
+    def withdraw_using_check(amount)
+      puts "You are allowed three free check uses per month. Each subsequent use will incur a $2 fee"
+      if @balance - amount < -10
+        return "You may not overdraft by more than $10."
+      else
+        @check_count += 1
+        if @check_count > 3
+          @balance -= CHECK_FEE
+        end
+        puts "Current check uses this month: #{@check_count}"
+        @balance -= amount
+        return "Account balance: #{@balance}"
+      end
+    end
     
+      def reset_checks
+        @check_count = 0
+        return "Current check uses: #{@check_count}"
+      end
+
+
   end
 
 
