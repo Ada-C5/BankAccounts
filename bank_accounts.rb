@@ -1,15 +1,9 @@
-# use money gem later when users get involved
-# for example, if a user enters 10, it will convert to 1000 for the money gem, which will then convert it to $10.00
-# require "money"
-
 require 'csv'
 require 'money'
 I18n.enforce_available_locales = false
 module Bank
 
   class Account
-    # For bank employee eyes only! I would remove the attr_reader if I was going
-    # to expose this code anywhere public.
     attr_reader :id, :balance, :date_created
 
     def initialize(account_info)
@@ -82,7 +76,7 @@ module Bank
         Do not attempt.")
       end
       #@balance = @balance - amount_to_withdraw
-      convert_cents(@balance - amount_to_withdraw)
+      @balance = @balance - amount_to_withdraw
       show_balance
     end
 
@@ -93,15 +87,21 @@ module Bank
 
     # displays the balance in a nice user-friendly way, but also returns it to the other methods
     def show_balance
+      convert_cents(@balance)
       puts "The balance for this account is currently $#{@balance}."
       return @balance
     end
 
   end
 
+  class CheckingAccount
+  end
+
+  class SavingsAccount
+  end
+
+
   class Owner
-    # For bank employee eyes only! I would remove the attr_reader if I was going
-    # to expose this code anywhere public.
     attr_reader :name, :phone, :email, :address, :owner
 
     def initialize(name, phone_number, email_address, street_address)
@@ -112,5 +112,3 @@ module Bank
     end
   end
 end
-
-#@array_of_accounts = CSV.open("accounts.csv", "r")
