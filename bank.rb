@@ -50,9 +50,10 @@ module Bank
       if @balance < 0
         @balance = @balance + withdraw
         puts "You dont have all that money"
+        return @balance
       end
-      balance_printed
       return @balance
+      # balance_printed
     end
 
     def deposit(money)
@@ -80,7 +81,13 @@ module Bank
     def withdraw(withdraw)
       regular_withdraw = super
       savings_withdraw_fee = 2
-      regular_withdraw - savings_withdraw_fee
+      @balance = regular_withdraw - savings_withdraw_fee
+        if @balance < 10
+          @balance = @balance + withdraw + savings_withdraw_fee
+          puts "Your saving account can not have less than 10 USD"
+          return @balance
+        end
+      return @balance
     end
 
   end
