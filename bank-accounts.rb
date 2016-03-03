@@ -4,8 +4,6 @@ module Bank
 
   class Account
 
-    WITHDRAWAL_FEE = 0
-
     attr_reader   :balance, :account_id, :open_date
     attr_accessor :owner
 
@@ -47,11 +45,11 @@ module Bank
     end
 
     def withdraw(withdraw_amount)
-      if @balance - withdraw_amount - WITHDRAWAL_FEE < 0
+      if @balance - withdraw_amount < 0
         puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
         return "Account balance: #{@balance}"
       else
-        @balance -= withdraw_amount - WITHDRAWAL_FEE
+        @balance -= withdraw_amount
         return "Account balance: #{@balance}"
       end
     end
@@ -67,14 +65,9 @@ module Bank
 
   end
 
-=begin
-
-Updated withdrawal functionality:
-
-=end
-
   class SavingsAccount < Account
     WITHDRAWAL_FEE = 2
+
     def initialize(account_id, balance, open_date)
       super
       if @balance < 10
@@ -93,10 +86,32 @@ Updated withdrawal functionality:
       end
     end
 
+    def add_interest(rate)
+      @interest = @balance * rate/100
+      return "Amount added: $#{@interest}"
+      @balance += @interest
+    end
   end
 
-  class CheckingAccount < Account
+#Updated withdrawal functionality:
+# Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance.
+  #Returns the updated account balance.
 
+# Does not allow the account to go negative. Will output a warning message and
+  #return the original un-modified balance.
+
+# #withdraw_using_check(amount): The input amount gets taken out of the account
+  # as a result of a check withdrawal. Returns the updated account balance.
+
+# Allows the account to go into overdraft up to -$10 but not any lower
+
+# The user is allowed three free check uses in one month, but any subsequent use
+  # adds a $2 transaction fee
+
+# #reset_checks: Resets the number of checks used to zero
+
+  class CheckingAccount < Account
+    
   end
 
 
