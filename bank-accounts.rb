@@ -65,6 +65,28 @@ module Bank
 
   end
 
+=begin
+
+Updated withdrawal functionality:
+- Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
+- Does not allow the account to go below the $10 minimum balance -
+  Will output a warning message and return the original un-modified balance
+=end
+
+  class SavingsAccount < Account
+    def initialize(account_id, balance, open_date)
+      super
+      if @balance < 10
+          raise ArgumentError, "Balance can't be less than $10"
+      end
+    end
+  end
+
+  class CheckingAccount < Account
+
+  end
+
+
   class Owner
 
     attr_reader :owner_id, :last_name, :first_name, :street_address, :city, :state
