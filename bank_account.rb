@@ -84,20 +84,33 @@ module Bank
         end
           return accounts
       end
-      #   # or @@accounts << row
+      # or @@accounts << row
 
       # this is a way to find data using one of the attributes
       def self.find(id)
         # acct_to_find = nil
-      account_item = self.all
-
+        account_item = self.all
           account_item.each do |acct| # acct is a temp name for reference as the loop iterates though the array
           if acct.id == id # calling the method that saying whats the id
             return acct
           end
         end
       end
+
   end
+
+          # this method is for the owner and the account file
+          # def self.load
+          #   owner_account = []
+          #   CSV.open(OWNERSACCOUNT, "r") do |csv|
+          #     csv.read.each do |row|
+          #       owner_account << [account_id: row[0], owner_id: row[1]]
+          #     end
+          #   end
+          #     return owner_account
+          # end
+          # at some point will be Bank::Account.find(row[0])
+
 
   class Owner
     FILENAME = "./support/owners.csv"
@@ -140,27 +153,6 @@ module Bank
         end
           return owners
       end
-
-      # this method is for the owner and the account file
-      def self.load
-        owner_account = []
-        CSV.open(OWNERSACCOUNT, "r") do |csv|
-          csv.read.each do |row|
-            owner_account << [account_id: row[0], owner_id: row[1]]
-          end
-        end
-          return owner_account
-      end
-
-      # def self.find
-      #   # acct_to_find = nil
-      #   owner_item = self.all
-      #     owner_item.each do |item| # acct is a temp name for reference as the loop iterates though the array
-      #     if item.id == id # calling the method that saying whats the id
-      #       return item
-      #     end
-      #   end
-      # end
   end
 end
 
