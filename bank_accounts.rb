@@ -11,6 +11,7 @@ module Bank
         # and will be how withdrawals and deposits are presumably handled.
         CENTS_IN_A_DOLLAR = 100.0
         WITHDARAWL_FEE_IN_DOLLARS = 0
+        ACCOUNT_MIN_BALANCE_IN_DOLLARS = 0
 
         attr_reader :id_number 
         attr_accessor :owner
@@ -30,11 +31,11 @@ module Bank
 
         # withdraw method
         def withdraw(amount)
-            if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS)) >= 0
+            if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS)) >= ACCOUNT_MIN_BALANCE_IN_DOLLARS
                 @balance = @balance - ( amount + WITHDARAWL_FEE_IN_DOLLARS )
                 puts "After withdrawing #{ amount } and the withdrawal fee the balance for account #{ @id_number } is #{ @balance }."
                 return @balance
-            elsif (@balance - amount) < 0
+            elsif (@balance - amount) < ACCOUNT_MIN_BALANCE_IN_DOLLARS
                 puts "HEY! That is unpossible because this account MUST not go below $0!"
                 puts "The balance for account #{ @id_number } is still #{ @balance }."
                 return @balance
@@ -110,6 +111,7 @@ module Bank
     class SavingsAccount < Account
         # the withdrawal fee for this account will always be the same so this seems like a good place for a constant.
         WITHDARAWL_FEE_IN_DOLLARS = 2
+        ACCOUNT_MIN_BALANCE_IN_DOLLARS = 10
         
         # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
         def initialize(account_info)
@@ -123,20 +125,20 @@ module Bank
     # more complicated amendments if I call it with super.
     # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
     # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
-        def withdraw(amount)
-            # changed the check here to make sure there would be $10 left in the account after.
-            if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS)) >= 10
-                @balance = @balance - ( amount + WITHDARAWL_FEE_IN_DOLLARS )
-                puts "After withdrawing #{ amount } and the withdrawal fee the balance for account #{ @id_number } is #{ @balance }."
-                return @balance
-            elsif (@balance - amount) < 10
-                puts "HEY! That is unpossible because this account MUST have $10 in it!"
-                puts "The balance for account #{ @id_number } is still #{ @balance }."
-                return @balance
-            else
-                puts "You can't do that operation on a bank account."
-            end     
-        end
+        # def withdraw(amount)
+        #     # changed the check here to make sure there would be $10 left in the account after.
+        #     if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS)) >= 10
+        #         @balance = @balance - ( amount + WITHDARAWL_FEE_IN_DOLLARS )
+        #         puts "After withdrawing #{ amount } and the withdrawal fee the balance for account #{ @id_number } is #{ @balance }."
+        #         return @balance
+        #     elsif (@balance - amount) < 10
+        #         puts "HEY! That is unpossible because this account MUST have $10 in it!"
+        #         puts "The balance for account #{ @id_number } is still #{ @balance }."
+        #         return @balance
+        #     else
+        #         puts "You can't do that operation on a bank account."
+        #     end     
+        # end
 
     # It should include the following new methods:
     # #add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
