@@ -4,15 +4,19 @@ require 'CSV'
 module Bank
 	
 	class Account
-		attr_reader :account_id, :balance, :account_open_date
-
+		attr_reader :account_id, :show_balance, :account_open_date, :withdraw_money, :deposit_money
+		
+		# magic number. Initial balance is in pennies This convers pennies to dollars 
+		PENNY_CONVERTER = 100.0
+		
 		def initialize(csv_data)
 			@csv_data = csv_data
 			@account_id = @csv_data[:account_id]
 			@initial_balance = @csv_data[:initial_balance]
-			@balance = @csv_data[:initial_balance]/100.0 # magic numbers! Maybe use show_balance somehow?
+			@balance = @csv_data[:initial_balance]/PENNY_CONVERTER 
 			@account_open_date = @csv_data[:account_open_date]
 			check_new_account(@csv_data[:initial_balance])
+			@owner_id = nil 
 		end
 
 		# check to see if initial balance is less than 0
@@ -94,6 +98,18 @@ module Bank
 			end
 		end
 	end 
+	class SavingsAccount < Account
+
+	# magic number! Account balance cannot be less than $10 or an error is raised,
+	ALLOWED_BALANCE = 10
+
+		def check_new_account(initial_balance)
+			if @balance < ALLOWED_BALANCE 
+				raise ArgumentError.new("Balance of account may not be less than $10.")
+			end
+		end
+
+	end 
 
 	class Owner
 		attr_reader :owner_id, :first_name, :last_name
@@ -106,6 +122,7 @@ module Bank
 			@street_address = csv_data[:street_address]
 			@city = csv_data[:city]
 			@state = csv_data[:state]
+			@account_id = nil 
 		end 
 
 		def self.get_all(file)
@@ -143,10 +160,13 @@ end
 
 accounts = Bank::Account.get_all('./support/accounts.csv')
 
-account = Bank::Account.find(1213, accounts).balance
-pp account
+account = Bank::Account.find(1212, accounts)
 
-owners = Bank::Owner.get_all('./support/owners.csv') 
 
-owner = Bank::Owner.find(14, owners)
-pp owner
+savings_accounts = Bank::SavingsAccount.get_all('./support/savings_accounts.csv')
+pp savings_accounts
+
+# owners = Bank::Owner.get_all('./support/owners.csv') 
+
+# owner = Bank::Owner.find(14, owners)
+# pp owner
