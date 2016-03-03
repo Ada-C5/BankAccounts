@@ -62,6 +62,10 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
 
   class Account
     attr_reader :id, :balance, :owner #moved initial_balance and balance into their own explicit methods below. Initial_balance moved for adjustment from cents to dollars.
+    MINIMUM_BALANCE = 0 # general Account can be opened with 0 dollars
+    TRANSACTION_FEE = 0 # general Account has no transaction fees
+
+    #note to self: we can make constants change in subclasses by user self.class::CONST (http://stackoverflow.com/questions/13234384/in-ruby-is-there-a-way-to-override-a-constant-in-a-subclass-so-that-inherited)
 
     def initialize(account_information)
       @id = account_information[:id]
@@ -69,7 +73,11 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       @balance = initial_balance(CENTS_IN_DOLLAR) #will start out at initial balance and then be updated as we add/withdraw money.
       @open_date = account_information[:open_date]
       @owner = account_information[:owner]
-      raise ArgumentError.new("An account cannot be created with an initial negative balance.") if @initial_balance < 0
+      check_initial_balance #to raise the argument error
+    end
+
+    def check_initial_balance #should I use an argument or a constant
+      raise ArgumentError.new("An account cannot be created with this initial balance.") if initial_balance(CENTS_IN_DOLLAR) < (self.class::MINIMUM_BALANCE)
     end
 
     def initial_balance(currency_changer = 1) #CSV data comes in cents - I want to play in dollars so I am converting to dollars (see CENTS_IN_DOLLAR constant).  Maybe a good idea to defaul to one if we don't have to convert.
@@ -85,13 +93,13 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
     end
 
     def withdraw(amount)
-      updated_balance = (balance - amount)
+      updated_balance = (balance - amount - self.class::TRANSACTION_FEE)
 
-      if updated_balance > 0
+      if updated_balance > self.class::MINIMUM_BALANCE
         puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{ sprintf("%.2f", updated_balance) }. "
         return @balance = updated_balance # I think I need an instance variable here becuase we do need to update the running balance. Can't do this through a reader. Should I make an attr_accesssor for balance instead?
       else
-        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }.00.  This is more than your current balance of $#{ sprintf("%.2f", balance) }."
+        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your account minimum of $#{ sprintf("%.2f", self.class::MINIMUM_BALANCE)}.  Your current balance is $#{ sprintf("%.2f", balance) }."
         # don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
       end
     end
@@ -124,11 +132,18 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
         account = self.new(id: row[0].to_i, initial_balance: row[1].to_f, open_date: row[2]) # to_i becasue ID and initial balance should be numbers.  ID is an integer because its a fixnum (per requirements) and intial_balance is to_f because I feel like this is more precise with money.
         accounts << account #put it into our collection of instances! (accounts)
       end
-
-      return accounts
+      return accounts #we need to return accounts outside the loop, otherwise it only returns the last loop through our do.
     end
 
   end
+
+  class SavingsAccount < Account
+
+    MINIMUM_BALANCE = 10.00 # SavingsAccount cannot be opened with less than 10 dollars.  The account balance cannot fall below $10.
+    TRANSACTION_FEE = 2 # transaction fee for withdrawls is 2.
+
+  end
+
 
   class Owner
     attr_reader :id, :first_name
@@ -200,13 +215,16 @@ end
 
 #test run the program
 
+#savings_account = Bank::SavingsAccount.new(initial_balance: 10000)
+#savings_account.withdraw(10)
+#savings_account.display_balance
 
-account_id = Bank::Account.find(1212)
-account_id.display_balance
-
-owner_id = Bank::Owner.find(14)
-puts owner_id.first_name
-
-owner_account = owner_id.return_owners_accounts
-puts owner_account[0].id
-owner_account[0].display_balance
+# account_id = Bank::Account.find(1212)
+# account_id.display_balance
+  #
+  # owner_id = Bank::Owner.find(14)
+  # puts owner_id.first_name
+  #
+  # owner_account = owner_id.return_owners_accounts
+  # puts owner_account[0].id
+  # owner_account[0].display_balance
