@@ -55,26 +55,40 @@ Wave 3: Inheritance
 
 Primary Requirements
 
-Create a SavingsAccount class which should inherit behavior from the Account class.
+**Create a SavingsAccount class which should inherit behavior from the Account class.
 It should include the following updated functionality:
 ** The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
 **Updated withdrawal functionality:
 *Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
 *Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
 It should include the following new methods:
-#add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
-Input rate is assumed to be a percentage (i.e. 0.25).
-The formula for calculating interest is balance * rate/100
-Example: If the interest rate is 0.25% and the balance is $10,000, then the interest that is returned is $25 and the new balance becomes $10,025.
-Create a CheckingAccount class which should inherit behavior from the Account class.
+**#add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
+*Input rate is assumed to be a percentage (i.e. 0.25).
+*The formula for calculating interest is balance * rate/100
+
+**Create a CheckingAccount class which should inherit behavior from the Account class.
 It should include the following updated functionality:
-Updated withdrawal functionality:
-Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. Returns the updated account balance.
-Does not allow the account to go negative. Will output a warning message and return the original un-modified balance.
-#withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
-Allows the account to go into overdraft up to -$10 but not any lower
-The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
-#reset_checks: Resets the number of checks used to zero
+*Updated withdrawal functionality:
+*Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. Returns the updated account balance.
+*Does not allow the account to go negative. Will output a warning message and return the original un-modified balance.
+*#withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
+*Allows the account to go into overdraft up to -$10 but not any lower
+*The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
+*#reset_checks: Resets the number of checks used to zero
+
+Bonus Optional Fun Times:
+Create a MoneyMarketAccount class which should inherit behavior from the Account class.
+A maximum of 6 transactions (deposits or withdrawals) are allowed per month on this account type
+The initial balance cannot be less than $10,000 - this will raise an ArgumentError
+Updated withdrawal logic:
+If a withdrawal causes the balance to go below $10,000, a fee of $100 is imposed and no more transactions are allowed until the balance is increased using a deposit transaction.
+Each transaction will be counted against the maximum number of transactions
+Updated deposit logic:
+Each transaction will be counted against the maximum number of transactions
+Exception to the above: A deposit performed to reach or exceed the minimum balance of $10,000 is not counted as part of the 6 transactions.
+#add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
+Note This is the same as the SavingsAccount interest.
+#reset_transactions: Resets the number of transactions to zero
 
 =end
 
@@ -85,7 +99,7 @@ module Bank
 CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other files may give us money information in other denominations, in which case make a new constant)
 
   class Account
-    attr_reader :id, :balance, :owner #moved initial_balance and balance into their own explicit methods below. Initial_balance moved for adjustment from cents to dollars.
+    attr_reader :id, :balance, :owner, :check_count #moved initial_balance and balance into their own explicit methods below. Initial_balance moved for adjustment from cents to dollars.
     MINIMUM_BALANCE = 0 # general Account can be opened with 0 dollars
     TRANSACTION_FEE = 0 # general Account has no transaction fees
 
@@ -97,6 +111,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       @balance = initial_balance(CENTS_IN_DOLLAR) #will start out at initial balance and then be updated as we add/withdraw money.
       @open_date = account_information[:open_date]
       @owner = account_information[:owner]
+      @check_count = 0 #some accounts will be able to issue checks, but the count always starts at 0
       check_initial_balance #to raise the argument error
     end
 
@@ -175,6 +190,45 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
 
   end
 
+  class CheckingAccount < Account
+
+    MINIMUM_BALANCE = 0 # CheckingAccount  dollars balance cannot fall below $0. (Unless by a check withdrawl)
+    TRANSACTION_FEE = 1 # transaction fee for withdrawls is 1. Withdrawls using ehcks have a separate fee schedule.
+
+
+
+    def withdraw_using_check(amount, overdraft_limit = 10)
+
+      update_check_count #we updated the check count first because we want the first check to count towards the three free
+      updated_balance = (balance - amount - check_transaction_fee)
+
+      if updated_balance > overdraft_limit
+        puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{ sprintf("%.2f", updated_balance) }. Remember when you withdraw using checks, you are only allowed to overdraft up to $#{ sprintf("%.2f", overdraft_limit) }."
+        return @balance = updated_balance # I think I need an instance variable here becuase we do need to update the running balance. Can't do this through a reader. Should I make an attr_accesssor for balance instead?
+      else
+        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your overdraft limit of $#{ sprintf("%.2f", overdraft_limit) }.  Your current balance is $#{ sprintf("%.2f", balance) }."
+        # don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
+      end
+    end
+
+    def check_transaction_fee
+      if check_count > 3 #three free checks are allowed to be used each month
+        fee = 2 #fee if they have used more than 3 checks
+      else
+        fee = 0 #there is no fee if they haven't used any checks
+      end
+    end
+
+    def update_check_count
+      @check_count += 1
+    end
+
+    def reset_check_count
+      @check_count = 0
+    end
+  end
+
+
 
   class Owner
     attr_reader :id, :first_name
@@ -246,11 +300,12 @@ end
 
 #test run the program
 
-savings_account = Bank::SavingsAccount.new(initial_balance: 10000)
-savings_account.withdraw(10)
-savings_account.display_balance
-puts savings_account.add_interest
-savings_account.display_balance
+# checking_account = Bank::CheckingAccount.new(initial_balance: 10000)
+# checking_account.withdraw(10)
+# checking_account.withdraw_using_check(10)
+# puts checking_account.check_count
+# checking_account.withdraw_using_check(10)
+
 
 # account_id = Bank::Account.find(1212)
 # account_id.display_balance
