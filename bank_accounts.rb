@@ -116,6 +116,15 @@ module Bank
     def owner_property #track info about who owns the account
       return @owner_property
     end
+
+    def accounts
+      accounts = Bank::Account.owner_account
+      accounts.each do |line|
+        if id == line[1].id
+          return line
+        end
+      end
+    end
   end
 
   class Display
@@ -136,21 +145,3 @@ module Bank
   end
 
 end
-
-# @joe_account = Bank::Account.new(id: 1234, amount: 50)
-# @joe_info = Bank::Owner.new(name: "Joe", address: {street: "1234 Lane Drive", city: "Oaklad", state: "CA", zip: 94612})
-
-# def add_owner(add_owner_info)
-#   @owner_property.push(add_owner_info)
-#   @owner_property
-# end
-#
-# def self.find(id)
-#   accounts = Bank::Account.all
-#   accounts.each_index do |line|
-#     # puts "line #{line} = #{@accounts[line].id.to_i}"
-#     if id.to_i == accounts[line].id.to_i
-#       return accounts[line]
-#     end
-#   end
-# end
