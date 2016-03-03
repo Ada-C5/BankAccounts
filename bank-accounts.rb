@@ -4,13 +4,15 @@ require 'CSV'
 module Bank
 	
 	class Account
-		attr_reader :accounts, :balance
+		attr_reader :account_id, :balance, :account_open_date
 
-		def initialize(accounts)
-			@accounts = accounts
-			@initial_balance = @accounts[:initial_balance]
-			@balance = @accounts[:initial_balance] # should this be current_balance in the future?
-			check_new_account(@accounts[:initial_balance])
+		def initialize(csv_data)
+			@csv_data = csv_data
+			@account_id = @csv_data[:account_id]
+			@initial_balance = @csv_data[:initial_balance]
+			@balance = @csv_data[:initial_balance]/100.0 # magic numbers! Maybe use show_balance somehow?
+			@account_open_date = @csv_data[:account_open_date]
+			check_new_account(@csv_data[:initial_balance])
 		end
 
 		# check to see if initial balance is less than 0
@@ -64,8 +66,7 @@ module Bank
 		end
 
 		def show_balance
-			puts format("Currently you have an account balance of $%.2f", @accounts[:initial_balance])
-			puts "Have a nice day 🤑"
+			puts format("Currently you have an account balance of $%.2f", @balance)
 		end
 
 		def self.get_all(file)
@@ -74,39 +75,46 @@ module Bank
 			CSV.open(file, 'r') do |csv|
 			  csv.read.each do |line|
 			   accounts << self.new(
-			   	account_id: 				line[0], 
-			   	initial_balance: 		line[1].to_f,
+			   	account_id: 				line[0].to_i, # converted to fixnum per instructions 
+			   	initial_balance: 		line[1].to_i, # converted to fixnum per instructions
 			   	account_open_date:  line[2]
 			   	)
 			 end
 			end
-			 return accounts
+
+			return accounts
 		end 
 		
-		def self.find(id, file)
-			accounts = self.get_all(file)
-			accounts.each do |index|
-				if index.accounts[:account_id] == id 
-					return index
+		def self.find(account_id, accounts)
+			
+			accounts.each do |account|
+				if account.account_id == account_id 
+					return account
 				end
 			end
 		end
 	end 
 
 	class Owner
-		attr_reader :owners
+		attr_reader :owner_id, :first_name, :last_name
 
-		def initialize(owners)
-			@owners = owners
+		def initialize(csv_data)
+			@csv_data = csv_data
+			@owner_id = csv_data[:owner_id]
+			@last_name = csv_data[:last_name]
+			@first_name = csv_data[:first_name]
+			@street_address = csv_data[:street_address]
+			@city = csv_data[:city]
+			@state = csv_data[:state]
 		end 
 
 		def self.get_all(file)
 			owners = []
 
 			CSV.open(file, 'r') do |csv|
-			  csv.read.each do |line|
+			 csv.read.each do |line|
 			   owners << self.new(
-			   	owner_id: 			line[0], 
+			   	owner_id: 			line[0].to_i, # converted to fixnum per instructions
 			   	last_name: 			line[1],
 			   	first_name: 		line[2],
 			   	street_address: line[3],
@@ -114,15 +122,15 @@ module Bank
 			   	state: 					line[5]
 			   	)
 			 end
-			 return owners
-			end 
+			end
+			return owners
+		end 
 			
-			def self.find(id, file)
-				owners = self.get_all(file)
-				owners.each do |index|
-					if index.owners[:owner_id] == id 
-						return index
-					end
+		def self.find(owner_id, owners)
+
+			owners.each do |owner|
+				if owner.owner_id == owner_id
+					return owner
 				end
 			end
 		end 
@@ -133,12 +141,12 @@ end
 # Testing Below
 #
 
-# test = Bank::Account.get_all('./support/accounts.csv')
-# pp test
+accounts = Bank::Account.get_all('./support/accounts.csv')
 
+account = Bank::Account.find(1213, accounts).balance
+pp account
 
-# test2 = Bank::Account.find("1212",'./support/accounts.csv')
-# pp test2
+owners = Bank::Owner.get_all('./support/owners.csv') 
 
-test3 = Bank::Account.get_all('./support/owners.csv')
-pp test3
+owner = Bank::Owner.find(14, owners)
+pp owner
