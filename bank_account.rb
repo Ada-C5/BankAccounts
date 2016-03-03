@@ -1,10 +1,11 @@
 require 'CSV'
-require 'awesome_print'
 
 module Bank
 
 
   class Account
+    MINIMUM_BALANCE = 0
+    WITHDRAW_FEE = 0
     attr_reader :id
 
     def initialize(id, initial_balance, opendate, owner=nil)
@@ -14,6 +15,8 @@ module Bank
       @balance = initial_balance
       @opendate = opendate
       @owner = owner
+      @minimum_balance = MINIMUM_BALANCE
+      @withdraw_fee = WITHDRAW_FEE
     end
 
     # Creates an array containing data from "./support/accounts.csv" or another file
@@ -61,17 +64,21 @@ module Bank
       end
     end
 
+    def you_broke
+      puts "You don't have enough money in your account."
+    end
+
     # Accepts a single parameter for the amount of money to be withdrawn.
     # Absolute value to input for negative numbers.
     # Returns the updated account balance with 2 decimal places.
     def withdraw(amount)
       amount = amount.abs
-      if (@balance - amount) < 0
-        puts "You don't have enough money in your account."
+      if (@balance - (amount + @withdraw_fee)) < @minimum_balance
+        you_broke
       else
-        @balance = @balance - amount
+        @balance = @balance - (amount + @withdraw_fee)
       end
-      return balance_inquiry
+      return @balance
     end
 
     # Accepts a single parameter for the amount of money to be deposited.
@@ -80,12 +87,24 @@ module Bank
     def deposit(amount)
       amount = amount.abs
       @balance = @balance + amount
-      return balance_inquiry
+      return @balance
     end
 
     def balance_inquiry
       "$#{'%.2f' % @balance}"
     end
+  end
+
+
+  class SavingsAccount < Account
+    MINIMUM_BALANCE = 10
+    WITHDRAW_FEE = 2
+    def initialize(id, initial_balance, opendate, owner=nil)
+      super
+      @minimum_balance = MINIMUM_BALANCE
+      @withdraw_fee = WITHDRAW_FEE
+    end
+
   end
 
   class Owner
@@ -136,3 +155,5 @@ module Bank
   end
 
 end
+
+myaccount = Bank::Account.new(4567, 20000, "2010-12-21 12:21:12 -0800")
