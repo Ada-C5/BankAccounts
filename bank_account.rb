@@ -59,21 +59,13 @@ module Bank
     end
 
     def self.connect(file = "support/account_owners.csv")
-      mates = CSV.read(file)
-      mate_list = []
-      mates.each do |mate|
-        mate_list << self.new(mate[0].to_f, mate[1].to_f)
-        return mate_list
-      end
-      #csv reading file
-      #store it in an array n/m
-      #loop that takes owner_id and connects it to the corresponding account
-      #.add_owner
-      #need 2 arguments for each key/value
-      #use account number to look up account using self.find(id number)
-      #set to variable, then update owner account.add_owner(12(from csv file))
+      mates = CSV.read(file)  #csv reading file
+      mates.each do |account, owner| #need 2 arguments for each key/value
+        Bank::Account.find(account).add_owner(owner)  #this is a method, so you need to pass the value to the method
+      end#loop that takes owner_id and connects it to the corresponding account using 2 methods
+      return
+      #puts mate_list
     end
-
   end
 
   class Owner
@@ -116,6 +108,9 @@ end
 
 
 #--------------------------TESTS-----------------------------------
+
+#b = Bank::Account.connect("support/account_owners.csv")
+
 #y = Bank::Owner.all("support/owners.csv") #this is a method inside a class inside a module
 #puts y
 #x = Bank::Owner.find(14)
