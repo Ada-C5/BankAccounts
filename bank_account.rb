@@ -109,9 +109,7 @@ module Bank
     WITHDRAW_FEE = 2
     # initialize new instance with at least $10 in account
     def initialize(id, balance, date)
-      @id = id
-      @balance = balance
-      @date = date
+      super
       if balance < MIN_BAL
         raise ArgumentError.new("New savings accounts must have at least $10 starting balance.")
       end
@@ -140,7 +138,12 @@ module Bank
     MIN_BAL = 0
     WITHDRAW_FEE = 1
     CHECK_FEE = 2
-    @@check_count = 0
+
+    def initialize(id, balance, date)
+      super
+      @check_count = 0
+    end
+
     def withdraw(amount)
       temp_balance = @balance - amount
       temp_balance -= WITHDRAW_FEE
@@ -159,7 +162,7 @@ module Bank
       check_fee = 2
       ### cut and just call method if withdraw(amount, fee)
       temp_balance = @balance - amount
-      if @@check_count >= 3
+      if @check_count >= 3
         temp_balance -= CHECK_FEE
       end
       # make sure result is positive
@@ -168,9 +171,14 @@ module Bank
       else 
         @balance = temp_balance
       end
-      @@check_count += 1
-      puts "Current check count is #{@@check_count}"
+      @check_count += 1
+      puts "Current check count is #{@check_count}"
       return @balance
+    end
+
+    # reset checks each month
+    def reset_checks
+      @check_count = 0
     end
 
 
