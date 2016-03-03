@@ -5,7 +5,7 @@ require 'awesome_print'
 module Bank
 
   class Owner
-    attr_accessor :last_name,:first_name, :owner_id, :email, :all_owner_info, :owner_to_find
+    attr_accessor :last_name,:first_name, :owner_id, :email, :all_owner_info, :owner_to_find, :accounts
 
     def initialize(owner_info)
       @owner_id = owner_info[:owner_id]
@@ -16,6 +16,7 @@ module Bank
       @city = owner_info[:city]
       @state = owner_info[:state]
       @cell_phone = owner_info[:cell_phone]
+      #@accounts = []
     end
 
     def self.all
@@ -36,13 +37,30 @@ module Bank
         if owner.owner_id == owner_id
           owner_to_find = owner
         end
-        return owner_to_find
       end
+      return owner_to_find
+    end
+
+    def locate_id
+      return owner_id
     end
 
     def accounts
+      id = locate_id
+      x =  Bank::Account.all
+        CSV.open("./support/account_owners.csv", 'r') do |csv|
+          csv.read.each do |line|
+            if line[1] == id
+              return line[0]
+            end
+          end
+        end
+      end
 
-    end
+# if a = Bank::Owner.find('25'), then a.accounts => returns the accounts they own => 1212
+
+      #return x
+
 
     def create_account(info)
       @accounts.push(Bank::Account.new(info))
