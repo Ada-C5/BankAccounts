@@ -4,6 +4,8 @@ module Bank
 
   class Account
 
+    WITHDRAWAL_FEE = 0
+
     attr_reader   :balance, :account_id, :open_date
     attr_accessor :owner
 
@@ -45,12 +47,12 @@ module Bank
     end
 
     def withdraw(withdraw_amount)
-      if @balance - withdraw_amount < 0
+      if @balance - withdraw_amount - WITHDRAWAL_FEE < 0
         puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
-        puts "Current account balance: $#{@balance}"
+        return "Account balance: #{@balance}"
       else
-        @balance -= withdraw_amount
-        puts "New account balance: $#{@balance}"
+        @balance -= withdraw_amount - WITHDRAWAL_FEE
+        return "Account balance: #{@balance}"
       end
     end
 
@@ -68,18 +70,29 @@ module Bank
 =begin
 
 Updated withdrawal functionality:
-- Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
-- Does not allow the account to go below the $10 minimum balance -
-  Will output a warning message and return the original un-modified balance
+
 =end
 
   class SavingsAccount < Account
+    WITHDRAWAL_FEE = 2
     def initialize(account_id, balance, open_date)
       super
       if @balance < 10
-          raise ArgumentError, "Balance can't be less than $10"
+          raise ArgumentError, "Balance can't be less than $10.00"
+      end
+      puts "A savings account will incur a $2 fee per transaction."
+    end
+
+    def withdraw(withdraw_amount)
+      if @balance - withdraw_amount - WITHDRAWAL_FEE < 10
+        puts "You must maintain a balance of $10.00 in the account. Choose another amount to withdraw"
+        puts "Account balance: #{@balance}"
+      else
+        @balance -= withdraw_amount - WITHDRAWAL_FEE
+        return "Account balance: #{@balance}"
       end
     end
+
   end
 
   class CheckingAccount < Account
