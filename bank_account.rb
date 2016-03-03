@@ -2,15 +2,16 @@
 require 'CSV'
 
 # input for withdraw and deposit must include cents without decimal ($1.50 - input at 150)
-
 module Bank
   class Account
+    # minimum balance to open account
+    MIN_BAL = 0
     def initialize(id, balance, date)
       @id = id
       @balance = balance
       @date = date
       # raise error if trying to start new account with negative balance
-      if balance < 0
+      if balance < MIN_BAL
         raise ArgumentError.new("New accounts must have a positive starting balance.")
       end
     end
@@ -37,23 +38,23 @@ module Bank
     def withdraw(amount)
       temp_balance = @balance - amount
       # make sure result is positive
-      if temp_balance < 0
+      if temp_balance < MIN_BAL
         puts "You don't have enough money to complete this withdrawl."
       else 
         @balance = temp_balance
       end
-      return money_convert(@balance)
+      return @balance
     end
 
     # deposit money in account
     def deposit(amount)
       @balance += amount
-      return money_convert(@balance)
+      return @balance
     end
 
     # show current balance
     def balance
-      return money_convert(@balance)
+      return @balance
     end
 
     # show id
@@ -99,6 +100,39 @@ module Bank
       end
       return sought_account
     end
+  end
+
+  class SavingsAccount < Account
+    # minimum balance to open account
+    MIN_BAL = 10
+    # withdraw fee
+    WITHDRAW_FEE = 2
+    # initialize new instance with at least $10 in account
+    def initialize(id, balance, date)
+      @id = id
+      @balance = balance
+      @date = date
+      if balance < MIN_BAL
+        raise ArgumentError.new("New savings accounts must have at least $10 starting balance.")
+      end
+    end
+
+    def withdraw(amount)
+      temp_balance = @balance - amount
+      temp_balance -= WITHDRAW_FEE
+      # make sure result is positive
+      if temp_balance < MIN_BAL
+        puts "You don't have enough money to complete this withdrawl."
+      else 
+        @balance = temp_balance
+      end
+      return @balance
+    end
+
+
+  end
+
+  class CheckingAccount < Account
   end
   
   class Owner
