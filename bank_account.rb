@@ -4,7 +4,7 @@ module Bank
   class Account
     attr_reader :account_id, :account_balance, :owner_id, :open_date
 
-    def initialize(initial_balance, account_id, open_date, owner_id = 0)#owner_id = 0 by default
+    def initialize(initial_balance, account_id, open_date, owner_id = nil)#owner_id = 0 by default
       if initial_balance < 0
         raise ArgumentError, "Initial balance must be greater than $0.00."
       end
@@ -35,6 +35,20 @@ module Bank
       return nil
     end
 
+    def connect
+      
+    end
+
+    # def self.connect(file = "support/account_owners.csv") #does all or none
+    #   mates = CSV.read(file)  #csv reading file
+    #   mates.each do |account, owner| #need 2 arguments for each key/value
+    #     Bank::Account.find(account).add_owner(owner)  #this is a method, so you need to pass the value to the method
+    #   end#loop that takes owner_id and connects it to the corresponding account using 2 methods
+    # end
+    #puts mates
+    #if you have a self method, do not call it with an object/instance of that account
+
+
     def add_owner(id) #account.add_owner(number that you get from Bank::Owner.new)
       @owner_id = id  #adriana_account.add_owner(adriana_owner.user_id)
     end
@@ -56,15 +70,6 @@ module Bank
     def deposit(money)
       @account_balance = @account_balance + money
       return @account_balance
-    end
-
-    def self.connect(file = "support/account_owners.csv")
-      mates = CSV.read(file)  #csv reading file
-      mates.each do |account, owner| #need 2 arguments for each key/value
-        Bank::Account.find(account).add_owner(owner)  #this is a method, so you need to pass the value to the method
-      end#loop that takes owner_id and connects it to the corresponding account using 2 methods
-      return
-      #puts mate_list
     end
   end
 
@@ -106,18 +111,23 @@ module Bank
 
 end
 
-
+puts "FuckYou"
 #--------------------------TESTS-----------------------------------
 
-#b = Bank::Account.connect("support/account_owners.csv")
+#account_connect = Bank::Account.connect("support/account_owners.csv")
 
-#y = Bank::Owner.all("support/owners.csv") #this is a method inside a class inside a module
+#account = Bank::Account.all("support/accounts.csv")
+
+#owner = Bank::Owner.all("support/owners.csv") #this is a method inside a class inside a module
+
+#account_owner = Bank::Account.connect("support/account_owners.csv")
+
 #puts y
 #x = Bank::Owner.find(14)
 #puts x
 #x = Bank::Owner.find(24)
 #puts x
-#z = Bank::Account.all("support/accounts.csv") #this is a method inside a class inside a module
+#account = Bank::Account.all("support/accounts.csv") #this is a method inside a class inside a module
 #puts z[0].balance #this prints out the first array bank account and then the balance using the balance method
 #a = Bank::Account.find(1217)
 #puts a
