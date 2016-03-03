@@ -99,11 +99,13 @@ module Bank
 		end
 	end 
 	class SavingsAccount < Account
+		
+		attr_reader :add_interest
 
-	# magic number! Account balance cannot be less than $10 or an error is raised
-	ALLOWED_BALANCE = 10
-	# magic number! All savings account withdrawals incur a $2 fee 
-	WITHDRAW_FEE = 2.00
+		# magic number! Account balance cannot be less than $10 or an error is raised
+		ALLOWED_BALANCE = 10
+		# magic number! All savings account withdrawals incur a $2 fee 
+		WITHDRAW_FEE = 2.00
 
 		def check_new_account(initial_balance)
 			if @balance < ALLOWED_BALANCE 
@@ -130,6 +132,14 @@ module Bank
 				show_balance
 			end
 		end
+		def add_interest(rate)
+			interest = @balance * rate/100
+			puts "GOOD NEWS! You've earned some fat stacks of cash from interest this month!"
+			puts format("Your earned interest this month is $%.2f", interest)
+			@balance += interest
+			return @balance
+		end
+
 
 	end 
 
@@ -186,9 +196,9 @@ account = Bank::Account.find(1212, accounts)
 
 
 savings_accounts = Bank::SavingsAccount.get_all('./support/savings_accounts.csv')
-
-savings_account = Bank::SavingsAccount.find(1112, savings_accounts).withdraw_money(10)
-pp savings_account
+savings_account = Bank::SavingsAccount.find(1112, savings_accounts).show_balance
+savings_account = Bank::SavingsAccount.find(1112, savings_accounts).add_interest(0.25)
+savings_account = Bank::SavingsAccount.find(1112, savings_accounts).show_balance
 
 # owners = Bank::Owner.get_all('./support/owners.csv') 
 
