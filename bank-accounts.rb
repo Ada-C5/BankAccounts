@@ -104,6 +104,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
     TRANSACTION_FEE = 0 # general Account has no transaction fees
 
     #note to self: we can make constants change in subclasses by user self.class::CONST (http://stackoverflow.com/questions/13234384/in-ruby-is-there-a-way-to-override-a-constant-in-a-subclass-so-that-inherited)
+    #we could also set these as default arguments in the methods they affect. Then, when we call the methods on a specific instance, they look at the instance's CONSTANTS.
 
     def initialize(account_information)
       @id = account_information[:id]
@@ -111,15 +112,14 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       @balance = initial_balance(CENTS_IN_DOLLAR) #will start out at initial balance and then be updated as we add/withdraw money.
       @open_date = account_information[:open_date]
       @owner = account_information[:owner]
-      @check_count = 0 #some accounts will be able to issue checks, but the count always starts at 0
       check_initial_balance #to raise the argument error
     end
 
-    def check_initial_balance #should I use an argument or a constant
+    def check_initial_balance #should I use an argument or a constant - see notes to self.
       raise ArgumentError.new("An account cannot be created with this initial balance.") if initial_balance(CENTS_IN_DOLLAR) < (self.class::MINIMUM_BALANCE)
     end
 
-    def initial_balance(currency_changer = 1) #CSV data comes in cents - I want to play in dollars so I am converting to dollars (see CENTS_IN_DOLLAR constant).  Maybe a good idea to defaul to one if we don't have to convert.
+    def initial_balance(currency_changer = 1) #CSV data comes in cents - I want to play in dollars so I am converting to dollars (see CENTS_IN_DOLLAR constant).  Maybe a good idea to default to one if we don't have to convert.
       @initial_balance/currency_changer
     end
 
@@ -194,8 +194,10 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
 
     MINIMUM_BALANCE = 0 # CheckingAccount  dollars balance cannot fall below $0. (Unless by a check withdrawl)
     TRANSACTION_FEE = 1 # transaction fee for withdrawls is 1. Withdrawls using ehcks have a separate fee schedule.
-
-
+    def initialize(account_information)
+      super
+      @check_count = 0 #also has checks! CHECKing account. Keep it out of Accounts generally because some accounts don't have checks. Let's be specific.
+    end
 
     def withdraw_using_check(amount, overdraft_limit = 10)
 
@@ -227,8 +229,6 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       @check_count = 0
     end
   end
-
-
 
   class Owner
     attr_reader :id, :first_name
@@ -300,11 +300,11 @@ end
 
 #test run the program
 
-# checking_account = Bank::CheckingAccount.new(initial_balance: 10000)
-# checking_account.withdraw(10)
-# checking_account.withdraw_using_check(10)
-# puts checking_account.check_count
-# checking_account.withdraw_using_check(10)
+checking_account = Bank::CheckingAccount.new(initial_balance: 10000)
+checking_account.withdraw(10)
+checking_account.withdraw_using_check(10)
+puts checking_account.check_count
+checking_account.withdraw_using_check(10)
 
 
 # account_id = Bank::Account.find(1212)
