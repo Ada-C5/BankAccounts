@@ -114,6 +114,18 @@ module Bank
 
   end
 
+
+  class CheckingAccount < Account
+    WITHDRAW_FEE = 1
+    def initialize(id, initial_balance, opendate, owner=nil)
+      super
+      @withdraw_fee = WITHDRAW_FEE
+    end
+
+
+  end
+
+
   class Owner
     attr_reader :id, :first_name, :last_name, :address
     def initialize(owner_hash)
