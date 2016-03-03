@@ -7,7 +7,7 @@ module Bank
   class Account
     #Should be able to access the current balance of an account at any time.
     attr_reader :balance, :id
-    def initialize(id, balance, open_date, its_owner) #intialize owner to nil
+    def initialize(id, balance, open_date, its_owner = nil) #intialize owner to nil
       #A new account cannot be created with initial negative balance - this will raise an ArgumentError
       raise ArgumentError, "A new account cannot be created with initial negative balance." if balance < 0
       @id = id
@@ -22,15 +22,15 @@ module Bank
       all_accounts = []
       CSV.foreach(file_path, "r") do |line|
 
-        @its_owner = ""
+        its_owner = ""
         CSV.foreach("./support/account_owners.csv", "r") do |match|
           if match[0].to_s == line[0].to_s #if in the relaitonship file the owner id is equal to the owner
-            @its_owner = match[1] #send the account id into their_accounts array
+            its_owner = match[1] #send the account id into their_accounts array
           end
         end
 
 
-        all_accounts << self.new(line[0].to_i, line[1].to_f, line[2], @its_owner)
+        all_accounts << self.new(line[0].to_i, line[1].to_f, line[2], its_owner)
       end
       return all_accounts
     end
@@ -48,7 +48,7 @@ module Bank
     def withdraw(amount)
       #withdraw method does not allow the account to go negative - Will puts a
       #warning message and then return the original un-modified balance
-      if amount < @balance
+      if amount <= @balance
         @balance = @balance - amount
         return @balance
       else
@@ -82,7 +82,7 @@ module Bank
     end
 
     def withdraw(amount)
-      if amount < @balance
+      if (amount + WITHDRAW_FEE) <= @balance
         new_balance = @balance - amount - WITHDRAW_FEE
         if new_balance < 10
           puts "WARNING: The account cannot go below $10. Withdrawal refused."
@@ -92,13 +92,65 @@ module Bank
           return @balance
         end
       else
-        puts "WARNING: The amount requested is greater than the account's balance."
+        puts "WARNING: The amount requested plus the fee is greater than the account's balance."
         return @balance
       end
     end
 
+    def add_interest(rate)
+      interest = @balance * rate/100
+      @balance = @balance + interest
+      return interest
+    end
+  end
 
+  class CheckingAccount < Account
+    WITHDRAW_FEE = 1
+    TRANSACTION_FEE = 2
+    attr_reader :number_free_checks
 
+    def initialize(id, balance, open_date, its_owner = nil)
+      super
+      @number_free_checks = 3
+    end
+
+    def withdraw(amount)
+      if (amount + WITHDRAW_FEE) <= @balance
+        @balance = @balance - amount - WITHDRAW_FEE
+        return @balance
+      else
+        puts "WARNING: The amount requested plus the fee is greater than the account's balance."
+        return @balance
+      end
+    end
+
+    def withdraw_using_check(amount)
+      #Determine if there is an incurred_fee: more than 3 checks, incurs in TRANSACTION_FEE
+      if @number_free_checks <= 0
+        incurred_fee = TRANSACTION_FEE
+      else
+        incurred_fee = 0
+      end
+
+      if (amount + incurred_fee) <= @balance
+        new_balance = @balance - amount - incurred_fee
+        if new_balance < -10
+          puts "WARNING: The account cannot go below -$10. Check withdrawal refused."
+          return @balance
+        else
+          @balance = new_balance
+          @number_free_checks = @number_free_checks - 1
+          return @balance
+        end
+      else
+        puts "WARNING: The amount requested plus the incurred fee is greater than the account's balance."
+        return @balance
+      end
+    end
+
+    def reset_checks
+      @number_free_checks = 3
+    end
   end
 
   class Owner
@@ -118,14 +170,14 @@ module Bank
       all_owners = []
       CSV.foreach(file_path, "r") do |line|
 
-        @their_accounts = []
+        their_accounts = []
         CSV.foreach("./support/account_owners.csv", "r") do |match|
           if match[1].to_s == line[0].to_s #if in the relaitonship file the owner id is equal to the owner
-            @their_accounts << match[0] #send the account id into their_accounts array
+            their_accounts << match[0] #send the account id into their_accounts array
           end
         end
 
-        all_owners << self.new(line[0], line[1], line[2], line[3], line[4], line[5], @their_accounts)
+        all_owners << self.new(line[0], line[1], line[2], line[3], line[4], line[5], their_accounts)
 
       end
       return all_owners
