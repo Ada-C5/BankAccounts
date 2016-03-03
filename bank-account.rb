@@ -18,7 +18,7 @@ module Bank
       @owner = account_info[:owner]
       @creation_date = account_info[:creation_date]
       @balance = account_info[:initial_balance]
-      is_balance_enough(LOWER_BALANCE_LIMIT) # checks if balance meets criteria (is there enough money in it?)
+      is_balance_enough(INITIAL_BALANCE_LIMIT) # checks if balance meets criteria (is there enough money in it?)
     end
 
     def withdraw(money, fee = TRANSACTION_FEE, limit = LOWER_BALANCE_LIMIT)
@@ -61,7 +61,7 @@ module Bank
         # index 0 will always be id
         # index 1 will always be balance (convert to a Money obj)
         # index 2 will always be creation date (in DateTime)
-        info_hash[:id] = line[0]
+        info_hash[:id] = line[0].to_i
         info_hash[:initial_balance] = line[1].to_i
         info_hash[:creation_date] = line[2]
         # instantiate using the new hash, then push into accounts array
@@ -106,8 +106,8 @@ module Bank
     def accounts
       owners_accounts = []
       CSV.open("./support/account_owners.csv", 'r').each do |line|
-        if @owner_id == line[1]
-          account_num = line[0]
+        if @owner_id == line[1].to_i
+          account_num = line[0].to_i
           owners_accounts << Bank::Account.find(account_num)
         end
       end
@@ -124,7 +124,7 @@ module Bank
 
       # iterate through the lines of the CSV file owners.csv
       CSV.open("./support/owners.csv", 'r').each do |line|
-        owners_hash[:owner_id] = line[0]
+        owners_hash[:owner_id] = line[0].to_i
         owners_hash[:last_name] = line[1]
         owners_hash[:first_name] = line[2]
         owners_hash[:street_address] = line[3]
@@ -155,10 +155,10 @@ module Bank
 
 
   class SavingsAccount < Account
+    attr_reader :balance
     TRANSACTION_FEE = 200 # $2.00 transaction fee (200 in cents)
     LOWER_BALANCE_LIMIT = 1000 # $10.00 lower balance limit
     INITIAL_BALANCE_LIMIT = 1000
-    INTEREST_RATE = 0.25
     
     def is_balance_enough(limit)
       super(LOWER_BALANCE_LIMIT)
