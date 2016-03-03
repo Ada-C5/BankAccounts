@@ -41,8 +41,6 @@
 
 module Bank
 
-  # require "money"
-
   class Account
     # initialize method creates instance of Account class with @instance variables @id,  @init_balance, and balance
     def initialize(accountdata)
@@ -53,7 +51,6 @@ module Bank
         raise ArgumentError.new("Account cannot be initialized with a negative balance.")
       end
     @balance = accountdata[:balance].to_f # float
-
     # set @balance to value of @init_balance
     @balance = @init_balance
     end
@@ -91,80 +88,130 @@ module Bank
       @owner = owner
     end
 
-    # be able to instantiate a new account from a csv.
+    # pulled tracing the pathway and putting the csv data into an array, into its own method.
+    def read_csv(file)
+      require 'csv'
+      allaccountscsv = CSV.read(file, 'r')
+      return read_csv
+    end
+
+    # be able to pull data from a specific line in the csv to an existing account.
     def acct_from_csv(csv_index)
-
-    require 'csv'
-    allaccountscsv = CSV.read("./support/accounts.csv", 'r')
-
+      read_csv("./support/accounts.csv")
       @id = allaccountscsv[csv_index][0]
       @balance = allaccountscsv[csv_index][1]
       @open_date = allaccountscsv[csv_index][2]
     end
 
+
     # be able to instantiate a new account from each line in the csv.
     # class method.
     # similar to above.
-    def self.csv_to_accounts
-    require "CSV"
-    allaccountscsv = CSV.read("./support/accounts.csv", 'r')
-
-        allaccountscsv.each do |entry|
-          Account.new(name: "name")
-          @id = entry[0]
-          @balance = entry[1]
-          @open_date = entry[2]
-        end
+    def self.read_csv(file)
+      require 'csv'
+      read_csv = CSV.read(file, 'r')
     end
+
+
+    def self.csv_to_accounts
+    require "awesome_print"
+
+    allaccounts = []
+      read_csv("./support/accounts.csv").each do |entry|
+      # allaccountscsv.each do |entry|
+        account = self.new(id: entry[0], balance: entry[1], open_date: entry[2])
+        allaccounts << account
+        end
+      ap allaccounts
+    end
+
 
     def self.all
-      require "awesome_print"
-      require "CSV"
-      allaccountscsv = CSV.read("./support/accounts.csv", 'r')
-      allaccounts = []
-          allaccountscsv.each do |entry|
+    require "awesome_print"
 
-            @id = entry[0]
-            @balance = entry[1]
-            @open_date = entry[2]
-            allaccounts << entry
-          end
-
-          ap allaccounts
+    allaccounts = []
+      read_csv("./support/accounts.csv").each do |entry|
+        @id = entry[0]
+        @balance = entry[1]
+        @open_date = entry[2]
+        allaccounts << entry
+      end
+      ap allaccounts
     end
+
 
     def self.find(id)
-      looking_for = []
-      require "CSV"
-
-      allaccountscsv = CSV.read("./support/accounts.csv", 'r')
-      allaccounts = []
+      id = id.to_s #lets the user enter id as a string/fixnum/float, and method still works.
       # find the entry in the csv where id matches the user-requested id
-          allaccountscsv.each do |entry|
-            if entry[0] == id
-            looking_for << entry
-            end
-          end
-          return looking_for
+      read_csv.("./support/accounts.csv")each do |entry|
+        if entry[0] == id
+        return entry
+        end
+      end
     end
-
-
-
   end
 
+
+
   class Owner
-    def initialize(ownerdata)
-      @title = ownerdata[:title] # all strings
-      @first_name = ownerdata[:first_name]
-      @middle_init = ownerdata[:middle_init]
-      @last_name = ownerdata[:last_name]
-      @street_address = ownerdata[:street_address]
-      @street_address2 = ownerdata[:street_address2]
-      @city = ownerdata[:city]
-      @state = ownerdata[:state]
-      @zip = ownerdata[:zip]
-      @cell = ownerdata[:cell]
-      @email = ownerdata[:email]
+    def initialize
+      @ownerID = ownerhash[:ownerID]
+      @last_name = ownerhash[:last_name]
+      @first_name = ownerhash[:first_name]
+      @street_address = ownerhash[:street_address]
+      @city = ownerhash[:city]
+      @state = ownerhash[:state]
     end
+
+    def self.read_csv(file)
+      require "CSV"
+      allownerscsv = CSV.read(file, 'r')
+    end
+
+    def self.owner_csv
+      allowners = []
+      read_csv("./support/owners.csv").each do |column|
+        ownerinfo = {
+          ownerID: column[0],
+          last_name: column[1],
+          first_name: column[2],
+          street_address: column[3],
+          city: column[4],
+          state: column[5]}
+          allowners << ownerinfo
+      end
+    end
+
+
+    # The data, in order in the CSV, consists of:
+    #
+    # ID - (Fixnum) a unique identifier for that Owner
+    # Last Name - (String) the owner's last name
+    # First Name - (String) the owner's first name
+    # Street Addess - (String) the owner's street address
+    # City - (String) the owner's city
+    # State - (String) the owner's state
+    #
+    # Add the instance method accounts to the Owner class. This method should return a collection of Account instances that belong to the specific owner. To create the relationship between the accounts and the owners use an account_owners.csv file. The data for this file, in order in the CSV, consists of:
+    #
+    # Account ID - (Fixnum) a unique identifier corresponding to an Account instance.
+    # Owner ID - (Fixnum) a unique identifier corresponding to an Owner instance.
+
+    # Step 1... Associate account_owners.csv and owners.csv
+    # Step 2... Add method to return all accounts that belong to a specific owner.
+
+    def self.link_csvs_by_id(ownerID)
+      assoc_accts = []
+      find read_csv("./support/accounts.csv")[n][ownerID]
+      read_csv("./support/accounts.csv").each do |acct|
+      if acct[0] == read_csv("./support/accounts.csv")[n][ownerID]
+        assoc_accts << acct
+      end
+    end
+
+    def owner_from_csv
+    end
+
+
   end
 end
