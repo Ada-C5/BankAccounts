@@ -3,11 +3,12 @@ require 'csv'
 module Bank
 
   class Account
-    attr_accessor :balance, :id, :amount, :owner, :name
+    attr_accessor :id, :balance, :opendate
 
     def initialize(id, balance, opendate)
 
       #Right now this error breaks the loop Bank::Account.all
+      #It breaks because the loop creates strings, not integers
       # unless balance.is_a?(Integer) && balance >= 0
       #   raise ArgumentError.new("New accounts must begin with a balance of 0 or more.")
       # end
@@ -33,7 +34,6 @@ module Bank
 
       all_accts.length.times do |n|
         if all_accts[n].include?"#{id_num}"
-          puts all_accts[n][0]
           acctmatch = Bank::Account.new(all_accts[n][0], all_accts[n][1], all_accts[n][2])
           puts acctmatch #why doesn't this display?
         end
