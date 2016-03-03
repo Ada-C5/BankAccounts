@@ -6,6 +6,9 @@ module Bank
       @id = id
       @balance = balance
       @date = date
+      if balance == 0
+        raise ArgumentError.new("The initial balance can not be zero")
+      end
     end
 
     def self.one
@@ -49,15 +52,35 @@ module Bank
         puts "You dont have all that money"
       end
       balance_printed
+      return @balance
     end
 
     def deposit(money)
       @balance = @balance + money
       balance_printed
+      return @balance
     end
 
     def balance_printed
       puts "#{@balance} is your new balance"
+    end
+
+  end
+
+  class SavingsAccount < Account
+    def initialize (id, balance, date)
+      @id = id
+      @balance = balance
+      @date = date
+      if balance < 10
+        raise ArgumentError.new("The initial balance for a Saving Account can not be less than 10 USD")
+      end
+    end
+
+    def withdraw(withdraw)
+      regular_withdraw = super
+      savings_withdraw_fee = 2
+      regular_withdraw - savings_withdraw_fee
     end
 
   end
@@ -74,14 +97,3 @@ module Bank
   end
 
 end
-
-# clients = Bank::Account.all
-# puts Bank::Account.find_with_id(1214)
-# puts clients.one
-# puts clients.class
-# puts clients
-# puts clients.balance
-# clients.deposit(200)
-# puts clients.balance
-
-# Bank::Account.find_with_id(1212)
