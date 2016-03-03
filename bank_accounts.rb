@@ -105,6 +105,8 @@ module Bank
 
     # add a savings account class that inherits from account
     class SavingsAccount < Account
+        # the withdrawal fee for this account will always be the same so this seems like a good place for a constant.
+        WITHDARAWL_FEE_IN_DOLLARS = 2
         
         # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
         def initialize
@@ -113,11 +115,24 @@ module Bank
                 raise ArgumentError.new("You think we give credit here? HAH!")
             end
         end
-    # It should include the following updated functionality:
     
-    # Updated withdrawal functionality:
+    # Redefining withdraw for SavingsAccount because inheriting the previous method will require
+    # more complicated amendments if I call it with super.
     # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
     # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
+        def withdraw(amount)
+            if (@balance - amount) >= 10
+                @balance = @balance - amount
+                puts "After withdrawing #{ amount } the balance for account #{ @id_number } is #{ @balance }."
+            elsif (@balance - amount) < 0
+                puts "HEY! That is unpossible because you don't have that much money! What do you think this is, Wall Street?"
+                puts "The balance for account #{ @id_number } is still #{ @balance }."
+                return @balance
+            else
+                puts "You can't do that operation on a bank account."
+            end     
+        end
+
     # It should include the following new methods:
     # #add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
     # Input rate is assumed to be a percentage (i.e. 0.25).
