@@ -150,6 +150,11 @@ module Bank
 
 
   class SavingsAccount < Account
+    def is_balance_enough
+      if @balance < 1000 #is the balance less than $10 (1000 cents)
+        raise ArgumentError.new("You need more than $10.00 to open a savings account!")
+      end
+    end
 
   end
 
