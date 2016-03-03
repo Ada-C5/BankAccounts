@@ -195,12 +195,9 @@ module Bank
                 account_to_link = row[0]
                 owner_to_link = row[1]
                 
-                puts account_to_link
-                puts owner_to_link
-                # commented out while I work through my problems.
-                # if account_to_link == account_collection[0].id_number
-                #     puts "yay! THIS DOES WHAT IT SHOULD!"
-                # end
+                if account_to_link == account_collection[0].id_number
+                    puts "Yay this is doing the thing."
+                end
             end
         end
     end
