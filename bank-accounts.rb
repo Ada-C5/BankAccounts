@@ -78,7 +78,8 @@ module Bank
     def accounts(owner_id)
       CSV.foreach("support/owners_owners.csv") do |row|
         if row[0] == owner_id
-
+            row[1] = account_id
+            Bank::Account.find(account_id)
         end
       end
     end
