@@ -1,6 +1,6 @@
 require_relative 'bank_account.rb'
 # # # # TESTS FOR ACCOUNT CLASS # # # # #
-### TEST FOR SELF.ALL METHOD   ###
+## TEST FOR SELF.ALL METHOD   ###
 puts Bank::Account.all("./support/accounts.csv")
 
 
@@ -20,8 +20,7 @@ puts "Using find method the owner instance with id 14 is #{my_owner}"
 
 ###   TEST FOR GET_ACCOUNT METHOD   ###
 my_owner = Bank::Owner.find(14)
-account = my_owner.get_account
-puts "Using get_account method this account instance for id 14 is #{account}"
+puts my_owner.get_account
 
 ### TEST FOR GET_INFO METHOD ###
 my_owner = Bank::Owner.find(14)
