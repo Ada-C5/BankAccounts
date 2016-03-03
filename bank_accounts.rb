@@ -12,8 +12,10 @@ module Bank
         @balance = account[:initial_balance]
         @open_date = account[:open_date]
       # @account_info = {account: account}
+    end
 
-        raise ArgumentError, "ERROR: invalid initial amount. Please try creating account" unless @initial_balance >= 0
+    def argument_error
+      raise ArgumentError, "ERROR: invalid initial amount. Please deposit more than $#{@initial_balance_min}. Please try creating an account again" unless @initial_balance >= @initial_balance_min
     end
 
     def self.all
@@ -144,4 +146,61 @@ module Bank
     end
   end
 
+#   1. Create a SavingsAccount class which should inherit behavior from the Account class.
+# 		1. It should include the following updated functionality:
+# 			§ The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
+# 			§ Updated withdrawal functionality:
+# 				□ Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
+# Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
+
+  class SavingsAccount < Account
+    TRANSACION_FEE = 2
+    MINIMUM_BALANCE = 10
+    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts, :balance
+
+    def initialize(account)
+
+        @id = account[:id]
+        @initial_balance = account[:initial_balance]
+        @current_balance = account[:initial_balance]
+        @balance = account[:initial_balance]
+        @open_date = account[:open_date]
+      # @account_info = {account: account}
+
+        raise ArgumentError, "ERROR: invalid initial amount. Please try creating account" unless @initial_balance >= 10
+    end
+
+    def withdraw (withdraw_amount) # parameter represents the amount of money that will be withdrawn
+      new_balance = @balance - TRANSACION_FEE - withdraw_amount
+      if new_balance > withdraw_amount
+        @current_balance = @balance - withdraw_amount
+      else
+        puts "WARNING: invalid withdraw amount. Current balance is: #{@current_balance}"
+      end
+      return @current_balance # return the updated account balance.
+    end
+
+    def withdraw (withdraw_amount) # parameter represents the amount of money that will be withdrawn
+      new_balance = @balance - TRANSACION_FEE - withdraw_amount
+      if new_balance >= 10
+        @current_balance = new_balance
+      else
+        puts "WARNING: invalid withdraw amount. Current balance is: #{@current_balance}"
+      end
+      return @current_balance # return the updated account balance.
+    end
+
+    def deposit(deposit_amount) #   parameter which represents the amount of money that will be deposited.
+      @current_balance = @current_balance + deposit_amount
+      return @current_balance
+    end
+
+    def current_balance
+      return @current_balance
+    end
+
+    def owner_info (owner)
+      @account_info[:owner]= (owner.owner_property[:owner])
+    end
+  end
 end
