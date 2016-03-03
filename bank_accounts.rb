@@ -83,9 +83,9 @@ module Bank
         # cost as converting IDs to Fixnums.
         def self.find(id)
             accounts_to_search = []
-            accounts_to_search = Bank::Owner.all("./support/owners.csv")
+            accounts_to_search = Bank::Account.all("./support/accounts.csv")
 
-            accounts_to_seach.each do |account|
+            accounts_to_search.each do |account|
                 if account.id_number == id.to_s
                     return account
                 end
