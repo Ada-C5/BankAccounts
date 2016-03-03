@@ -32,6 +32,7 @@ module Bank
             if (@balance - amount) >= 0
                 @balance = @balance - amount
                 puts "After withdrawing #{ amount } the balance for account #{ @id_number } is #{ @balance }."
+                return @balance
             elsif (@balance - amount) < 0
                 puts "HEY! That is unpossible because you don't have that much money! What do you think this is, Wall Street?"
                 puts "The balance for account #{ @id_number } is still #{ @balance }."
@@ -121,11 +122,13 @@ module Bank
     # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
     # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
         def withdraw(amount)
-            if (@balance - amount) >= 10
-                @balance = @balance - amount
-                puts "After withdrawing #{ amount } the balance for account #{ @id_number } is #{ @balance }."
-            elsif (@balance - amount) < 0
-                puts "HEY! That is unpossible because you don't have that much money! What do you think this is, Wall Street?"
+            # changed the check here to make sure there would be $10 left in the account after.
+            if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS) >= 10
+                @balance = @balance - ( amount + WITHDARAWL_FEE_IN_DOLLARS )
+                puts "After withdrawing #{ amount } and the withdrawal fee the balance for account #{ @id_number } is #{ @balance }."
+                return @balance
+            elsif (@balance - amount) < 10
+                puts "HEY! That is unpossible because this account MUST have $10 in it!"
                 puts "The balance for account #{ @id_number } is still #{ @balance }."
                 return @balance
             else
