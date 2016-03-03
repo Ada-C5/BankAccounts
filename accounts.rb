@@ -19,13 +19,13 @@ module Bank
 
     def self.all
       all_accts = CSV.read("./support/accounts.csv")
-      all_accts.each do |n|
-      n=0
-       id = all_accts[n][0].to_i
-       bal = all_accts[n][1].to_i
-       date = all_accts[2]
-      new_acct = Bank::Account.new(id, bal, date)
-      end
+        all_accts.each do |n|
+          n=0
+          id = all_accts[n][0].to_i
+          bal = all_accts[n][1].to_i
+          date = all_accts[2]
+          new_acct = Bank::Account.new(id, bal, date)
+        end
     end
 
     def self.find(id_num)
@@ -38,8 +38,7 @@ module Bank
           id = all_accts[n][0].to_i
           bal = all_accts[n][1].to_i
           date = all_accts[2]
-        acctmatch = Bank::Account.new(id, bal, date)
-        puts acctmatch #why doesn't this display? OWELLZ
+          acctmatch = Bank::Account.new(id, bal, date)
         end
       end
     end
@@ -64,4 +63,34 @@ module Bank
       puts "Your current balance is $#{@balance}."
     end
   end
+
+  class SavingsAccount < Account
+
+    def initialize(id, balance, opendate)
+
+      unless balance.is_a?(Integer) && balance >= 10
+        raise ArgumentError.new("New accounts must begin with a balance of $10 or more.")
+      end
+
+      @id = id
+      @balance = balance
+      @opendate = opendate
+
+    end
+
+    def withdraw(amount)
+      @amount = amount+2
+      if @balance - @amount < 10
+        puts "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
+      elsif @balance - @amount >= 10
+      @balance = @balance - @amount
+      puts "Withdrawal processed. Your current balance is: $#{@balance}."
+      end
+    end
+
+  end 
+
+  class CheckingAccount < Account
+  end
+
 end
