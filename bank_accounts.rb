@@ -4,6 +4,7 @@
 
 require 'csv'
 require 'money'
+I18n.enforce_available_locales = false
 module Bank
 
   class Account
@@ -38,7 +39,7 @@ module Bank
       # instantiate a new Account based on that hash, after each one shovel into an array
       # return that array to whoever calls this method
       array_of_accounts.each do |element|
-        account_info_array << Account.new({id: element[0], balance: element[1], date_created: element[2]})
+        account_info_array << Account.new({id: element[0], balance: element[1].to_i, date_created: element[2]})
       end
       return account_info_array
     end
@@ -62,9 +63,9 @@ module Bank
       end
     end
 
-    # def convert_cents(money)
-    #   money = Money.new()
-    # end
+    def convert_cents(money)
+      @balance = Money.new(money, "USD")
+    end
 
     # If the owner has already been created in the Owner class, the method should be called like so:
     # account_instance.add_owner(owner_instance.name)
@@ -80,7 +81,8 @@ module Bank
         raise ArgumentError.new("This withdrawal would cause a negative balance.
         Do not attempt.")
       end
-      @balance = @balance - amount_to_withdraw
+      #@balance = @balance - amount_to_withdraw
+      convert_cents(@balance - amount_to_withdraw)
       show_balance
     end
 
