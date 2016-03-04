@@ -7,13 +7,13 @@ module Bank
     # minimum balance to open account
     MIN_BAL = 0
     WITHDRAW_FEE = 0
-    def initialize(id, balance, date)
+    def initialize(id, balance, date, min = MIN_BAL)
       @id = id
       @balance = balance
       @date = date
       # raise error if trying to start new account with negative balance
-      if balance < MIN_BAL
-        raise ArgumentError.new("New accounts must have a positive starting balance.")
+      if balance < min
+        raise ArgumentError.new("New accounts must have at least a #{money_convert(min)} starting balance.")
       end
     end
 
@@ -30,9 +30,13 @@ module Bank
     end
 
     # convert balance output to have a decimal
-    def money_convert(balance)
-      print_bal = balance.to_s
-      print_bal = print_bal.insert -3, "."
+    def money_convert(money)
+      if money != 0 
+        print_mon = money.to_s
+        print_mon = print_mon.insert -3, "."
+      else
+        print_mon = 0
+      end
     end
 
     # withdraw money from account
@@ -102,16 +106,11 @@ module Bank
   end
 
   class SavingsAccount < Account
-    # minimum balance to open account
     MIN_BAL = 1000
-    # withdraw fee
     WITHDRAW_FEE = 200
-    # initialize new instance with at least $10 in account
-    def initialize(id, balance, date)
+
+    def initialize(id, balance, date, min = MIN_BAL)
       super
-      if balance < MIN_BAL
-        raise ArgumentError.new("New savings accounts must have at least $10 starting balance.")
-      end
     end
 
     def withdraw(amount, min = MIN_BAL, fee = WITHDRAW_FEE)
@@ -130,9 +129,13 @@ module Bank
     MIN_BAL = 0
     WITHDRAW_FEE = 100
     CHECK_FEE = 200
-    # initialize with check counter to track used checks in a month
+
     def initialize(id, balance, date)
       super
+      if balance < MIN_BAL
+        raise ArgumentError.new("New savings accounts must have positive starting balance.")
+      end
+      # check counter to track checks used, 3 free checks a month
       @check_count = 0
     end
 
@@ -180,9 +183,10 @@ module Bank
     end
 
     def withdraw(amount, min = MIN_BAL)
+      # balance must be over 10,000 to make a withdraw
       if @balance > 1000000
         temp_balance = @balance - amount
-        # make sure result is positive
+        # make sure withdraw didn't cause balance to go under 10,000
         if temp_balance < MIN_BAL
           puts "You're balance is under $10,000, no more withdrawls are possible."
           @balance -= WITHDRAW_FEE
@@ -199,6 +203,7 @@ module Bank
 
     def deposit(amount)
       new_bal = super
+      # if balance was over 10,000 no additional "transaction"
       if new_bal - amount > 1000000
         @transactions += 1
       end
