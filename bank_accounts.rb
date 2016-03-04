@@ -42,14 +42,15 @@
 module Bank
 
   class Account
-  WITHDRAWAL_FEE = 2
+  # Class has constants to simplify changing minimum initial balances and fees.
+  WITHDRAWAL_FEE = 0
   MIN_INIT_BALANCE = 0
 
-    # initialize method creates instance of Account class with @instance variables @id,  @init_balance, and balance
+    attr_reader :balance
 
     def initialize(accountdata)
-    # @owner = accountdata[:owner] # string
-    @id = accountdata[:id] # fixnum? provided from csv?
+    @owner = accountdata[:owner] # string
+    @id = accountdata[:id] # fixnum
     @init_balance = accountdata[:init_balance].to_f #float
       if @init_balance < self.class::MIN_INIT_BALANCE
         raise ArgumentError.new("Account cannot be initialized with a balance less than #{self.class::MIN_INIT_BALANCE}.")
@@ -59,54 +60,45 @@ module Bank
     @balance = @init_balance
     end
 
-    # def money_print
-    #   Money.new(@balance, "USD").to_f
-    # end
-
-    # withdraw method accepts a single parameter which represents the amount of the withdrawal. method should return the updated account balance.
+    # Withdraw method accepts a single parameter which represents the amount of the withdrawal. Method should return the updated account balance.
     def withdraw(withdrawal)
-      if @balance - withdrawal >= 0
-        @balance -= withdrawal
+      if @balance - (withdrawal + self.class::WITHDRAWAL_FEE)>= 0
+        @balance -= (withdrawal + self.class::WITHDRAWAL_FEE)
           else puts "Withdrawal cannot be completed with available funds."
         balance
       end
     end
 
-    # deposit method accepts a single parameter which represents the amount of the deposit. method should return the updated account balance.
+    # Deposit method accepts a single parameter which represents the amount of the deposit. Method should return the updated account balance.
     def deposit(deposit)
       @balance += deposit
       balance
     end
 
-    def balance
-      @balance
-    end
-
-    # just checking to see if differentiating @init_balance and @balance worked.
+    # Test to see if differentiating @init_balance and @balance worked.
     # def initial_balance
     #   return @init_balance
     # end
 
-    # add an owner (instance of Owner class, below) to an already existing account.
+    # Add an owner (instance of Owner class, below) to an already existing account.
     def add_owner(owner)
       @owner = owner
     end
 
-    # pulled tracing the pathway and putting the csv data into an array, into its own method.
+    # Pulled tracing the pathway and putting the csv data into an array, into its own method.
     def read_csv(file)
       require 'csv'
       allaccountscsv = CSV.read(file, 'r')
       return read_csv
     end
 
-    # be able to pull data from a specific line in the csv to an existing account.
+    # Be able to pull data from a specific line in the csv to an existing account.
     def acct_from_csv(csv_index)
       read_csv("./support/accounts.csv")
       @id = allaccountscsv[csv_index][0]
       @balance = allaccountscsv[csv_index][1]
       @open_date = allaccountscsv[csv_index][2]
     end
-
 
     # be able to instantiate a new account from each line in the csv.
     # class method.
@@ -116,25 +108,22 @@ module Bank
       read_csv = CSV.read(file, 'r')
     end
 
-
+# Create array of hashes from csv.
     def self.csv_to_accounts
     require "awesome_print"
-
     allaccounts = []
       read_csv("./support/accounts.csv").each do |entry|
-      # allaccountscsv.each do |entry|
         account = self.new(id: entry[0], balance: entry[1], open_date: entry[2])
         allaccounts << account
         end
       ap allaccounts
     end
 
-
-    def self.all
+#Create array of arrays from csv.
+    def self.csv_to_accounts_2
     require "awesome_print"
-
     allaccounts = []
-      read_csv("./support/accounts.csv").each do |entry|
+      (read_csv("./support/accounts.csv")).each do |entry|
         @id = entry[0]
         @balance = entry[1]
         @open_date = entry[2]
@@ -142,7 +131,6 @@ module Bank
       end
       ap allaccounts
     end
-
 
     def self.find(id)
       id = id.to_s #lets the user enter id as a string/fixnum/float, and method still works.
@@ -153,12 +141,13 @@ module Bank
         end
       end
     end
-
   end
 
 
   class SavingsAccount < Account
     # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
+    # Override constants from base class Account.
+    WITHDRAWAL_FEE = 2
     MIN_INIT_BALANCE = 10
 
       # Updated withdrawal functionality:
@@ -176,43 +165,35 @@ module Bank
     # Input rate is assumed to be a percentage (i.e. 0.25).
     # The formula for calculating interest is balance * rate/100
     # Example: If the interest rate is 0.25% and the balance is $10,000, then the interest that is returned is $25 and the new balance becomes $10,025.
-    # defining interest_rate in isolated, easily changed method.
+    # Defining interest_rate in isolated, easily changed method.
     def interest_rate
       interest_rate = (0.25)
     end
 
-    # calculating interest on a specific balance.
+    # Calculating interest on a specific balance.
     def calc_interest
       @balance * (interest_rate / 100)
     end
 
-    # adding calculated interest to balance.
+    # Adding calculated interest to balance.
     def add_interest
       @balance += calc_interest
     end
-
   end
 
 
-
   class CheckingAccount < Account
+  # Override constant from base class Account.
+  WITHDRAWAL_FEE = 1
+
+  # Set local constants.
   CHECK_LIMIT = 3
+  CHECK_FEE = 2
+
     def initialize(accountdata)
-    # @owner = accountdata[:owner] # string
     super
     @checktally = 0
     end
-
-    # Updated withdrawal functionality:
-    # Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. Returns the updated account balance.
-    # Does not allow the account to go negative. Will output a warning message and return the original un-modified balance.
-   def withdraw(withdrawal)
-     if @balance - withdrawal >= 0
-       @balance -= withdrawal - WITHDRAWAL_FEE
-         else puts "Withdrawal cannot be completed with available funds."
-       balance
-     end
-   end
 
     # #withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
     # Allows the account to go into overdraft up to -$10 but not any lower
@@ -227,7 +208,7 @@ module Bank
 
     def withdraw_using_check(withdrawal)
       if @checktally >= CHECK_LIMIT && checking_min_balance(withdrawal)
-        @balance -= (withdrawal + WITHDRAWAL_FEE)
+        @balance -= (withdrawal + CHECK_FEE)
         check_tally
         return @balance
       elsif @checktally < CHECK_LIMIT && checking_min_balance(withdrawal)
