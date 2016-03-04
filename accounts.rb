@@ -4,7 +4,7 @@ module Bank
 
   class Account
     attr_accessor :id, :balance, :opendate, :transaction_fee, :balance_min,
-                  :withdrawl_bal_min
+                  :withdrawl_bal_min, :checknum
 
     def initialize(id, balance, opendate)
 
@@ -14,6 +14,7 @@ module Bank
       @transaction_fee = 0
       @balance_min = 0
       @withdrawl_bal_min = 0
+      @checknum = 0
 
       unless @balance.is_a?(Integer) && @balance >= @balance_min
         raise ArgumentError.new("New accounts must begin with a balance of #{@balance_min} or more.")
@@ -80,7 +81,7 @@ module Bank
             @opendate = opendate
             @transaction_fee = 2
             @balance_min = 10
-            @withdrawl_bal_min = 0
+            @withdrawl_bal_min = 10
 
             unless @balance.is_a?(Integer) && @balance >= @balance_min
               raise ArgumentError.new("New accounts must begin with a balance of #{@balance_min} or more.")
@@ -90,9 +91,9 @@ module Bank
 
     def withdraw(amount)
       @amount = amount + @transaction_fee
-      if @balance - @amount < @balance_min
+      if @balance - @amount < @withdrawl_bal_min
         return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
-      elsif @balance - @amount >= @balance_min
+      elsif @balance - @amount >= @withdrawl_bal_min
       @balance = @balance - @amount
       return "Withdrawal processed. Your current balance is: $#{@balance}."
       end
@@ -107,34 +108,45 @@ module Bank
   end
 
   class CheckingAccount < Account
-    attr_accessor :checknum
-
     def initialize(id, balance, opendate)
-      super
+
+      @id = id
+      @balance = balance
+      @opendate = opendate
+      @transaction_fee = 1
+      @balance_min = 0
+      @withdrawl_bal_min = 0
       @checknum = 3
+      @check_bal_min = -10
+      @no_checks_fee = 2
+
+      unless @balance.is_a?(Integer) && @balance >= @balance_min
+        raise ArgumentError.new("New accounts must begin with a balance of #{@balance_min} or more.")
+      end
     end
 
     def withdraw(amount)
-      @amount = amount + 1
-      if @balance - @amount < 0
-        puts "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
-      elsif @balance - @amount >= 0
+      @amount = amount + @transaction_fee
+      if @balance - @amount < @withdrawl_bal_min
+        return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
+      elsif @balance - @amount >= @withdrawl_bal_min
       @balance = @balance - @amount
-      puts "Withdrawal processed. Your current balance is: $#{@balance}."
+        return "Withdrawal processed. Your current balance is: $#{@balance}."
       end
     end
 
     def withdraw_using_check(amount)
-      if @balance - amount >= -10 && @checknum > 0
+      if @balance - amount >= @check_bal_min && @checknum > 0
         @balance = @balance - amount
         @checknum = @checknum - 1
-        return @balance
-      elsif @balance - amount >= -10 && @checknum <= 0
-        @balance = @balance - (amount+2)
+        return "Check Withdrawl Processed. Your current balance is $#{@balance}."
+      elsif @balance - amount >= @check_bal_min && @checknum <= 0
+        @balance = @balance - (amount + @no_checks_fee)
         @checknum = @checknum - 1
-        return @balance
+        return "Check Withdrawl Processed. No-Checks Fee Incured." +
+                " Your current balance is $#{@balance}."
       else
-        puts "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
+        return "Check Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}."
       end
     end
 
