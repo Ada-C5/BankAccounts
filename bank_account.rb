@@ -2,6 +2,7 @@
 require 'yaml'
 require 'csv'
 require 'awesome_print'
+require 'colorize'
 module Bank
 
   class Owner
@@ -77,7 +78,7 @@ module Bank
       @id_num = info[:id_num]
       @balance = info[:balance]/100
       @open_date = info[:open_date]
-      raise ArgumentError.new("You need an initial balance of $#{self.class::MINIMUM_BALANCE} to start an account here.") if @balance < self.class::MINIMUM_BALANCE
+      raise ArgumentError.new("You need an initial balance of $#{self.class::MINIMUM_BALANCE} to start an account here.".colorize(:light_magenta)) if @balance < self.class::MINIMUM_BALANCE
       @account_owner = @name
     end
 
@@ -110,7 +111,7 @@ module Bank
 
     def withdraw(amount)
       if @balance - amount < self.class::MINIMUM_BALANCE
-        puts "Sorry, but you can't withdraw that amount. You must maintain a mimimum balance of $#{self.class::MINIMUM_BALANCE}."
+        puts "Sorry, but you can't withdraw that amount. You must maintain a mimimum balance of $#{self.class::MINIMUM_BALANCE}.".colorize(:light_magenta)
         printf("Your current balance is $%.2f." , @balance)
 
       else
@@ -140,7 +141,7 @@ module Bank
       if @balance - amount >= 12
         super
       else
-        printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.", @balance)
+        printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.".colorize(:light_magenta), @balance)
       end
     end
 
@@ -168,7 +169,7 @@ module Bank
       if @balance - amount >= 1
         super
       else
-        printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.", @balance)
+        printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.".colorize(:light_magenta), @balance)
       end
     end
 
@@ -178,14 +179,14 @@ module Bank
           @balance -= amount
           @balance -= determine_check_use_fee
           @checks_used += 1
-          printf("You have withdrawn $%.2f.  Your current balance is $%.2f.", amount, @balance)
+          printf("You have withdrawn $%.2f.  Your current @balance is $%.2f.", amount, @balance)
         else
-          printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.", @balance)
+          printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.".colorize(:light_magenta), @balance)
         end
     end
 
     def determine_check_use_fee
-      if @checks_used < 3
+      if checks_used < 3
         check_fee = 0
       else
         check_fee = 2
@@ -195,12 +196,79 @@ module Bank
 
 
     def reset_checks
-      @checks_used = 0
+      checks_used = 0
     end
 
     def checks_used
-      puts "You have used #{@checks_used} checks."
+      puts "You have used #{checks_used} checks."
     end
+  end
+
+
+  class MoneyMarket < Account
+    MINIMUM_BALANCE = 10000
+    LOW_MINIMUM_PENALTY = 100
+    attr_reader :transactions_made
+    def initialize(info)
+      super(info)
+      @transactions_made = 0
+      raise ArgumentError.new("You need an initial balance of $#{self.class::MINIMUM_BALANCE} to start an account here.".colorize(:light_magenta)) if @balance < self.class::MINIMUM_BALANCE
+    end
+
+    def withdraw(amount)
+      if can_make_transaction? && @balance >= 10000
+        @balance -= amount
+        @transactions_made += 1
+        printf("$%.2f has been withdrawn. Your current balance is $%.2f." ,amount ,@balance)
+        puts " You have used #{@transactions_made} of 6 allowed transactions this month."
+      else
+        puts "Sorry, you have gone below your minimum required balance of $#{self.class::MINIMUM_BALANCE}.  You need to deposit at least $#{self.class::MINIMUM_BALANCE - @balance} to continue making transactions.".colorize(:light_magenta)
+      end
+
+    end
+
+
+    #def withdraw(amount)
+    #  if @balance - amount < self.class::MINIMUM_BALANCE
+    #    puts "Sorry, but you can't withdraw that amount. You must maintain a mimimum balance of $#{self.class::MINIMUM_BALANCE}."
+    #    printf("Your current balance is $%.2f." , @balance)
+
+    #  else
+    #    @balance -= amount
+    #    @balance -= self.class::TRANSACTION_FEE
+    #    printf("$%.2f has been withdrawn. Your current balance is $%.2f." ,amount ,@balance)
+    #  end
+
+    #end
+
+
+
+
+
+
+
+    def deposit(amount)
+      #come back and amend this in case they are trying to add moeny to get back to the minimum
+      if can_make_transaction?
+        super
+        @transactions_made += 1
+        puts " You have used #{@transactions_made} of 6 allowed transactions this month."
+      end
+    end
+
+    def reset_transactions
+      @transactions_made = 0
+    end
+
+    def can_make_transaction?
+      if @transactions_made < 6
+        return true
+      else
+        puts "Sorry, you have already made 6 transactions this month.  Access DENIED!!".colorize(:light_magenta).blink
+      end
+    end
+
+
   end
 
 end
