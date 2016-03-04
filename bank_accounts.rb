@@ -103,6 +103,20 @@ module Bank
   end
 
   class CheckingAccount < Account
+    TRANSACTION_FEE = 100
+    # instance_var is the name of the instance variable you're calling the method on
+    def withdraw(amount_to_withdraw, instance_var)
+        @balance = super - TRANSACTION_FEE
+        show_balance
+        return @balance
+    end
+
+    def withdraw_using_check(amount) 
+      #The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
+      #Allows the account to go into overdraft up to -$10 but not any lower
+      #The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
+    end
+
   end
 
   class SavingsAccount < Account
