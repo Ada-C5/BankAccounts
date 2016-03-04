@@ -235,12 +235,12 @@ module Bank
 
     def deposit(money)
       super
-      if balance < 10_000
+      if @account_balance < 10_000
         return @account_balance
       end
       if @transactions >= 6
         puts "You have already used your 6 monthly transactions."
-        @account_balance = balance - money
+        @account_balance = @account_balance - money
         return @account_balance
       end
       @transactions += 1
