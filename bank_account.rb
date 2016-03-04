@@ -205,7 +205,7 @@ module Bank
     def withdraw(money)
       balance = @account_balance - money
       if @transactions >= 6
-        puts "You have already used your 6 monthly tranactions."
+        puts "You have already used your 6 monthly transactions."
         return @account_balance
       end
       if balance < 9_900
@@ -225,8 +225,15 @@ module Bank
       return @account_balance
     end
 
-    def deposit
-      
+    def deposit(money)
+      super
+      if @transactions >= 6
+        puts "You have already used your 6 monthly transactions."
+        @account_balance = balance - money
+        return @account_balance
+      end
+      @transactions += 1
+      return @account_balance
     end
 
   end
