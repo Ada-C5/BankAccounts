@@ -5,7 +5,7 @@ module Bank
 
   class Account
     attr_reader :id, :balance, :date_created
-    MINIMUM_STARTING_BALANCE = 100
+    MINIMUM_STARTING_BALANCE = 0
 
     def initialize(account_info)
       # manually choose the data from the first line of the CSV file and ensure
@@ -16,7 +16,7 @@ module Bank
       # of given array to shovel into account_info hash?
 
       if account_info[:balance] < MINIMUM_STARTING_BALANCE
-       raise ArgumentError.new("You must have at least $1 to open an account.")
+       raise ArgumentError.new("You must have at least $#{MINIMUM_STARTING_BALANCE} to open an account.")
       end
       @id = account_info[:id]
       @balance = account_info[:balance]
@@ -72,7 +72,7 @@ module Bank
 
     def withdraw(amount_to_withdraw, minimum_balance=0, transaction_fee=0)
       if @balance - amount_to_withdraw < minimum_balance
-        raise ArgumentError.new("This withdrawal would cause a negative balance.")
+        raise ArgumentError.new("This withdrawal would go below the minimum balance.")
       end
       @balance = @balance - amount_to_withdraw
       # show_balance
@@ -119,6 +119,9 @@ module Bank
     end
 
     def withdraw(amount_to_withdraw, minimum_balance=0, transaction_fee=100)
+      if super - transaction_fee
+        raise ArgumentError.new("This withdrawal would go below the minimum balance.")
+      end
       @balance = super - transaction_fee
     end
 
@@ -130,6 +133,7 @@ module Bank
         transaction_fee = 200
         @balance = @balance - transaction_fee
       end
+      # why do I need return @balance here? why does it return nil otherwise?
       return @balance
     end
 
