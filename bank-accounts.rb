@@ -3,28 +3,22 @@
 require "CSV"
 
 module Bank
-
 CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other files may give us money information in other denominations, in which case make a new constant)
 
   class Account
-    attr_reader :id, :balance, :owner, :check_count #moved initial_balance and balance into their own explicit methods below. Initial_balance moved for adjustment from cents to dollars.
-    MINIMUM_BALANCE = 0 # general Account can be opened with 0 dollars
-    TRANSACTION_FEE = 0 # general Account has no transaction fees
-
-    #note to self: we can make constants change in subclasses by user self.class::CONST (http://stackoverflow.com/questions/13234384/in-ruby-is-there-a-way-to-override-a-constant-in-a-subclass-so-that-inherited)
-    #we could also set these as default arguments in the methods they affect. Then, when we call the methods on a specific instance, they look at the instance's CONSTANTS.
+    attr_reader :id, :balance, :owner, :check_count
 
     def initialize(account_information)
       @id = account_information[:id]
       @initial_balance = account_information[:initial_balance]
-      @balance = initial_balance(CENTS_IN_DOLLAR) #will start out at initial balance and then be updated as we add/withdraw money.
+      @balance = initial_balance(CENTS_IN_DOLLAR)
       @open_date = account_information[:open_date]
       @owner = account_information[:owner]
       check_initial_balance #to raise the argument error
     end
 
-    def check_initial_balance #should I use an argument or a constant - see notes to self.
-      raise ArgumentError.new("An account cannot be created with this initial balance.") if initial_balance(CENTS_IN_DOLLAR) < (self.class::MINIMUM_BALANCE)
+    def check_initial_balance(minimum_balance = 0)
+      raise ArgumentError.new("An account cannot be created with this initial balance.") if initial_balance(CENTS_IN_DOLLAR) < minimum_balance
     end
 
     def initial_balance(currency_changer = 1) #CSV data comes in cents - I want to play in dollars so I am converting to dollars (see CENTS_IN_DOLLAR constant).  Maybe a good idea to default to one if we don't have to convert.
@@ -39,29 +33,41 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       puts "Your current account balance is $#{ sprintf("%.2f", balance) }."
     end
 
-    def withdraw(amount)
-      updated_balance = (balance - amount - self.class::TRANSACTION_FEE)
+    def withdraw(amount, fee = 0, minimum_balance = 0)
+      if balance_brought_below_limit?(amount, fee, minimum_balance)
+        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your account minimum of $#{ sprintf("%.2f", minimum_balance) }.  Your current balance is $#{ sprintf("%.2f", balance) }."
 
-      if updated_balance > self.class::MINIMUM_BALANCE
-        puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{ sprintf("%.2f", updated_balance) }. "
-        return @balance = updated_balance # I think I need an instance variable here becuase we do need to update the running balance. Can't do this through a reader. Should I make an attr_accesssor for balance instead?
       else
-        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your account minimum of $#{ sprintf("%.2f", self.class::MINIMUM_BALANCE) }.  Your current balance is $#{ sprintf("%.2f", balance) }."
-        # don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
+        updated_balance = remove_money(amount, fee)
+        puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
+        updated_balance #gross?
+
       end
     end
 
-    def deposit(amount)
-      updated_balance = (balance + amount)
+    def balance_brought_below_limit?(amount, fee = 0, minimum_balance = 0)
+      if balance - amount - fee < minimum_balance #withdrawl brings balance below limit, or we already are below limit
+        return true # we don't allow the withdrawl
 
-      puts "After depositing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
-      return @balance = updated_balance
+      else
+        return false # we do
+      end
     end
 
-    def add_interest(rate = 0.25)
-        interest = balance * rate / 100 # interest rate as a percentage
-        @balance += interest # add interest to balance to update balance
-        return interest #per method requirements
+    def remove_money(amount, fee)
+      updated_balance = balance - amount - fee
+      @balance = updated_balance
+    end
+
+    def deposit(amount)
+      updated_balance = add_money(amount)
+      puts "After depositing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
+      updated_balance #gross?
+    end
+
+    def add_money(amount)
+      updated_balance = balance + amount
+      @balance = updated_balance
     end
 
     ##### CLASS METHODS BELOW #####
@@ -70,7 +76,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       accounts = self.all(data_file)
       accounts.each do |account|
         if
-          account.id == id # didn't expect instance method to work in a class method, but I guess it does beceause we called it on an instance.
+          account.id == id
           return account
         end
       end
@@ -82,54 +88,57 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
 
       accounts_data = CSV.read(data_file)
       accounts_data.each do |row|
-        account = self.new(id: row[0].to_i, initial_balance: row[1].to_f, open_date: row[2]) # to_i becasue ID and initial balance should be numbers.  ID is an integer because its a fixnum (per requirements) and intial_balance is to_f because I feel like this is more precise with money.
+        account = self.new(id: row[0].to_i, initial_balance: row[1].to_f, open_date: row[2]) # to_i because ID and initial balance should be numbers.  ID is an integer because it's a fixnum (per requirements) and intial_balance is to_f because I feel like this is more precise with money.
         accounts << account #put it into our collection of instances! (accounts)
       end
-      return accounts #we need to return accounts outside the loop, otherwise it only returns the last loop through our do.
+      return accounts
     end
 
   end
 
-  class SavingsAccount < Account
+  class InterestBearingAccount < Account
 
-    MINIMUM_BALANCE = 10.00 # SavingsAccount cannot be opened with less than 10 dollars.  The account balance cannot fall below $10.
-    TRANSACTION_FEE = 2 # transaction fee for withdrawls is 2.
+    def add_interest(rate = 0.25)
+        interest = balance * rate / 100 # interest rate as a percentage
+        @balance += interest # add interest to balance to update balance
+        return interest #per method requirements
+    end
+  end
+
+  class SavingsAccount < InterestBearingAccount
+
+    def check_initial_balance(minimum_balance = 10)
+      super
+    end
+
+    def withdraw(amount, fee = 2, minimum_balance = 10)
+      super
+    end
 
   end
 
   class CheckingAccount < Account
-
-    MINIMUM_BALANCE = 0 # CheckingAccount  dollars balance cannot fall below $0. (Unless by a check withdrawl)
-    TRANSACTION_FEE = 1 # transaction fee for withdrawls is 1. Withdrawls using ehcks have a separate fee schedule.
-
+    MONTHLY_FREE_CHECK_USES = 3 #three free checks are allowed to be used each month
     def initialize(account_information)
       super
       @check_count = 0 #also has checks! CHECKing account. Keep it out of Accounts generally because some accounts don't have checks. Let's be specific.
     end
 
-    def add_interest
-      puts "Sorry, checking accounts are not eligible for interest."
+    def withdraw(amount, fee = 1, minimum_balance = 0)
+      super
     end
 
-    def withdraw_using_check(amount, overdraft_limit = 10)
+    def withdraw_using_check(amount, fee = check_transaction_fee, minimum_balance = -10)
+    withdraw(amount, fee, minimum_balance)
 
-      update_check_count #we updated the check count first because we want the first check to count towards the three free
-      updated_balance = (balance - amount - check_transaction_fee)
-
-      if updated_balance > overdraft_limit
-        puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{ sprintf("%.2f", updated_balance) }. Remember when you withdraw using checks, you are only allowed to overdraft up to $#{ sprintf("%.2f", overdraft_limit) }."
-        return @balance = updated_balance # I think I need an instance variable here becuase we do need to update the running balance. Can't do this through a reader. Should I make an attr_accesssor for balance instead?
-      else
-        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your overdraft limit of $#{ sprintf("%.2f", overdraft_limit) }.  Your current balance is $#{ sprintf("%.2f", balance) }."
-        # don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
-      end
     end
 
     def check_transaction_fee
-      if check_count > 3 #three free checks are allowed to be used each month
-        fee = 2 #fee if they have used more than 3 checks
+      update_check_count #we updated the check count first because we want the first check to count towards the three free in calculating check transaction fee.  Each time we are calling check transaction fee, we need to update the check count. ? Pattern breaking :(.  Works in this case because there is no limit - is different than "transactions" in money market account...
+      if check_count > MONTHLY_FREE_CHECK_USES
+        return fee = 2
       else
-        fee = 0 #there is no fee if they haven't used any checks
+        return fee = 0
       end
     end
 
@@ -142,97 +151,96 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
     end
   end
 
-  class MoneyMarketAccount < Account
-
-    MINIMUM_BALANCE = 10000 # CheckingAccount  dollars balance cannot fall below $0. (Unless by a check withdrawl)
-    TRANSACTION_FEE = 0 # there are no transaction fees - unless you fall below your account minimum. then there is a fine!!
-
+  class MoneyMarketAccount < InterestBearingAccount
+    MONTHLY_TRANSACTION_MAXIMUM = 6
+    TRANSACTION_INCREMENT = 1
     attr_reader :transaction_count
 
     def initialize(account_information)
       super
-      @transaction_count = 0 # the MoneyMarketAccount counts any transactions (withdrawl or deposit)
+      @transaction_count = 0
     end
 
-    def withdraw(amount)
-      update_transaction_count
+    def check_initial_balance(minimum_balance = 10000)
+      super
+    end
 
-      if balance_below_limit?
-        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your account minimum of $#{ sprintf("%.2f", self.class::MINIMUM_BALANCE) }.  Your current balance is $#{ sprintf("%.2f", balance) }."
+    def withdraw(amount, fee = 0, minimum_balance = 10000)
+    increase_transaction_count
 
-        undo_transaction_count # unsuccessful withdrawls don't count as transactions
+    fee = balance_below_minimum_fee(amount) #fee is 0 unless withdrawl amount brings us below min. balance
 
-      elsif !balance_below_limit? && transactions_remaining?
-        updated_balance = (balance - amount - self.class::TRANSACTION_FEE - withdrawl_fee(amount) )
+      if balance_below_limit?(minimum_balance)
+        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This is a violation your account minimum of $#{ sprintf("%.2f", minimum_balance) }.  Your current balance is $#{ sprintf("%.2f", balance) }."
+        decrease_transaction_count # unsuccessful withdrawls don't count as transactions
+
+      elsif !balance_below_limit?(minimum_balance) && transactions_remaining?
+        updated_balance = remove_money(amount, fee) # also breaks pattern?
         puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{ sprintf("%.2f", updated_balance) }. "
-        return @balance = updated_balance
+        updated_balance #is there a better way to format this? gross.
 
       else
         puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your transaction maximum for the period.  Your current balance is $#{ sprintf("%.2f", balance) }."
-
-        undo_transaction_count #unsuccessful withdrawls don't count as transactions.
+        decrease_transaction_count #unsuccessful withdrawls don't count as transactions.
 
       end
     end
 
-    def balance_below_limit?
-      if balance < 10_000
+    def balance_below_minimum_fee(amount, fee = 0, minimum_balance = 10000)
+      if !balance_below_limit? && balance_brought_below_limit?(amount, fee, minimum_balance)
+        return fee = 100 #there is a $100 fee if a withdrawl causes the account to go below the minimum
+      else
+        return fee = 0
+      end
+    end
+
+    def balance_below_limit?(minimum_balance = 10000)
+      if balance < minimum_balance
         return true
       else
         return false
       end
     end
 
-    def withdrawl_fee(withdrawl_amount)
-      if balance - withdrawl_amount > 10_000 # we can withdraw without a fee if the balance doesn't fall below the limit
-        fee = 0
-      else
-        fee = 100 #otherwise we are charged a withdrawl fee
-      end
-    end
+    def deposit(amount, minimum_balance = 10000)
+      increase_transaction_count
 
-    def deposit(amount)
-      update_transaction_count
+      updated_balance = balance + amount #i don't like this
 
-      updated_balance = (balance + amount)
-
-      if balance_below_limit? && updated_balance >= MINIMUM_BALANCE # the deposit needs to make us REACH OR EXCEED the minimum balance.
+      if balance_below_limit?(minimum_balance) && updated_balance >= minimum_balance # the deposit needs to make us REACH OR EXCEED the minimum balance. We can make a deposit in this case even if it exceeds the 6 monthly transactions.
         puts "After depositing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
-        undo_transaction_count # deposits to bring out account back above the limit don't count as transactions
-        return @balance = updated_balance
+        decrease_transaction_count
+        add_money(amount)
 
-      elsif updated_balance < MINIMUM_BALANCE #we can't make a deposit that doesn't help us reach or exceed the minimum
-        puts "WARNING: You cannot deposit $#{ sprintf("%.2f", amount) }.  Your current balance is $#{ sprintf("%.2f", balance) }. You must make a deposit that causes your account to reach or exceed the minimum of $#{ sprintf("%.2f", MINIMUM_BALANCE) }."
-
-        undo_transaction_count #unsuccessful deposits don't count as transactions.
-
-      elsif !balance_below_limit? && transactions_remaining?
+      elsif !balance_below_limit?(minimum_balance) && transactions_remaining?
         puts "After depositing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
+        add_money(amount)
 
-        return @balance = updated_balance
+      elsif updated_balance < minimum_balance #Can't make a deposit that doesn't help us reach or exceed the minimum
+        puts "WARNING: You cannot deposit $#{ sprintf("%.2f", amount) }.  Your current balance is $#{ sprintf("%.2f", balance) }. You must make a deposit that causes your account to reach or exceed the minimum of $#{ sprintf("%.2f", minimum_balance) }."
+        decrease_transaction_count
 
       else
         puts "WARNING: You cannot deposit $#{ sprintf("%.2f", amount) }. This transaction violates your transaction maximum for the period.  Your current balance is $#{ sprintf("%.2f", balance) }."
-
-        undo_transaction_count #unsuccessful deposits don't count as transactions.
+        decrease_transaction_count
 
       end
     end
 
     def transactions_remaining?
-      if transaction_count < 6
+      if transaction_count <= MONTHLY_TRANSACTION_MAXIMUM
         return true
       else
         return false
       end
     end
 
-    def update_transaction_count
-      @transaction_count += 1
+    def increase_transaction_count
+      @transaction_count += TRANSACTION_INCREMENT
     end
 
-    def undo_transaction_count #We don't count as transactions: unsuccessful withdrawls, or deposits to bring us above MINIMUM_BALANCE.
-      @transaction_count -= 1
+    def decrease_transaction_count #We don't count as transactions: unsuccessful withdrawls,deposits, or deposits to bring us above minimum_balance.
+      @transaction_count -= TRANSACTION_INCREMENT
     end
 
     def reset_transaction_count
@@ -311,30 +319,44 @@ end
 
 #test run the program
 
-checking_account = Bank::CheckingAccount.new(initial_balance: 10000 * 100)
-checking_account.add_interest
-mm_acct = Bank::MoneyMarketAccount.new(initial_balance: 10000 * 100)
-mm_acct.display_balance
-mm_acct.withdraw(10)
-puts mm_acct.transaction_count
-mm_acct.withdraw(10)
-puts mm_acct.transaction_count
-mm_acct.deposit(20)
-puts mm_acct.transaction_count
-
-#checking_account = Bank::CheckingAccount.new(initial_balance: 10000)
-#checking_account.withdraw(10)
-#checking_account.withdraw_using_check(10)
-#puts checking_account.check_count
-#checking_account.withdraw_using_check(10)
+# CHECKING ACCOUNT
+# account = Bank::CheckingAccount.new(initial_balance: 10000 * 100)
+# account.withdraw(10)
+# account.withdraw_using_check(10)
+# account.withdraw_using_check(10)
+# account.withdraw_using_check(10)
+# account.withdraw_using_check(10) #this one charges a higher fee
+# account.withdraw_using_check(9950) #this one proves we can overdraft
+# puts account.check_count
+# account.withdraw(10) # BUT, we can't withdraw if we have overdrafted.
+# account.display_balance
+# account.deposit(10)
+# account.display_balance
 
 
-# account_id = Bank::Account.find(1212)
-# account_id.display_balance
-  #
-  # owner_id = Bank::Owner.find(14)
-  # puts owner_id.first_name
-  #
-  # owner_account = owner_id.return_owners_accounts
-  # puts owner_account[0].id
-  # owner_account[0].display_balance
+# SAVINGS ACCOUNT
+# account = Bank::SavingsAccount.new(initial_balance: 10000 * 100)
+# puts account.add_interest
+# account.withdraw(10)
+# account.display_balance
+# account.deposit(10)
+# account.display_balance
+
+
+# MONEY MARKET TEST
+# account = Bank::MoneyMarketAccount.new(initial_balance: 10000 * 100)
+# account.withdraw(10)
+# account.display_balance
+# account.withdraw(10)
+# account.display_balance
+# account.deposit(1)
+# account.deposit(120)
+# account.deposit(1)
+# account.deposit(1)
+# account.deposit(1)
+# account.deposit(1)
+# account.withdraw(30)
+# puts account.transaction_count
+# account.deposit(200)
+# account.withdraw(1)
+# puts account.transaction_count
