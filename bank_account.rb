@@ -1,4 +1,5 @@
 module Bank
+require "money"
 require "CSV"
   class Account
 		attr_reader :balance, :account_id, :open_date
@@ -43,10 +44,17 @@ require "CSV"
 			return @balance
 		end
 
+    def say_balance(balance)
+      dollars = Money.new(balance, "USD")
+      puts "Your available balance is $#{dollars}."
+    end
+
+
+    #This is broken.
     #def add_owner(id)
     #  full = []
     #  owner_id = 0
-      #finds corresponding owner id using account id
+    #finds corresponding owner id using account id
     #  CSV.foreach("./support/account_owners.csv", "r") do |line|
     #    if id ==line[0]
     #      owner_id = line[1]
@@ -66,21 +74,21 @@ require "CSV"
     #  return full
     #end
 
-		#def add_owner(owner)
-    #  full = []
-    #  acc_id = nil
-    #  CSV.foreach("./support/account_owners.csv", "r") do |line|
-    #    if owner.owner_id ==line[1]
-    #      acc_id = line[0]
-    #      CSV.foreach("./support/accounts.csv") do |row|
-    #        if acc_id == row[0]
-    #          full = row << owner
-    #        end
-    #      end
-    #    end
-		#	end
-    #  return full
-		#end
+		def add_owner(owner)
+      full = []
+      acc_id = nil
+      CSV.foreach("./support/account_owners.csv", "r") do |line|
+        if owner.owner_id ==line[1]
+          acc_id = line[0]
+          CSV.foreach("./support/accounts.csv") do |row|
+            if acc_id == row[0]
+              full = row << owner
+            end
+          end
+        end
+			end
+      return full
+		end
 	end
 	
   class Owner
@@ -120,21 +128,23 @@ require "CSV"
     def initialize(id, balance, open_date)
       super
       @interest = nil
-      raise ArgumentError, "Initial balance cannot be less than $10." unless @balance>=10
+      raise ArgumentError, "Initial balance cannot be less than $10." unless @balance>=1000
     end
 
     def withdraw(debit)
-        if debit > (@balance-10)
+        if debit > (@balance-1000)
           puts "Withdrawal amount is above the limit. Request denied."
         else
           super-2        
         end
+        say_balance(@balance)
     end
 
     def add_interest(rate)
       @interest = @balance*(rate/100)
       @balance = @interest +@balance
-      return "The interest is #{@interest} and the new balance $#{@balance}." 
+      puts "The interest is #{@interest}." 
+      say_balance(@balance)
     end
   end
 
@@ -150,20 +160,21 @@ require "CSV"
       if debit > (@balance)
         puts "Withdrawal amount is above the limit. Request denied."
       else
-        super-1        
+        super-100        
       end
     end
 
     def withdraw_using_check(amount)
-      if amount > (@balance+10)
+      if amount > (@balance+1000)
         puts "Withdrawal amount is above the limit. Request denied."
       elsif @check_count>=3
         @check_count+=1
-        @balance = withdraw(amount)-1
+        @balance = withdraw(amount)-100
       else
         @check_count+=1
-        @balance = withdraw(amount)+1
+        @balance = withdraw(amount)+100
       end
+      say_balance(@balance)
     end
 
     def reset_check
