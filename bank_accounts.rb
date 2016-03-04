@@ -97,8 +97,8 @@ module Bank
     # add a savings account class that inherits from account
     class SavingsAccount < Account
         # the withdrawal fee for this account will always be the same so this seems like a good place for a constant.
-        WITHDARAWL_FEE = 2
-        ACCOUNT_MIN_BALANCE = 10
+        WITHDARAWL_FEE = 200
+        ACCOUNT_MIN_BALANCE = 1000
 
     # Input rate is assumed to be a percentage (i.e. 0.25).
     # The formula for calculating interest is balance * rate/100
@@ -113,8 +113,8 @@ module Bank
     # checking account class that inherits from account
     class CheckingAccount < Account
         # set the constants for the expectations of a CheckingAccount
-        WITHDARAWL_FEE = 1
-        CHECK_FEE_IN_DOLLARS = 2
+        WITHDARAWL_FEE = 100
+        CHECKFEE = 200
         
         # adds an instance variable to track how many checks are used monthly.
         def initialize(account_info)
@@ -125,13 +125,13 @@ module Bank
         # Allows the account to go into overdraft up to -$10 but not any lower
         # The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
         def withdraw_with_check(amount)
-            if (@balance - amount) > -10 && @checks_used_in_month < 3
+            if (@balance - amount) > -1000 && @checks_used_in_month < 3
                 @balance -= amount
                 puts "Your new balance is $#{@balance}"
                 @checks_used_in_month += 1
                 return @balance
-            elsif (@balance - amount) > -10 && @checks_used_in_month >= 3
-                @balance -= (amount + CHECK_FEE_IN_DOLLARS)
+            elsif (@balance - amount) > -1000 && @checks_used_in_month >= 3
+                @balance -= (amount + CHECKFEE)
                 puts "Your new balance is $#{@balance}"
                 @checks_used_in_month += 1
                 return @balance
