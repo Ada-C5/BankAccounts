@@ -60,6 +60,10 @@ module Bank
       return @balance
     end
 
+    def get_id
+      return @id
+    end
+
     # create new accounts from csv information
     def self.create_accounts(file)
       accounts = []
@@ -181,7 +185,7 @@ module Bank
     end
   end
 
-  class MoneyMarketAccount < Account
+  class MoneyMarketAccount < SavingsAccount 
     MIN_BAL = 1000000
     WITHDRAW_FEE = 100
 
@@ -194,7 +198,7 @@ module Bank
     end
 
     def withdraw(amount)
-      if @balance < 1000000
+      if @balance > 1000000
         temp_balance = @balance - amount
         # make sure result is positive
         if temp_balance < MIN_BAL
@@ -213,7 +217,7 @@ module Bank
 
     def deposit(amount)
       new_bal = super
-      if new_bal - amount < 1000000
+      if new_bal - amount > 1000000
         @transactions += 1
       end
     end

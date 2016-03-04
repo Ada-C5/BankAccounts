@@ -21,14 +21,14 @@ require_relative 'bank_account.rb'
 # my_account.withdraw(5100)
 
 ### test for withdraw_using_check
-my_account = Bank::CheckingAccount.new(33, 60000, 2003)
-puts my_account.withdraw_using_check(10000)
-puts my_account.withdraw_using_check(10000)
-puts my_account.withdraw_using_check(10000)
-puts my_account.withdraw_using_check(10000)
-puts my_account.withdraw_using_check(10000)
-puts my_account.withdraw_using_check(10000)
-puts my_account.withdraw_using_check(10000)
+# my_account = Bank::CheckingAccount.new(33, 60000, 2003)
+# puts my_account.withdraw_using_check(10000)
+# puts my_account.withdraw_using_check(10000)
+# puts my_account.withdraw_using_check(10000)
+# puts my_account.withdraw_using_check(10000)
+# puts my_account.withdraw_using_check(10000)
+# puts my_account.withdraw_using_check(10000)
+# puts my_account.withdraw_using_check(10000)
 
 ### test for add_interest method
 # my_account = Bank::SavingsAccount.new(2, 10000, 2005)
@@ -37,7 +37,7 @@ puts my_account.withdraw_using_check(10000)
 
 # # # # # TESTS FOR OWNER CLASS # # # # #
 # ### TEST FOR SELF.CREATE_OWNERS(file)  ###
-# puts Bank::Owner.create_owners("./support/owners.csv")
+puts Bank::Owner.create_owners("./support/owners.csv")
 
 
 # ### TEST FOR SELF.ALL METHOD   ###
