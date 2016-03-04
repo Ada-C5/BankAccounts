@@ -7,7 +7,7 @@ module Bank
     MINIMUM_BALANCE = 0
     WITHDRAW_FEE = 0
     MIN_INITIAL_BALANCE = 0
-    attr_reader :id, :balance
+    attr_reader :id, :balance, :transaction_count
 
     def initialize(id, initial_balance, opendate, owner=nil)
       @id = id
@@ -18,6 +18,7 @@ module Bank
       @owner = owner
       @minimum_balance = MINIMUM_BALANCE
       @withdraw_fee = WITHDRAW_FEE
+      @transaction_count = 0
     end
 
     def check_initial_balance
@@ -74,6 +75,14 @@ module Bank
       puts "You don't have enough money in your account."
     end
 
+    def one_transaction
+      @transaction_count += 1
+    end
+
+    def reset_transaction_count
+      @transaction_count = 0
+    end
+
     # Accepts a single parameter for the amount of money to be withdrawn.
     # Absolute value to input for negative numbers.
     # Returns the updated account balance with 2 decimal places.
@@ -83,6 +92,7 @@ module Bank
         withdraw_error(amount)
       else
         @balance = @balance - (amount + @withdraw_fee)
+        one_transaction
       end
       return balance
     end
@@ -93,6 +103,7 @@ module Bank
     def deposit(amount)
       amount = amount.abs
       @balance = @balance + amount
+      one_transaction
       return @balance
     end
 
@@ -165,6 +176,35 @@ module Bank
     def withdraw_error(amount)
       puts "You have been charged $100. You must increase your account balance to $10,000 before you can withdraw again."
       @balance = @balance - (amount + @withdraw_fee + 100)
+      one_transaction
+      return balance
+    end
+
+    def balance_too_low
+      raise ArgumentError, "Balance is under $10,000" unless balance > @minimum_balance
+    end
+
+    def maximum_transaction_check
+      if transaction_count >= 6
+        raise ArgumentError, "Too many transactions this month."
+      end
+    end
+
+    def withdraw(amount)
+      balance_too_low
+      maximum_transaction_check
+      super
+    end
+
+    def deposit(amount)
+      if balance < @minimum_balance
+        super
+        @transaction_count -= 1
+        return balance
+      else
+        maximum_transaction_check
+        super
+      end
     end
 
   end
