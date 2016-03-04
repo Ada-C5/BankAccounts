@@ -3,17 +3,19 @@ require 'csv'
 module Bank
 
   class Account
-    attr_accessor :id, :balance, :opendate
+    attr_accessor :id, :balance, :opendate, :transaction_fee, :balance_min
 
     def initialize(id, balance, opendate)
-
-      unless balance.is_a?(Integer) && balance >= 0
-        raise ArgumentError.new("New accounts must begin with a balance of 0 or more.")
-      end
 
       @id = id
       @balance = balance
       @opendate = opendate
+      @transaction_fee = 0
+      @balance_min = 0
+
+      unless balance.is_a?(Integer) && balance >= @balance_min
+        raise ArgumentError.new("New accounts must begin with a balance of 0 or more.")
+      end
 
     end
 
@@ -47,9 +49,11 @@ module Bank
 
     def withdraw(amount)
       @amount = amount
-      if @balance - @amount < 0
-        return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
-      elsif @balance - @amount >= 0
+      @withdrawl_bal_min = 0
+
+      if @balance - @amount < @withdrawl_bal_min
+        return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}."
+      elsif @balance - @amount >= @withdrawl_bal_min
       @balance = @balance - @amount
       return "Withdrawal processed. Your current balance is: $#{@balance}."
       end
@@ -135,4 +139,4 @@ module Bank
 
   end
 
-end
+  end
