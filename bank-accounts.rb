@@ -146,20 +146,26 @@ module Bank
 
 	class CheckingAccount < Account
 
+		attr_reader :withdraw_money, :checks, :reset_checks
+
+		def initialize(checks)
+			super
+			@checks = 0
+		end  
+
 		WITHDRAW_FEE = 1.00 
 		# This fee is assessed whenever more than three checks are used per month
 		TRANSACTION_FEE = 2.00
 
 
-		def	withdraw_money(amount)
-			@checks = 0 
+		def	withdraw_money(amount) 
 			check_entry = check_entry(amount)
 			if check_entry == false
 				puts "*** ERROR ***"
 				puts "That is not a valid amount to withdraw." 
 				show_balance
 			end
-			if @checks <= 3
+			if @checks < 3
 				new_balance = @balance - amount - WITHDRAW_FEE 
 				if new_balance < -10
 					puts "*** ERROR ***"
@@ -170,31 +176,34 @@ module Bank
 					puts format("Removing $%.2f from account #{@account_id} with a balance of $%.2f", amount, @balance)
 					puts format("Checking Accounts incur a $%.2f fee per withdrawal transation", WITHDRAW_FEE)
 					@balance = new_balance
+					@checks += 1
 					show_balance
+					return @checks
+				end
+			else @checks > 3
+				new_balance = @balance - amount - WITHDRAW_FEE - TRANSACTION_FEE
+				if new_balance < -10
+					puts "*** ERROR ***"
+					puts "Insufficent Funds."
+					new_balance = @balance + amount + WITHDRAW_FEE + TRANSACTION_FEE
+					show_balance
+				else 
+					puts format("Removing $%.2f from account #{@account_id} with a balance of $%.2f", amount, @balance)
+					puts format("Checking Accounts incur a $%.2f fee per withdrawal transation.", WITHDRAW_FEE)
+					puts "Your account has used more than three checks this month."
+					puts format("Therefore you have an additional transaction fee of $%.2f", TRANSACTION_FEE)
+					@balance = new_balance
+					@checks += 1 
+					show_balance
+					return @checks
 				end
 			end
-			# if @checks > 3
-			# 	new_balance = @balance - amount - WITHDRAW_FEE - TRANSACTION_FEE
-			# 	if new_balance < -10
-			# 		puts "*** ERROR ***"
-			# 		puts "Insufficent Funds."
-			# 		new_balance = @balance + amount + WITHDRAW_FEE + TRANSACTION_FEE
-			# 		show_balance
-			# 	else 
-			# 		puts format("Removing $%.2f from account #{@account_id} with a balance of $%.2f", amount, @balance)
-			# 		puts format("Checking Accounts incur a $%.2f fee per withdrawal transation.", WITHDRAW_FEE)
-			# 		puts "Your account has used more than three checks this month."
-			# 		puts format("Therefore there is an additional transaction fee of $%.2f", TRANSACTION_FEE)
-			# 		@balance = new_balance
-			# 		checks = checks + 1 
-			# 		show_balance
-			# 		return checks
-			# 	end
-			# end
 		end
 
-		def track_used_checks(checks)
-			checks = @checks + 1
+		def reset_checks
+			# used to reset check use to 0 at the end of the month 
+			@checks = 0 
+			return @checks 
 		end
 	end
 
@@ -245,11 +254,11 @@ end
 # Testing Below
 #
 
-accounts 	= Bank::Account.get_all('./support/accounts.csv')
-account 	= Bank::Account.find(1212, accounts)
+# accounts 	= Bank::Account.get_all('./support/accounts.csv')
+# account 	= Bank::Account.find(1212, accounts)
 
 
-savings_accounts 	= Bank::SavingsAccount.get_all('./support/savings_accounts.csv')
+# savings_accounts 	= Bank::SavingsAccount.get_all('./support/savings_accounts.csv')
 
 # savings_account 	= Bank::SavingsAccount.find(1112, savings_accounts).show_balance
 # savings_account 	= Bank::SavingsAccount.find(1112, savings_accounts).withdraw_money(20)
@@ -257,10 +266,28 @@ savings_accounts 	= Bank::SavingsAccount.get_all('./support/savings_accounts.csv
 checking_accounts = Bank::CheckingAccount.get_all('./support/checking_accounts.csv')
 
 checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).show_balance
-pp checking_account
-checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(20)
-pp checking_account
-
+puts checking_account
+checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
+puts checking_account
+pp @checks
+checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
+puts checking_account
+pp @checks
+checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
+puts checking_account
+pp @checks
+checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
+puts checking_account
+pp @checks
+checking_account = Bank::CheckingAccount.find(1012, checking_accounts).reset_checks
+puts checking_account
+pp @checks
+checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
+puts checking_account
+pp @checks
+checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
+puts checking_account
+pp @checks
 
 # owners = Bank::Owner.get_all('./support/owners.csv') 
 
