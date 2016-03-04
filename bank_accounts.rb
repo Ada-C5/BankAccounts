@@ -31,12 +31,12 @@ module Bank
 
         # withdraw method
         def withdraw(amount)
-            if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS)) >= ACCOUNT_MIN_BALANCE_IN_DOLLARS
-                @balance = @balance - ( amount + WITHDARAWL_FEE_IN_DOLLARS )
+            if (@balance - (amount + self.class::WITHDARAWL_FEE_IN_DOLLARS)) >= self.class::ACCOUNT_MIN_BALANCE_IN_DOLLARS
+                @balance = @balance - ( amount + self.class::WITHDARAWL_FEE_IN_DOLLARS )
                 puts "After withdrawing #{ amount } (and the withdrawal fee if applicable), the balance for account #{ @id_number } is #{ @balance }."
                 return @balance
-            elsif (@balance - amount) < ACCOUNT_MIN_BALANCE_IN_DOLLARS
-                puts "HEY! That is unpossible because this account MUST not go below $#{ACCOUNT_MIN_BALANCE_IN_DOLLARS}!"
+            elsif (@balance - amount) < self.class::ACCOUNT_MIN_BALANCE_IN_DOLLARS
+                puts "HEY! That is unpossible because this account MUST not go below $#{self.class::ACCOUNT_MIN_BALANCE_IN_DOLLARS}!"
                 puts "The balance for account #{ @id_number } is still #{ @balance }."
                 return @balance
             else
