@@ -10,26 +10,30 @@ module Bank
       @money = hash[:money]
       @start_date = hash[:start_date]
 
-      if money < 0
+      account_min = 0
+      if money < account_min
         raise ArgumentError.new("Only positive amounts are allowed in the bank.")
       end
     end
 
-    def self.new_account(id = nil, money = nil, start_date =nil)
-      new_hash = self.new(:id => id, :money => money)
-      if money < 0
-        raise ArgumentError.new("Only positive amounts are allowed in the bank.")
-      end
-      return new_hash
-    end
+    # def self.new_account(id = nil, money = nil, start_date =nil)
+    #   new_hash = self.new(:id => id, :money => money)
+    #   account_min = 0
+    #   if money < account_min
+    #     raise ArgumentError.new("Only positive amounts are allowed in the bank.")
+    #   end
+    #   return new_hash
+    # end
 
     def withdraw(take_out = 0)
+      account_min = 0
+      withdrawal_fee = 0
       # @take_out = take_out
-      if @money.to_f - take_out.to_f < 0#@take_out.to_f < 0
+      if @money.to_f - take_out.to_f < account_min
         puts "You don't have enough money in the bank for this transaction."
         balance
       else
-        @money -= take_out.to_f
+        @money -= take_out.to_f + withdrawal_fee
         balance
       end
     end
@@ -66,6 +70,24 @@ module Bank
       end
       return account_info #pushes each info into the array
     end
+
+    def self.all_together_now
+      account = self.account_info
+      owner = Bank::Owner.owner_info
+      match = CSV.read('account_owners.csv')
+
+      CSV.foreach("account_owners.csv") do |row|
+        puts row[1]
+        account.each do |instance|
+          puts instance.
+          if row[1] == instance.id
+            puts "MEOW"
+            return instance
+          end
+        end
+      end
+    end
+
   end
 
   class Owner
@@ -107,7 +129,6 @@ module Bank
       end
       return owner_info
     end
-
   end
 
   class SavingsAccount < Account
@@ -116,18 +137,21 @@ module Bank
       @money = hash[:money]
       @start_date = hash[:start_date]
 
-      if money < 10
+      account_min = 10
+      if money < account_min
         raise ArgumentError.new("Only amounts above $10 are allowed in the bank.")
       end
     end
 
     def withdraw(take_out = 0)
-      # @take_out = take_out
-      if @money.to_f - take_out.to_f < 10#@take_out.to_f < 0
+      account_min = 10
+      withdrawal_fee = 2
+
+      if @money.to_f - take_out.to_f < account_min
         puts "$10 must be left in the savings account at all times."
         balance
       else
-        @money -= take_out.to_f + 2
+        @money -= take_out.to_f + withdrawal_fee
         balance
       end
     end
@@ -145,23 +169,30 @@ module Bank
     end
 
     def withdraw(take_out = 0)
+      account_min = 0
+      withdrawal_fee = 1
+
       # @take_out = take_out
-      if @money.to_f - take_out.to_f < 0#@take_out.to_f < 0
+      if @money.to_f - take_out.to_f < account_min
         puts "You don't have enough money in the bank for this transaction."
         balance
       else
-        @money -= take_out.to_f + 1
+        @money -= take_out.to_f + withdrawal_fee
         balance
       end
     end
 
     def withdraw_using_check(take_out = 0)
+      account_min = -10
+      withdrawal_fee = 2
+      free_withdrawal = 3
       @num += 1
-      if @money.to_f - take_out.to_f < -10#@take_out.to_f < 0
+
+      if @money.to_f - take_out.to_f < account_min
         puts "You may only overdraft up to $10."
         balance
-      elsif @num > 3
-        @money -= take_out.to_f + 2
+      elsif @num > free_withdrawal #After 3 withdrawals, fees start
+        @money -= take_out.to_f + withdrawal_fee
         balance
       else
         @money -= take_out.to_f
@@ -170,7 +201,8 @@ module Bank
     end
 
     def reset_checks
-      @num = 0
+      @num = 0 #reset the check withdrawal count to 0
     end
   end
+
 end
