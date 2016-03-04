@@ -4,7 +4,7 @@ require 'awesome_print'
 module Bank
   class Account
   BALANCE_MINIMUM = 0
-
+  TRANSACTION_FEE = 0
   attr_reader :current_balance, :all_accounts
   attr_accessor :id, :initial_balance, :owner
 
@@ -16,7 +16,7 @@ module Bank
         @start_date = account[:start_date]
         @all_accounts = account[:all_accounts]
         @owner = nil
-        raise ArgumentError, "We cannot process your transaction-you need a minimum $#{self.class::BALANCE_MINIMUM} amount." unless @initial_balance.to_i >= self.class::BALANCE_MINIMUM
+        raise ArgumentError.new("We cannot process your transaction-you need a minimum $#{self.class::BALANCE_MINIMUM} amount.") unless @initial_balance.to_i >= self.class::BALANCE_MINIMUM
       end
     end
 
@@ -57,11 +57,12 @@ module Bank
     end
 
     def withdraw(money)
-      if @current_balance < money
-        puts "We cannot deposit negative amounts. Please enter your deposit amount."
+      fees = self.class::BALANCE_MINIMUM + self.class::TRANSACTION_FEE
+      if @current_balance.to_i < money + fees
+        puts "WARNING: We cannot process your request-You need a $ #{fees}minimum amount."
         return @current_balance
-      else @current_balance = @current_balance - money
-      return @current_balance
+      else @current_balance = @current_balance - money - self.class::TRANSACTION_FEE
+        return @current_balance
       end
     end
 
@@ -116,6 +117,7 @@ module Bank
 
   class SavingsAccount < Account
     BALANCE_MINIMUM = 10
+    TRANSACTION_FEE = 2
   end
 end
 
