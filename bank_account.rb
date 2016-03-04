@@ -191,8 +191,22 @@ module Bank
         end
       end
     end
+
+    # Create and array from the data in account_owners.csv
+    def self.csv_owner_data(file_path="./support/account_owners.csv")
+      CSV.read(file_path)
+    end
+
+    # Use accounts_owner.csv array to find an owner id that matches input then
+    # returns the correlating accounts
+    def self.find_accounts(owner_id)
+      csv_owner_data.each_index do |i|
+        if csv_owner_data[i][1] == owner_id.to_s
+          return Bank::Account.find(csv_owner_data[i][0])
+        end
+      end
+    end
+
   end
 
 end
-
-myaccount = Bank::Account.new(4567, 20000, "2010-12-21 12:21:12 -0800")
