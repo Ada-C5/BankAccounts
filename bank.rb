@@ -15,7 +15,7 @@ module Bank
       total = CSV.read('support/accounts.csv')
       total = total.first
       id_local = total[0]
-      balance_local = total[1].to_i
+      balance_local = total[1].to_f
       date_local = total[2]
       return self.new(id_local, balance_local, date_local)
     end
@@ -24,7 +24,7 @@ module Bank
       csv_array = CSV.read('support/accounts.csv')
       array_accounts = []
       csv_array.each do |row|
-        one_account = self.new(row[0],row[1].to_i,row[2])
+        one_account = self.new(row[0],row[1].to_f,row[2])
         array_accounts << one_account
         # puts "accounts"
       end
@@ -91,8 +91,7 @@ module Bank
     end
 
     def add_interest(rate)
-      INTEREST_RATE = 0.25%
-      interest = @balance * INTEREST_RATE/100
+      interest = @balance * rate/100
       @balance = @balance + interest
       return interest
     end
