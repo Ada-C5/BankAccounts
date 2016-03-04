@@ -52,7 +52,6 @@ module Bank
       puts Bank::Owner.find(connect)
     end
 
-
     #Find an account by id, add owner to that account, add to mates array
 
     # def self.connect(file = "support/account_owners.csv") #does all or none
@@ -63,7 +62,6 @@ module Bank
     # end
     #puts mates
     #if you have a self method, do not call it with an object/instance of that account
-
 
     def add_owner(id) #account.add_owner(number that you get from Bank::Owner.new)
       @owner_id = id  #adriana_account.add_owner(adriana_owner.user_id)
@@ -191,12 +189,47 @@ module Bank
     def reset_checks
       @checks_used = 0
     end
+  end
+
+  class MoneyMarketAccount < Account
+    attr_reader :account_balance, :initial_balance, :transactions
+
+    def initialize(initial_balance)
+      if initial_balance < 10_000
+        raise ArgumentError, "Initial balance must be greater than $10,000.00."
+      end
+      @account_balance = initial_balance
+      @transactions = 0
+    end
+
+    def withdraw(money)
+      balance = @account_balance - money
+      if @transactions >= 6
+
+      end
+      if balance < 9_900
+        puts "All transactions are suspended until balance is $10,000.00."
+        return @account_balance
+      elsif balance < 10_000
+        puts "Taking out money will incur a $100.00 fee, do you want to continue (y or n)?"
+        continue = gets.chomp.downcase
+        if continue == "y"
+          @account_balance = balance - 100
+          @transactions += 1
+        end
+        return @account_balance
+      end
+      @account_balance = balance
+      @transactions += 1
+      return @account_balance
+    end
+
 
   end
 
 end
 
-puts "FuckYou"
+puts "I am the Batman."
 #--------------------------TESTS-----------------------------------
 
 #account_connect = Bank::Account.connect("support/account_owners.csv")
