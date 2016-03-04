@@ -1,25 +1,26 @@
 require 'CSV'
 module Bank
   class Account
-    FEE = 0.0
-    INITIAL_BALANCE = 0.0
-    attr_reader :initial_balance, :owner, :open_date, :id
+    #FEE = 0.0
+    #INITIAL_BALANCE = 0.0
+    attr_reader :initial_balance, :owner, :open_date, :id, :fee
     attr_accessor
-    def initialize(id=nil,initial_balance=nil,open_date=nil)
+    def initialize(id=nil,initial_balance=nil,open_date=nil,fee = nil)
+      @fee = 0.0.to_f
       @owner = []
       @id = id
-      @initial_balance = initial_balance.to_f
+      @initial_balance = 0.0.to_f
       @open_date = open_date
-      if @initial_balance > INITIAL_BALANCE
+      if @initial_balance < 0.0
         raise ArgumentError.new("Account can not start with a negative balance.")
       end
     end
 
 
     def withdraw(withdraw_amount)
-      if withdraw_amount > @initial_balance
+      if withdraw_amount > @initial_balance + @fee
         puts "You don't have enough money to take that out."
-        return @initial_balance - FEE
+        return @initial_balance
       else
       @initial_balance = @initial_balance - withdraw_amount
       return @initial_balance
@@ -106,10 +107,11 @@ module Bank
 
 
   class SavingsAccount < Account
-    FEE = -12
-    INITIAL_BALANCE = 12 #this inludes the 2 dollar transaction fee and the 10 minimum balance
+    #FEE = -12
+    #INITIAL_BALANCE = 12 #this inludes the 2 dollar transaction fee and the 10 minimum balance
     def initialize
-      super
+      super(fee)
+      @fee = -12
     end
 
     def withdraw(withdraw_amount)
@@ -122,11 +124,20 @@ module Bank
       interest_added
     end
 
+  end
 
 
+  class CheckingAccount < Account
+    INITIAL_BALANCE = 0.0
+    FEE = 1
+    def initialize
+      super
+    end
 
+    def withdraw(withdraw_amount)
+      super
+    end
 
-    
   end
 
 end
