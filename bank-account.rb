@@ -28,6 +28,19 @@ module Bank
       return instance_array # return collection of all instances from the file given
     end
 
+
+    def self.find(id, key, class_name)
+      #loop through until I find the one I'm looking for
+      found_account = nil
+      class_name.all.each do |line|
+        if id == line.key
+          found_account = line
+        end
+      end
+
+      return found_account
+    end
+
   end
 
 
@@ -37,6 +50,8 @@ module Bank
     attr_reader :id, :owner, :creation_date, :balance
     TRANSACTION_FEE = 0
     BALANCE_MINIMUM = 0
+    FILE_NAME = "./support/accounts.csv"
+    account_keys = [:id, :initial_balance, :creation_date]
     
     def initialize(account_info)
       @id = account_info[:id].to_i
@@ -78,23 +93,24 @@ module Bank
     # Accounts described in the CSV.
     def self.all
       account_keys = [:id, :initial_balance, :creation_date]
-      BankMethod::make_all("./support/accounts.csv", account_keys, Account)
+      BankMethod::make_all(FILE_NAME, account_keys, Account)
     end
 
     # return an instance of Account, where the value of the id field in
     # the CSV matches the passed parameter.
     def self.find(id)
-      #loop through until I find the one I'm looking for
-      found_account = nil
-      self.all.each do |line|
-        if id == line.id
-          found_account = line
-          return found_account
-        end
-      end
+      BankMethod::find(id, Account)
+    #   #loop through until I find the one I'm looking for
+    #   found_account = nil
+    #   self.all.each do |line|
+    #     if id == line.id
+    #       found_account = line
+    #       return found_account
+    #     end
+    #   end
 
-      # if no account is found that matches the id, return nil
-      return nil
+    #   # if no account is found that matches the id, return nil
+    #   return nil
     end
   end
 
@@ -137,15 +153,17 @@ module Bank
   # return an instance of Owner where the value of the id field in the CSV
   # matches the passed parameter.
     def self.find(id)
-      found_owner = nil
-      self.all.each do |line|
-        if id == line.owner_id
-          found_owner = line
-          return found_owner
-        end
-      end
+      BankMethod::find(id, owner_id, Owner)
 
-      return nil
+    #   found_owner = nil
+    #   self.all.each do |line|
+    #     if id == line.owner_id
+    #       found_owner = line
+    #       return found_owner
+    #     end
+    #   end
+
+    #   return nil
     end
 
   end
