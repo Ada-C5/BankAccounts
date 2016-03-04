@@ -128,7 +128,7 @@ module Bank
     MIN_BAL = 0
     WITHDRAW_FEE = 100
     CHECK_FEE = 200
-
+    # initialize with check counter to track used checks in a month
     def initialize(id, balance, date)
       super
       @check_count = 0
@@ -140,8 +140,6 @@ module Bank
       # make sure result is positive
       if temp_balance < MIN_BAL
         puts "You don't have enough money to complete this withdrawl."
-        # if a check keeps trying to clear but you don't have the funds
-        # check count goes up but there is currently no fee for each try
       else 
         @balance = temp_balance
       end
@@ -215,6 +213,17 @@ module Bank
 
     def reset_transactions
       @transactions = 0
+    end
+
+    # update balance with interest, but return only interest
+    def add_interest(rate)
+      temp = super
+      @balance = temp.round
+      puts "New total in your account is #{money_convert(@balance)}"
+      interest = @balance * (rate/100)
+      interest = interest.round
+      puts "Interest accumelated was #{money_convert(interest)}"
+      return interest
     end
 
   end
