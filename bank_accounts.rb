@@ -4,7 +4,8 @@ I18n.enforce_available_locales = false
 module Bank
 
   class Account
-    attr_reader :id, :balance, :date_created
+    attr_reader :id, :balance, :date_created, :min_bal
+    MINIMUM_BALANCE = 100
 
     def initialize(account_info)
       # manually choose the data from the first line of the CSV file and ensure
@@ -14,9 +15,9 @@ module Bank
       # from reading accounts.csv (which turns it into an array), and use indexes
       # of given array to shovel into account_info hash?
 
-      #if account_info[:balance] < 1
-      #  raise ArgumentError.new("You must have at least $1 to open an account.")
-      #end
+      if account_info[:balance] < MINIMUM_BALANCE
+       raise ArgumentError.new("You must have at least $1 to open an account.")
+      end
       @id = account_info[:id]
       @balance = account_info[:balance]
       @date_created = account_info[:date_created]
@@ -87,6 +88,9 @@ module Bank
 
     # displays the balance in a nice user-friendly way, but also returns it to the other methods
     def show_balance
+      # temporarily converts @balance to dollar format for easier readability,
+      # but doesn't affect original numbers. This way all math can still be done
+      # in cents.
       pretty_money = convert_cents(@balance)
       puts "The balance for this account is currently $#{pretty_money}."
     end
@@ -98,20 +102,25 @@ module Bank
 
   class SavingsAccount < Account
     TRANSACTION_FEE = 200
+    MINIMUM_BALANCE = 1000
 
     # The initial balance cannot be less than $10.
     def initialize(account_info)
-      if account_info[:balance] < 10
+      if account_info[:balance] < MINIMUM_BALANCE
         raise ArgumentError.new("You must have at least $10 to open a savings account.")
       end
       super
     end
 
-    # Updated withdrawal functionality:
     # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
+    # But how do I make it so show_balance doesn't show twice?
     def withdraw(amount_to_withdraw)
       @balance = super - TRANSACTION_FEE
-      show_balance
+      if @balance < MINIMUM_BALANCE
+        # nope you can't do that
+      else
+        show_balance
+      end
       return @balance
     end
 
