@@ -138,7 +138,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
         puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{ sprintf("%.2f", updated_balance) }. "
         return @balance = updated_balance # I think I need an instance variable here becuase we do need to update the running balance. Can't do this through a reader. Should I make an attr_accesssor for balance instead?
       else
-        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your account minimum of $#{ sprintf("%.2f", self.class::MINIMUM_BALANCE)}.  Your current balance is $#{ sprintf("%.2f", balance) }."
+        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your account minimum of $#{ sprintf("%.2f", self.class::MINIMUM_BALANCE) }.  Your current balance is $#{ sprintf("%.2f", balance) }."
         # don't need to return @initial_balance = @initial_balance because we haven't updated it for the withdrawl
       end
     end
@@ -181,7 +181,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
     MINIMUM_BALANCE = 10.00 # SavingsAccount cannot be opened with less than 10 dollars.  The account balance cannot fall below $10.
     TRANSACTION_FEE = 2 # transaction fee for withdrawls is 2.
 
-    def add_interest(rate = 0.25) #IDK if I like that instance variable!!!
+    def add_interest(rate = 0.25)
       interest = balance * rate / 100 # interest rate as a percentage
       @balance += interest # add interest to balance to update balance
       return interest #per method requirements
@@ -233,11 +233,73 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
   class MoneyMarketAccount < Account
 
     MINIMUM_BALANCE = 10000 # CheckingAccount  dollars balance cannot fall below $0. (Unless by a check withdrawl)
-    TRANSACTION_FEE = 100 # transaction fee for withdrawls is 1. Withdrawls using ehcks have a separate fee schedule.
+    TRANSACTION_FEE = 0 # there are no transaction fees - unless you fall below your account minimum. then there is a fine!!
+
+    attr_reader :transaction_count
+
     def initialize(account_information)
       super
-      @transactions = 0 # the MoneyMarketAccount counts any transactions (withdrawl or deposit)
+      @transaction_count = 0 # the MoneyMarketAccount counts any transactions (withdrawl or deposit)
     end
+
+    def withdraw(amount)
+      update_transaction_count
+
+      if balance_below_limit?
+        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your account minimum of $#{ sprintf("%.2f", self.class::MINIMUM_BALANCE) }.  Your current balance is $#{ sprintf("%.2f", balance) }."
+
+        undo_transaction_count # unsuccessful withdrawls don't count as transactions
+
+      elsif !balance_below_limit? && transactions_remaining?
+        updated_balance = (balance - amount - self.class::TRANSACTION_FEE - withdrawl_fee(amount) )
+        puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{ sprintf("%.2f", updated_balance) }. "
+        return @balance = updated_balance
+
+      else
+        puts "WARNING: You cannot withdraw $#{ sprintf("%.2f", amount) }. This transaction violates your transaction maximum for the period.  Your current balance is $#{ sprintf("%.2f", balance) }."
+
+        undo_transaction_count #unsuccessful withdrawls don't count as transactions.
+
+      end
+    end
+
+    def withdrawl_fee(withdrawl_amount)
+      if balance - withdrawl_amount > 10_000 # we can withdraw without a fee if the balance doesn't fall below the limit
+        fee = 0
+      else
+        fee = 100 #otherwise we are charged a withdrawl fee
+      end
+    end
+
+    def balance_below_limit?
+      if balance < 10_000
+        return true
+      else
+        return false
+      end
+    end
+
+    def transactions_remaining?
+      if transaction_count < 6
+        return true
+      else
+        return false
+      end
+    end
+
+
+    def update_transaction_count
+      @transaction_count += 1
+    end
+
+    def undo_transaction_count #We don't count as transactions: unsuccessful withdrawls, or deposits to bring us above MINIMUM_BALANCE.
+      @transaction_count -= 1
+    end
+
+    def reset_transaction_count
+      @transaction_count = 0
+    end
+
   end
 
 
@@ -311,8 +373,10 @@ end
 
 #test run the program
 
-checking_account = Bank::SavingsAccount.new(initial_balance: 900)
-checking_account.display_balance
+mm_acct = Bank::MoneyMarketAccount.new(initial_balance: 10000 * 100)
+mm_acct.display_balance
+mm_acct.withdraw(10)
+puts mm_acct.transaction_count
 
 #checking_account = Bank::CheckingAccount.new(initial_balance: 10000)
 #checking_account.withdraw(10)
