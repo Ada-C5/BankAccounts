@@ -69,18 +69,19 @@ module Bank
 
   class SavingsAccount < Account
     WITHDRAWAL_FEE = 2
+    MIN_BALANCE = 10
 
     def initialize(account_id, balance, open_date)
       super
       if @balance < 10
-        raise ArgumentError, "Balance can't be less than $10.00"
+        raise ArgumentError, "Balance can't be less than $#{MIN_BALANCE}"
       end
       puts "A savings account will incur a $#{WITHDRAWAL_FEE} fee per withdrawal."
     end
 
     def withdraw(withdraw_amount)
       if @balance - withdraw_amount - WITHDRAWAL_FEE < 10
-        puts "You must maintain a balance of $10.00 in the account. Choose another amount to withdraw"
+        puts "You must maintain a balance of $#{MIN_BALANCE} in the account. Choose another amount to withdraw"
         puts "Account balance: #{@balance}"
       else
         @balance = @balance - withdraw_amount - WITHDRAWAL_FEE
@@ -99,11 +100,11 @@ module Bank
   class CheckingAccount < Account
     WITHDRAWAL_FEE = 1
     CHECK_FEE = 2
+    OVERDRAFT = 10
 
     def initialize(account_id, balance, open_date)
       super
       puts "A checking account will incur a $#{WITHDRAWAL_FEE} fee per withdrawal."
-
       @check_count = 0
     end
 
@@ -119,8 +120,8 @@ module Bank
 
     def withdraw_using_check(amount)
       puts "You are allowed three free check uses per month. Each subsequent use will incur a $2 fee"
-      if @balance - amount < -10
-        return "You may not overdraft by more than $10."
+      if @balance - amount < -OVERDRAFT
+        return "You may not overdraft by more than $#{OVERDRAFT}."
       else
         @check_count += 1
         if @check_count > 3
