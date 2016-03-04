@@ -10,18 +10,17 @@ module Bank
   class Account
     attr_reader :id, :owner, :creation_date, :balance
     TRANSACTION_FEE = 0
-    LOWER_BALANCE_LIMIT = 0
-    INITIAL_BALANCE_LIMIT = 0
+    BALANCE_LIMIT = 0
     
     def initialize(account_info)
       @id = account_info[:id].to_i
       @owner = account_info[:owner]
       @creation_date = account_info[:creation_date]
       @balance = account_info[:initial_balance].to_i
-      is_balance_enough(INITIAL_BALANCE_LIMIT) # checks if balance meets criteria (is there enough money in it?)
+      is_balance_enough(BALANCE_LIMIT) # checks if balance meets criteria (is there enough money in it?)
     end
 
-    def withdraw(money, fee = TRANSACTION_FEE, limit = LOWER_BALANCE_LIMIT)
+    def withdraw(money, fee = TRANSACTION_FEE, limit = BALANCE_LIMIT)
       if @balance >= (money + limit + fee) # if balance will stay above the lower limit after money is withdrawn
         @balance -= (money + fee)
       else
@@ -156,15 +155,14 @@ module Bank
 
   class SavingsAccount < Account
     TRANSACTION_FEE = 200 # $2.00 transaction fee (200 in cents)
-    LOWER_BALANCE_LIMIT = 1000 # $10.00 lower balance limit
-    INITIAL_BALANCE_LIMIT = 1000
+    BALANCE_LIMIT = 1000 # $10.00 lower balance limit
     
     def is_balance_enough(limit)
-      super(INITIAL_BALANCE_LIMIT)
+      super(BALANCE_LIMIT)
     end
 
     def withdraw(money)
-      super(money, TRANSACTION_FEE, LOWER_BALANCE_LIMIT)
+      super(money, TRANSACTION_FEE, BALANCE_LIMIT)
     end
 
     def add_interest(rate)
@@ -181,7 +179,6 @@ module Bank
   class CheckingAccount < Account
     attr_reader :number_of_checks
     TRANSACTION_FEE = 100
-    CHECK_FEE = 200
 
     def initialize(account_info)
       super
@@ -193,10 +190,11 @@ module Bank
     end
 
     def withdraw_using_check(amount)
+      check_fee = 200
       fee = 0 # no fee until the 4th check
       @number_of_checks += 1
       if number_of_checks > 3
-        fee = CHECK_FEE # if 3 checks have already been used, each additional check has a $2 fee
+        fee = check_fee # if 3 checks have already been used, each additional check has a $2 fee
       end
       withdraw(amount, fee, -1000) # can have up to a $10 overdraft
     end
@@ -210,8 +208,7 @@ module Bank
 
   class MoneyMarketAccount < Account
     attr_reader :number_of_transactions
-    INITIAL_BALANCE_LIMIT = 1000000 # initial balance can't be less than $10,000
-    LOWER_BALANCE_LIMIT = 1000000
+    BALANCE_LIMIT = 1000000 # initial balance can't be less than $10,000
 
     def initialize(account_info)
       super
@@ -221,15 +218,16 @@ module Bank
     end
 
     def is_balance_enough(limit)
-      super(INITIAL_BALANCE_LIMIT)
+      super(BALANCE_LIMIT)
     end
 
     def check_transaction_status
-      unless @can_withdraw == false
+      unless @can_withdraw == false # unless withdrawing is suspended due to low account balance
         @number_of_transactions += 1
       end
-      if number_of_transactions > 6
-        @can_transact = false
+
+      if number_of_transactions > 6 # if max number of transactions has been exceeded
+        @can_transact = false # prevent future transactions from occuring unless reset
       end
     end
 
@@ -239,11 +237,11 @@ module Bank
     end
 
     def give_withdrawal_message
-      puts "You may not withdraw any more money while balance is below #{Money.new(LOWER_BALANCE_LIMIT).format}"
+      puts "You may not withdraw any more money while balance is below #{Money.new(BALANCE_LIMIT).format}"
       return balance
     end
 
-    def withdraw(money, fee = TRANSACTION_FEE, limit = 0)
+    def withdraw(money, fee = TRANSACTION_FEE, limit = 0) # balance can go below $10,000 but will cause withdrawals to freeze
       check_transaction_status
 
       if @can_transact == false
@@ -254,7 +252,7 @@ module Bank
 
       super
 
-      if balance < LOWER_BALANCE_LIMIT
+      if balance < BALANCE_LIMIT
         @can_withdraw = false
         @balance -= 10000
         return give_withdrawal_message
@@ -272,7 +270,7 @@ module Bank
         return give_transaction_message
       end
 
-      if balance > LOWER_BALANCE_LIMIT
+      if balance > BALANCE_LIMIT
         @can_withdraw = true
       end
 
