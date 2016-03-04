@@ -132,7 +132,6 @@ module Bank
         def reset_checks
             @checks_used_in_month = 0
         end
-
     end
 
     class MoneyMarketAccount < Account
@@ -150,9 +149,9 @@ module Bank
             @overdraft_flag = false
         end
  
-    # Updated withdrawal logic:
-    # If a withdrawal causes the balance to go below $10,000, a fee of $100 is imposed and no more transactions are allowed until the balance is increased using a deposit transaction.
-    # Each transaction will be counted against the maximum number of transactions
+        # Updated withdrawal logic:
+        # If a withdrawal causes the balance to go below $10,000, a fee of $100 is imposed and no more transactions are allowed until the balance is increased using a deposit transaction.
+        # Each transaction will be counted against the maximum number of transactions
         def withdraw(amount)
             unless @transactions_this_month == MAXIMUM_TRANSACTIONS_MONTHLY
                 if (@balance - amount) >= self.class::ACCOUNT_MIN_BALANCE
@@ -168,9 +167,9 @@ module Bank
             end    
         end
 
-    # Updated deposit logic:
-    # Each transaction will be counted against the maximum number of transactions
-    # Exception to the above: A deposit performed to reach or exceed the minimum balance of $10,000 is not counted as part of the 6 transactions.
+        # Updated deposit logic:
+        # Each transaction will be counted against the maximum number of transactions
+        # Exception to the above: A deposit performed to reach or exceed the minimum balance of $10,000 is not counted as part of the 6 transactions.
         def deposit(amount)
             if @overdraft_flag == true 
                 @balance += amount
@@ -187,7 +186,7 @@ module Bank
             end
         end
 
-    # reset_transactions: Resets the number of transactions to zero
+        # reset_transactions: Resets the number of transactions to zero
         def reset_transactions
             @transactions_this_month = 0
         end
