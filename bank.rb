@@ -1,8 +1,8 @@
 require 'csv'
 module Bank
   class Account
-    attr_accessor :id, :balance, :date
-    def initialize (id, balance, date, owner_info = nil)
+    attr_accessor :id, :balance, :date, :owner
+    def initialize (id, balance, date, owner_info = false)
       @id = id
       @balance = balance
       @date = date
@@ -65,11 +65,8 @@ module Bank
   end
 
   class SavingsAccount < Account
-    def initialize (id, balance, date)
+    def initialize (id, balance, date, owner_info = false)
       initializer = super
-      # @id = id
-      # @balance = balance
-      # @date = date
       if balance < 10
         raise ArgumentError.new("The initial balance for a Saving Account can not be less than 10 USD")
       end
@@ -96,9 +93,9 @@ module Bank
   end
 
   class CheckingAccount < Account
-    def initialize(id, balance, date)
-      ini = super
-      @number_of_checks = 3
+    def initialize(id, balance, date, owner_info = false)
+      initializer = super
+      @@number_of_checks = 0
     end
 
     def withdraw(ammount)
@@ -110,40 +107,51 @@ module Bank
 
     def withdraw_using_check(ammount)
       @ammount = ammount
-
       @balance = @balance - @ammount
-      checks_dropper
+      @extra_checks_fee = 2
+      # return @balance
+
+      # checks_dropper
       if @balance < -10
-        @balance = @balance + @ammount + @extra_checks_fee
         puts "You can go into overdraft up to -$10"
+        @balance = @balance + @ammount
+        # return @balance
+        else
+        @@number_of_checks += 1
+        while @@number_of_checks > 3
+          @balance = @balance - @extra_checks_fee
+          return @balance
+        end
       end
+      #   #
+      #
+      #   return @balance
+      #   else
+      #   @@number_of_checks += 1
+      # end
       return @balance
 
     end
 
     #every time the method withdraw_using_check is called
 
-    def checks_dropper
-      name = :withdraw_using_check
-      TracePoint.trace(:call) do |t|
-        @number_of_checks -= 1 if t.method_id == name
-        end
+    # def checks_dropper
+    #   name = :withdraw_using_check
+    #   TracePoint.trace(:call) do |t|
+    #     @number_of_checks -= 1 if t.method_id == name
+    #   end
+    #
+    #   while @number_of_checks < 0
+    #     @extra_checks_fee = 2
+    #     @balance = @balance - @extra_checks_fee
+    #     return @balance
+    #   end
+    # end
 
-        while @number_of_checks < 0
-          @extra_checks_fee = 2
-          @balance = @balance - @extra_checks_fee
-          return @balance
-          end
-    end
-
-    def checks_acounter
-
-      return @balance
-    end
   end
 
 
-  class Owner #< Account
+  class Owner
     attr_accessor :name, :last_name, :address, :email, :mobile
     def initialize(user_hash)
       @name = user_hash[:name]
