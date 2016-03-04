@@ -4,7 +4,7 @@ module Bank
 
   class Account
     attr_accessor :id, :balance, :opendate, :transaction_fee, :balance_min,
-                  :withdrawl_bal_min, :checknum
+                  :withdrawl_bal_min
 
     def initialize(id, balance, opendate)
 
@@ -50,7 +50,7 @@ module Bank
     end
 
     def withdraw(amount)
-      @amount = amount
+      @amount = amount + @transaction_fee
 
       if @balance - @amount < @withdrawl_bal_min
         return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}."
@@ -74,44 +74,29 @@ module Bank
   class SavingsAccount < Account
 
     def initialize(id, balance, opendate)
+      super
+      @transaction_fee = 2
+      @balance_min = 10
+      @withdrawl_bal_min = 10
 
-            @id = id
-            @balance = balance
-            @opendate = opendate
-            @transaction_fee = 2
-            @balance_min = 10
-            @withdrawl_bal_min = 10
-
-            unless @balance.is_a?(Integer) && @balance >= @balance_min
-              raise ArgumentError.new("New accounts must begin with a balance of $#{@balance_min} or more.")
-            end
-
-    end
-
-    def withdraw(amount)
-      @amount = amount + @transaction_fee
-      if @balance - @amount < @withdrawl_bal_min
-        return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
-      elsif @balance - @amount >= @withdrawl_bal_min
-      @balance = @balance - @amount
-      return "Withdrawal processed. Your current balance is: $#{@balance}."
+      unless @balance.is_a?(Integer) && @balance >= @balance_min
+        raise ArgumentError.new("New accounts must begin with a balance of $#{@balance_min} or more.")
       end
+
     end
 
     def add_interest(rate)
       interest = @balance * rate/100
       @balance = @balance + interest
-      return "$#{interest} in interest added."
+      puts "$#{interest} in interest added."
+      return interest
     end
 
   end
 
   class CheckingAccount < Account
     def initialize(id, balance, opendate)
-
-      @id = id
-      @balance = balance
-      @opendate = opendate
+      super
       @transaction_fee = 1
       @balance_min = 0
       @withdrawl_bal_min = 0
@@ -121,16 +106,6 @@ module Bank
 
       unless @balance.is_a?(Integer) && @balance >= @balance_min
         raise ArgumentError.new("New accounts must begin with a balance of $#{@balance_min} or more.")
-      end
-    end
-
-    def withdraw(amount)
-      @amount = amount + @transaction_fee
-      if @balance - @amount < @withdrawl_bal_min
-        return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
-      elsif @balance - @amount >= @withdrawl_bal_min
-      @balance = @balance - @amount
-        return "Withdrawal processed. Your current balance is: $#{@balance}."
       end
     end
 
@@ -150,9 +125,9 @@ module Bank
     end
 
     def reset_checks
-      @checknum = 3
+      return @checknum = 3
     end
 
   end
 
-  end
+end
