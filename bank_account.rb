@@ -117,11 +117,31 @@ module Bank
 
   class CheckingAccount < Account
     WITHDRAW_FEE = 1
+
+    attr_reader :used_check, :reset_checks
     def initialize(id, initial_balance, opendate, owner=nil)
       super
       @withdraw_fee = WITHDRAW_FEE
+      @used_check = 0
     end
 
+    def reset_checks
+      @used_check = 0
+    end
+
+    def withdraw_using_check(amount)
+      @minimum_balance = -10
+      if used_check >= 3
+        @withdraw_fee = 2
+        puts "after 3!"
+        withdraw(amount)
+      else
+        @withdraw_fee = 0
+        withdraw(amount)
+        @used_check += 1
+      end
+      return balance
+    end
 
   end
 
