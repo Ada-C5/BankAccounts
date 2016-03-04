@@ -59,7 +59,7 @@ module Bank
     def withdraw(money)
       fees = self.class::BALANCE_MINIMUM + self.class::TRANSACTION_FEE
       if @current_balance.to_i < money + fees
-        puts "WARNING: We cannot process your request-You need a $ #{fees}minimum amount."
+        puts "WARNING: We cannot process your request-You need a $ #{fees} minimum amount."
         return @current_balance
       else @current_balance = @current_balance - money - self.class::TRANSACTION_FEE
         return @current_balance
@@ -118,6 +118,12 @@ module Bank
   class SavingsAccount < Account
     BALANCE_MINIMUM = 10
     TRANSACTION_FEE = 2
+
+    def add_interest(rate)
+      interest_earned = @current_balance * rate/100
+      @current_balance = @current_balance + interest_earned
+      return interest_earned
+    end
   end
 end
 
