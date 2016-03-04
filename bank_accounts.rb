@@ -44,7 +44,7 @@ module Bank
         # Input rate is assumed to be a percentage (i.e. 0.25).
         # The formula for calculating interest is balance * rate/100
         def interest_rate(rate)
-            interest = @balance * (rate/100)
+            interest = @balance * (rate/100.0)
             @balance += interest
             return interest
         end
@@ -93,14 +93,14 @@ module Bank
         WITHDARAWL_FEE = 200
         ACCOUNT_MIN_BALANCE = 1000
 
-    # # Input rate is assumed to be a percentage (i.e. 0.25).
-    # # The formula for calculating interest is balance * rate/100
-    #     def interest_rate(rate)
-    #         interest = @balance * (rate/100)
-    #         @balance += interest
-    #         return interest
-    #     end
-    # end
+        # # Input rate is assumed to be a percentage (i.e. 0.25).
+        # # The formula for calculating interest is balance * rate/100
+        #     def interest_rate(rate)
+        #         interest = @balance * (rate/100)
+        #         @balance += interest
+        #         return interest
+        #     end
+    end
 
     # checking account class that inherits from account
     class CheckingAccount < Account
