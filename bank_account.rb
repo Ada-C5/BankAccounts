@@ -152,6 +152,14 @@ module Bank
       end
   end
 
+  class CheckingAccount < Account
+    attr_reader :
+
+    def initialize
+      
+    end
+  end
+
 end
 
 puts "FuckYou"
