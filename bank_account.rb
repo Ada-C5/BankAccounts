@@ -125,6 +125,33 @@ module Bank
 
   end
 
+  class SavingsAccount < Account
+    attr_reader :initial_balance
+
+    def initialize(initial_balance)
+      if initial_balance < 10
+        raise ArgumentError, "Initial balance must be greater than $10.00."
+      end
+      @account_balance = initial_balance
+    end
+
+      def withdraw(money)
+        balance = @account_balance - money - 2
+        if balance < 10
+          puts "Your balance cannot go below $10.00."
+          @account_balance = balance + money + 2
+          return @account_balance
+        end
+        @account_balance = balance
+        return @account_balance
+      end
+
+      def add_interest(rate = 0.25)
+        interest = @account_balance * (rate / 100)
+        @account_balance = @account_balance + interest
+      end
+  end
+
 end
 
 puts "FuckYou"
