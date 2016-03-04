@@ -50,8 +50,6 @@ module Bank
     attr_reader :id, :owner, :creation_date, :balance
     TRANSACTION_FEE = 0
     BALANCE_MINIMUM = 0
-    FILE_NAME = "./support/accounts.csv"
-    account_keys = [:id, :initial_balance, :creation_date]
     
     def initialize(account_info)
       @id = account_info[:id].to_i
@@ -93,7 +91,7 @@ module Bank
     # Accounts described in the CSV.
     def self.all
       account_keys = [:id, :initial_balance, :creation_date]
-      BankMethod::make_all(FILE_NAME, account_keys, Account)
+      BankMethod::make_all("./support/accounts.csv", account_keys, Account)
     end
 
     # return an instance of Account, where the value of the id field in
