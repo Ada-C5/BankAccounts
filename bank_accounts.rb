@@ -11,13 +11,14 @@ module Bank
     def initialize(account)
       if account != nil
         @id = account[:id]
-        @initial_balance  = account[:initial_balance]
-        @current_balance  = account[:initial_balance]
-        @start_date       = account[:start_date]
-        @all_accounts     = account[:all_accounts]
-        @day              = nil
-        @reset_checks     = 3
-        @owner            = nil
+        @initial_balance    = account[:initial_balance]
+        @current_balance    = account[:initial_balance]
+        @start_date         = account[:start_date]
+        @all_accounts       = account[:all_accounts]
+        @day                = nil
+        @reset_checks       = 3
+        @owner              = nil
+        @reset_transactions = 6
         raise ArgumentError.new("We cannot process your transaction-you need a minimum $#{self.class::BALANCE_MINIMUM} amount.") unless @initial_balance.to_i >= self.class::BALANCE_MINIMUM
       end
     end
@@ -149,7 +150,7 @@ module Bank
       end
 
       if @reset_checks == 0
-        if money > @current_balance.to_i + overdraft_threshold 
+        if money > @current_balance.to_i + overdraft_threshold
         puts "WARNING: We cannot process this transaction. You have an allowable overdraft of $#{overdraft_threshold}. Your current balance is $#{@current_balance}."
           return @current_balance
         else @current_balance = @current_balance - money - overdraft_fee_per_check
@@ -162,6 +163,61 @@ module Bank
       if day == 1
         @reset_checks = 3
       puts "It's a new month and you have 3 free checks!"
+      end
+    end
+  end
+
+  class MoneyMarketAccount < Account
+    BALANCE_MINIMUM = 10000
+    TRANSACTION_FEE = 100
+
+    def deposit(money)
+      until @reset_transactions == 0
+        if @initial_balance < BALANCE_MINIMUM
+        raise ArgumentError.new("We cannot process your transaction-you need a minimum $#{self.class::BALANCE_MINIMUM} amount.") unless @initial_balance.to_i >= self.class::BALANCE_MINIMUM
+        else @current_balance = @current_balance + money
+        return @current_balance
+        end
+      end
+    end
+
+    #If a withdrawal causes the balance to go below $10,000, a fee of $100 is
+    #imposed and no more transactions are allowed until the balance is increased using a deposit transaction.
+    def withdraw(money)
+      deposit_amount_needed = BALANCE_MINIMUM - @current_balance.to_i
+
+      until @reset_transactions == 0
+        if money < @current_balance - BALANCE_MINIMUM
+          @current_balance = @current_balance - money
+          @reset_transactions = @reset_transactions - 1
+          puts "You have #{@reset_transactions} transaction(s) left without a fee."
+          return @current_balance
+
+        else money > @current_balance - BALANCE_MINIMUM
+          @current_balance.to_i = @current_balance + TRANSACTION_FEE
+          @reset_transactions = @reset_transactions - 1
+          puts "WARNING: At the conclusion of this transaction your balance is now below the $#{self.class::BALANCE_MINIMUM} minimum."
+          puts "You will not be able to withdraw funds until a minimum deposit of $ #{deposit_amount_needed}."
+          puts "Your current balance is $#{@current_balance}."
+          return @current_balance
+
+        end
+      end
+
+      if @reset_checks == 0
+        if money > @current_balance.to_i + overdraft_threshold
+        puts "WARNING: We cannot process this transaction. You have an allowable overdraft of $#{overdraft_threshold}. Your current balance is $#{@current_balance}."
+          return @current_balance
+        else @current_balance = @current_balance - money - overdraft_fee_per_check
+          return @current_balance
+        end
+      end
+    end
+
+    def reset_transactions(day)
+      if day == 1
+        @reset_transactions = 6
+      puts "It's a new month and you have 6 transactions!"
       end
     end
   end
