@@ -41,19 +41,10 @@ module Bank
             return @balance
         end
 
-        # Input rate is assumed to be a percentage (i.e. 0.25).
-        # The formula for calculating interest is balance * rate/100
-        def interest_rate(rate)
-            interest = @balance * rate / 100
-            @balance += interest
-            return interest
-        end
-
         # this will allow you to give an account an owner, without exposing owner for other kinds of method calls. 
         def add_owner(owner_object_name)
             @owner = owner_object_name
         end
-
 
         # make a Class method that will instantiate accounts from a csv
         def self.all(path_to_csv)
@@ -91,6 +82,8 @@ module Bank
     # add a savings account class that inherits from account
     # due to refactoring, this account contains the specified methods through inheritance, but only currently needs its fees and minimum balance defined.
     class SavingsAccount < Account
+        include InterestRate
+
         WITHDARAWL_FEE = 200
         ACCOUNT_MIN_BALANCE = 1000
 
@@ -133,6 +126,8 @@ module Bank
     end
 
     class MoneyMarketAccount < Account
+        include InterestRate
+
         # A maximum of 6 transactions (deposits or withdrawals) are allowed per month on this account type
         MAXIMUM_TRANSACTIONS_MONTHLY = 6
         ACCOUNT_MIN_BALANCE = 1000000
@@ -274,5 +269,15 @@ module Bank
                 end
             end
         end
+    end
+end
+
+module InterestRate
+    # Input rate is assumed to be a percentage (i.e. 0.25).
+    # The formula for calculating interest is balance * rate/100
+    def interest_rate(rate)
+        interest = @balance * rate / 100
+        @balance += interest
+        return interest
     end
 end
