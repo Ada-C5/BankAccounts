@@ -2,10 +2,11 @@ require 'csv'
 module Bank
   class Account
     attr_accessor :id, :balance, :date
-    def initialize (id, balance, date)
+    def initialize (id, balance, date, owner_info = nil)
       @id = id
       @balance = balance
       @date = date
+      @owner = Owner.new(owner_info)
       if balance == 0
         raise ArgumentError.new("The initial balance can not be zero")
       end
@@ -66,6 +67,9 @@ module Bank
   class SavingsAccount < Account
     def initialize (id, balance, date)
       initializer = super
+      # @id = id
+      # @balance = balance
+      # @date = date
       if balance < 10
         raise ArgumentError.new("The initial balance for a Saving Account can not be less than 10 USD")
       end
@@ -93,15 +97,15 @@ module Bank
 
   class CheckingAccount < Account
     def initialize(id, balance, date)
-      initializer = super
+      ini = super
       @number_of_checks = 3
     end
 
     def withdraw(ammount)
       regular_withdraw = super
       #It charges  a 1 dollar fee even when the withdraw is canceled for lacking of founds
-      @checking_withdraw_fee = 1
-      @balance = regular_withdraw - @checking_withdraw_fee
+      checking_withdraw_fee = 1
+      @balance = regular_withdraw - checking_withdraw_fee
     end
 
     def withdraw_using_check(ammount)
@@ -129,7 +133,7 @@ module Bank
           @extra_checks_fee = 2
           @balance = @balance - @extra_checks_fee
           return @balance
-        end
+          end
     end
 
     def checks_acounter
