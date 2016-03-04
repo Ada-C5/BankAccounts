@@ -77,12 +77,12 @@ It should include the following updated functionality:
 *#reset_checks: Resets the number of checks used to zero
 
 Bonus Optional Fun Times:
-Create a MoneyMarketAccount class which should inherit behavior from the Account class.
+**Create a MoneyMarketAccount class which should inherit behavior from the Account class.
 A maximum of 6 transactions (deposits or withdrawals) are allowed per month on this account type
-The initial balance cannot be less than $10,000 - this will raise an ArgumentError
-Updated withdrawal logic:
-If a withdrawal causes the balance to go below $10,000, a fee of $100 is imposed and no more transactions are allowed until the balance is increased using a deposit transaction.
-Each transaction will be counted against the maximum number of transactions
+**The initial balance cannot be less than $10,000 - this will raise an ArgumentError
+**Updated withdrawal logic:
+*If a withdrawal causes the balance to go below $10,000, a fee of $100 is imposed and no more transactions are allowed until the balance is increased using a deposit transaction.
+**Each transaction will be counted against the maximum number of transactions
 Updated deposit logic:
 Each transaction will be counted against the maximum number of transactions
 Exception to the above: A deposit performed to reach or exceed the minimum balance of $10,000 is not counted as part of the 6 transactions.
@@ -150,6 +150,8 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       return @balance = updated_balance
     end
 
+    
+
     ##### CLASS METHODS BELOW #####
     def self.find(data_file = "./support/accounts.csv", id) # returns an instance of Account where the value of the id field in the CSV matches the passed parameter.
 
@@ -180,13 +182,6 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
 
     MINIMUM_BALANCE = 10.00 # SavingsAccount cannot be opened with less than 10 dollars.  The account balance cannot fall below $10.
     TRANSACTION_FEE = 2 # transaction fee for withdrawls is 2.
-
-    def add_interest(rate = 0.25)
-      interest = balance * rate / 100 # interest rate as a percentage
-      @balance += interest # add interest to balance to update balance
-      return interest #per method requirements
-
-    end
 
   end
 
@@ -263,6 +258,14 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       end
     end
 
+    def balance_below_limit?
+      if balance < 10_000
+        return true
+      else
+        return false
+      end
+    end
+
     def withdrawl_fee(withdrawl_amount)
       if balance - withdrawl_amount > 10_000 # we can withdraw without a fee if the balance doesn't fall below the limit
         fee = 0
@@ -271,11 +274,26 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       end
     end
 
-    def balance_below_limit?
-      if balance < 10_000
-        return true
+    def deposit(amount)
+      update_transaction_count
+
+      updated_balance = (balance + amount)
+
+      if balance_below_limit? #meaning of reach or exceed
+        puts "After depositing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
+        undo_transaction_count # deposits to bring out account back above the limit don't count as transactions
+        return @balance = updated_balance
+
+      elsif !balance_below_limit? && transactions_remaining?
+        puts "After depositing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
+
+        return @balance = updated_balance
+
       else
-        return false
+        puts "WARNING: You cannot deposit $#{ sprintf("%.2f", amount) }. This transaction violates your transaction maximum for the period.  Your current balance is $#{ sprintf("%.2f", balance) }."
+
+        undo_transaction_count #unsuccessful deposits don't count as transactions.
+
       end
     end
 
@@ -286,7 +304,6 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
         return false
       end
     end
-
 
     def update_transaction_count
       @transaction_count += 1
@@ -376,6 +393,10 @@ end
 mm_acct = Bank::MoneyMarketAccount.new(initial_balance: 10000 * 100)
 mm_acct.display_balance
 mm_acct.withdraw(10)
+puts mm_acct.transaction_count
+mm_acct.withdraw(10)
+puts mm_acct.transaction_count
+mm_acct.deposit(200)
 puts mm_acct.transaction_count
 
 #checking_account = Bank::CheckingAccount.new(initial_balance: 10000)
