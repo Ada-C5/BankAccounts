@@ -40,16 +40,19 @@
   # OpenDate - (Datetime) when the account was opened
 
 module Bank
-WITHDRAWAL_FEE = 2
 
   class Account
+  WITHDRAWAL_FEE = 2
+  MIN_INIT_BALANCE = 0
+
     # initialize method creates instance of Account class with @instance variables @id,  @init_balance, and balance
+
     def initialize(accountdata)
     # @owner = accountdata[:owner] # string
     @id = accountdata[:id] # fixnum? provided from csv?
     @init_balance = accountdata[:init_balance].to_f #float
-      if @init_balance < 0
-        raise ArgumentError.new("Account cannot be initialized with a negative balance.")
+      if @init_balance < self.class::MIN_INIT_BALANCE
+        raise ArgumentError.new("Account cannot be initialized with a balance less than #{self.class::MIN_INIT_BALANCE}.")
       end
     @balance = accountdata[:balance].to_f # float
     # set @balance to value of @init_balance
@@ -156,11 +159,7 @@ WITHDRAWAL_FEE = 2
 
   class SavingsAccount < Account
     # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
-    def init_balance
-      if @init_balance < 10
-        raise ArgumentError.new("Minimum balance to open a savings account is $10.")
-      end
-    end
+    MIN_INIT_BALANCE = 10
 
       # Updated withdrawal functionality:
       # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
