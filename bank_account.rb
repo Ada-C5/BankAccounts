@@ -4,6 +4,16 @@ require 'csv'
 require 'awesome_print'
 require 'colorize'
 module Bank
+  module BankMethod
+    def add_interest(rate)
+      interest = @balance * rate/100
+      @balance += interest
+      if interest.round == interest
+        interest = interest.round
+      end
+      return "You just earned $#{interest} in interest."
+    end
+  end
 
   class Owner
     attr_accessor :last_name,:first_name, :owner_id, :email, :all_owner_info, :owner_to_find, :accounts
@@ -134,6 +144,7 @@ module Bank
   end
 
   class SavingsAccount < Account
+    include Bank::BankMethod
     MINIMUM_BALANCE = 10
     TRANSACTION_FEE = 2
 
@@ -145,14 +156,6 @@ module Bank
       end
     end
 
-    def add_interest(rate)
-      interest = @balance * rate/100
-      @balance += interest
-      if interest.round == interest
-        interest = interest.round
-      end
-      return "You just earned $#{interest} in interest."
-    end
 
   end
 
@@ -206,6 +209,7 @@ module Bank
 
 
   class MoneyMarket < Account
+    include Bank::BankMethod
     MINIMUM_BALANCE = 10000
     LOW_MINIMUM_PENALTY = 100
     attr_reader :transactions_made
@@ -219,40 +223,31 @@ module Bank
       if can_make_transaction? && @balance >= 10000
         @balance -= amount
         @transactions_made += 1
-        printf("$%.2f has been withdrawn. Your current balance is $%.2f." ,amount ,@balance)
-        puts " You have used #{@transactions_made} of 6 allowed transactions this month."
+        if @balance < 10000
+          @balance -= self.class::LOW_MINIMUM_PENALTY
+          warning
+        else
+          printf("$%.2f has been withdrawn. Your current balance is $%.2f." ,amount ,@balance)
+          display_transactions
+        end
       else
-        puts "Sorry, you have gone below your minimum required balance of $#{self.class::MINIMUM_BALANCE}.  You need to deposit at least $#{self.class::MINIMUM_BALANCE - @balance} to continue making transactions.".colorize(:light_magenta)
+        puts "Sorry, you are below your required minimum balance. Please deposit at least $#{self.class::MINIMUM_BALANCE - @balance} to continue making transactions.".colorize(:light_magenta)
       end
 
     end
 
-
-    #def withdraw(amount)
-    #  if @balance - amount < self.class::MINIMUM_BALANCE
-    #    puts "Sorry, but you can't withdraw that amount. You must maintain a mimimum balance of $#{self.class::MINIMUM_BALANCE}."
-    #    printf("Your current balance is $%.2f." , @balance)
-
-    #  else
-    #    @balance -= amount
-    #    @balance -= self.class::TRANSACTION_FEE
-    #    printf("$%.2f has been withdrawn. Your current balance is $%.2f." ,amount ,@balance)
-    #  end
-
-    #end
-
-
-
-
-
-
-
     def deposit(amount)
-      #come back and amend this in case they are trying to add moeny to get back to the minimum
-      if can_make_transaction?
-        super
-        @transactions_made += 1
-        puts " You have used #{@transactions_made} of 6 allowed transactions this month."
+      if @balance < 10000 && amount >= (self.class::MINIMUM_BALANCE - @balance)
+        @balance += amount
+        printf("$%.2f has been deposited. Your current balance is $%.2f." ,amount ,@balance)
+      elsif
+        if can_make_transaction? && @balance >= 10000
+          super
+          @transactions_made += 1
+          display_transactions
+        end
+      else
+        puts "Sorry, but you must deposit at least $#{self.class::MINIMUM_BALANCE - @balance} to maintain your minimum required balance of #{self.class::MINIMUM_BALANCE}"
       end
     end
 
@@ -266,6 +261,15 @@ module Bank
       else
         puts "Sorry, you have already made 6 transactions this month.  Access DENIED!!".colorize(:light_magenta).blink
       end
+    end
+
+    def warning
+      puts "WARNING: You have done below the required minimum balance of $#{self.class::MINIMUM_BALANCE}.  This has incurred a penalty of $#{self.class::LOW_MINIMUM_PENALTY}.
+Your current balance is now $#{@balance}, and you will need to deposit at least $#{self.class::MINIMUM_BALANCE - @balance} to continue making transactions.".colorize(:light_magenta)
+    end
+
+    def display_transactions
+      puts " You have used #{@transactions_made} of 6 allowed transactions this month."
     end
 
 
