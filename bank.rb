@@ -70,9 +70,10 @@ module Bank
 
   class SavingsAccount < Account
     def initialize (id, balance, date)
-      @id = id
-      @balance = balance
-      @date = date
+      initializer = super
+      # @id = id
+      # @balance = balance
+      # @date = date
       if balance < 10
         raise ArgumentError.new("The initial balance for a Saving Account can not be less than 10 USD")
       end
@@ -94,6 +95,26 @@ module Bank
       interest = @balance * rate/100
       @balance = @balance + interest
       return interest
+    end
+  end
+
+  class CheckingAccount < Account
+
+    # def initialize (id, balance, date)
+    #   @id = id
+    #   @balance = balance
+    #   @date = date
+    #   if balance < 10
+    #     raise ArgumentError.new("The initial balance for a Saving Account can not be less than 10 USD")
+    #   end
+    # end
+
+    def withdraw
+      regular_withdraw = super
+      savings_withdraw_fee = 1
+      @balance = regular_withdraw - savings_withdraw_fee
+      return @balance
+
     end
   end
 
