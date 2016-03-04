@@ -149,7 +149,7 @@ module Bank
 
         def withdraw(amount)
             unless @transactions_this_month == MAXIMUM_TRANSACTIONS_MONTHLY
-                if (@balance - amount >= self.class::ACCOUNT_MIN_BALANCE
+                if (@balance - amount) >= self.class::ACCOUNT_MIN_BALANCE
                     @balance = @balance - ( amount )
                     @transactions_this_month += 1
                     return @balance
