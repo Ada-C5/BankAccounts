@@ -221,19 +221,25 @@ module Bank
       checking_min_balance = ((@balance - withdrawal) >= -10)
     end
 
+    def check_tally
+      @checktally += 1
+    end
+
     def withdraw_using_check(withdrawal)
       if @checktally >= CHECK_LIMIT && checking_min_balance(withdrawal)
         @balance -= (withdrawal + WITHDRAWAL_FEE)
-        @checktally += 1
+        check_tally
         return @balance
       elsif @checktally < CHECK_LIMIT && checking_min_balance(withdrawal)
         @balance -= withdrawal
-        @checktally += 1
+        check_tally
         return @balance
+        puts
       elsif (checking_min_balance(withdrawal) == false)
         puts "Checking account must maintain minimum balance of $-10. Withdrawal cannot be completed with available funds."
       end
     end
+
 
     #reset_checks: Resets the number of checks used to zero
     def reset_checks
