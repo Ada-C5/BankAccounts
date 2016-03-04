@@ -28,7 +28,7 @@ module Bank
 
         def withdraw(amount)
             if (@balance - (amount + self.class::WITHDARAWL_FEE)) >= self.class::ACCOUNT_MIN_BALANCE
-                @balance = @balance - ( amount + self.class::WITHDARAWL_FEE )
+                @balance -= ( amount + self.class::WITHDARAWL_FEE )
                 return @balance
             elsif (@balance - amount) < self.class::ACCOUNT_MIN_BALANCE
                 puts "HEY! That is unpossible because this account MUST not go below $#{self.class::ACCOUNT_MIN_BALANCE}!"
@@ -98,7 +98,7 @@ module Bank
     class CheckingAccount < Account
         # set the constants for the expectations of a CheckingAccount
         WITHDARAWL_FEE = 100
-        CHECKFEE = 200
+        CHECK_FEE = 200
         
         # adds an instance variable to track how many checks are used monthly.
         def initialize(account_info)
@@ -113,8 +113,8 @@ module Bank
                 @balance -= amount
                 @checks_used_in_month += 1
                 return @balance
-            elsif (@balance - amount) > -1000 && @checks_used_in_month >= 3
-                @balance -= (amount + CHECKFEE)
+            elsif (@balance - amount) > -1000 || @checks_used_in_month >= 3
+                @balance -= (amount + CHECK_FEE)
                 @checks_used_in_month += 1
                 return @balance
             else
@@ -146,15 +146,14 @@ module Bank
     # Updated withdrawal logic:
     # If a withdrawal causes the balance to go below $10,000, a fee of $100 is imposed and no more transactions are allowed until the balance is increased using a deposit transaction.
     # Each transaction will be counted against the maximum number of transactions
-
         def withdraw(amount)
             unless @transactions_this_month == MAXIMUM_TRANSACTIONS_MONTHLY
                 if (@balance - amount) >= self.class::ACCOUNT_MIN_BALANCE
-                    @balance = @balance - ( amount )
+                    @balance -= amount
                     @transactions_this_month += 1
                     return @balance
                 elsif ((@balance - amount) < self.class::ACCOUNT_MIN_BALANCE) && (@overdraft_flag == false)
-                    @balance = @balance - ( amount + self.class::WITHDARAWL_FEE )
+                    @balance -= ( amount + self.class::WITHDARAWL_FEE )
                     @transactions_this_month += 1
                     @overdraft_flag = true
                     return @balance
@@ -166,7 +165,6 @@ module Bank
     # Each transaction will be counted against the maximum number of transactions
     # Exception to the above: A deposit performed to reach or exceed the minimum balance of $10,000 is not counted as part of the 6 transactions.
         def deposit(amount)
-            
             if @overdraft_flag == true 
                 @balance += amount
                 if @balance > self.class::ACCOUNT_MIN_BALANCE
@@ -282,5 +280,4 @@ module Bank
             end
         end
     end
-
 end
