@@ -6,13 +6,12 @@ module Bank
     INITIAL_BALANCE_MIN = 0
     MINIMUM_ACCOUNT_BALANCE = 0
 
-    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts, :balance
+    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts
 
     def initialize(account) # account is a hash ex. Account.new(id: 1234, amount: 50)
       @id = account[:id]
       @initial_balance = account[:initial_balance]
       @current_balance = account[:initial_balance]
-      @balance = account[:initial_balance]
       @open_date = account[:open_date]
       @owner_info = account[:owner_info]
       account_values
@@ -86,7 +85,7 @@ module Bank
       return @current_balance
     end
 
-    def current_balance
+    def balance
       return @current_balance
     end
 
@@ -96,7 +95,7 @@ module Bank
   end
 
   class Owner
-    attr_reader :id, :last_name, :first_name, :address, :street_address, :city, :state
+    attr_reader :id, :last_name, :first_name, :address, :street_address, :city, :state, :account_info
     def initialize (owner_info)
       @id = owner_info [:id]
       @last_name = owner_info[:last_name]
@@ -170,7 +169,7 @@ module Bank
     INITIAL_BALANCE_MIN = 10
     MINIMUM_ACCOUNT_BALANCE = 10
 
-    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts, :balance
+    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts
 
     def account_values
       super(MINIMUM_ACCOUNT_BALANCE, INITIAL_BALANCE_MIN, TRANSACION_FEE)
@@ -201,7 +200,7 @@ module Bank
     INITIAL_BALANCE_MIN = 10
     MINIMUM_ACCOUNT_BALANCE = 0 # for withdraw but not for check withdrawals
 
-    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts, :balance
+    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts
 
     def account_values
       super(MINIMUM_ACCOUNT_BALANCE, INITIAL_BALANCE_MIN, TRANSACION_FEE)
@@ -238,7 +237,7 @@ module Bank
     INITIAL_BALANCE_MIN = 10000
     MINIMUM_ACCOUNT_BALANCE = 0 # for withdraw but not for check withdrawals
 
-    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts, :balance
+    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts
 
     def account_values
       super(MINIMUM_ACCOUNT_BALANCE, INITIAL_BALANCE_MIN, TRANSACION_FEE)
