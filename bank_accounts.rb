@@ -131,11 +131,34 @@ module Bank
     end
 
     class MoneyMarketAccount < Account
-    # Create a MoneyMarketAccount class which should inherit behavior from the Account class.
-    # A maximum of 6 transactions (deposits or withdrawals) are allowed per month on this account type
-    # The initial balance cannot be less than $10,000 - this will raise an ArgumentError
+        # A maximum of 6 transactions (deposits or withdrawals) are allowed per month on this account type
+        MAXIMUM_TRANSACTIONS_MONTHLY = 6
+        ACCOUNT_MIN_BALANCE = 1000000
+
+        # The initial balance cannot be less than $10,000 - this will raise an ArgumentError
+        def initialize(account_info)
+            super
+            @transactions_this_month = 0
+            @overdraft_flag = false
+        end
+ 
     # Updated withdrawal logic:
     # If a withdrawal causes the balance to go below $10,000, a fee of $100 is imposed and no more transactions are allowed until the balance is increased using a deposit transaction.
+        def withdraw(amount)
+            unless @transactions_this_month == MAXIMUM_TRANSACTIONS_MONTHLY
+                if (@balance - amount >= self.class::ACCOUNT_MIN_BALANCE
+                    @balance = @balance - ( amount + self.class::WITHDARAWL_FEE )
+                    @transactions_this_month += 1
+                    return @balance
+                elsif ((@balance - amount) < self.class::ACCOUNT_MIN_BALANCE) && (@overdraft_flag == false)
+                    @balance = @balance - ( amount + self.class::WITHDARAWL_FEE )
+                    @transactions_this_month += 1
+                    @overdraft_flag = true
+                    return @balance
+                end 
+            end    
+        end
+
     # Each transaction will be counted against the maximum number of transactions
     # Updated deposit logic:
     # Each transaction will be counted against the maximum number of transactions
