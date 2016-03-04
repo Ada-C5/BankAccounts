@@ -129,7 +129,7 @@ module Bank
 
   class CheckingAccount < Account
     def initialize
-      super(fee)
+      super(fee,min_amount)
       @fee = 1
     end
 
@@ -138,14 +138,13 @@ module Bank
     end
 
 
-    def check(amount)
-
-      if amount > @initial_balance + 10
+    def withdraw_using_check(amount)
+      if amount + @fee > @initial_balance + 10
         puts "You don't have enough money to take that out."
         return @initial_balance
       else
-      @initial_balance = @initial_balance - amount
-      return @initial_balance = @initial_balance - @fee
+      @initial_balance = @initial_balance - amount - @fee
+      return @initial_balance = @initial_balance
       end
     end
 
