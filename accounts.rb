@@ -53,10 +53,12 @@ module Bank
       @amount = amount + @transaction_fee
 
       if @balance - @amount < @withdrawl_bal_min
-        return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}."
+        puts "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}."
+        return @balance
       elsif @balance - @amount >= @withdrawl_bal_min
       @balance = @balance - @amount
-      return "Withdrawal processed. Your current balance is: $#{@balance}."
+        puts "Withdrawal processed. Your current balance is: $#{@balance}."
+        return @balance
       end
     end
 
