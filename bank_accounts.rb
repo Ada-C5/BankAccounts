@@ -149,7 +149,7 @@ module Bank
       end
 
       if @reset_checks == 0
-        if money > @current_balance.to_i + overdraft_threshold + overdraft_fee_per_check
+        if money > @current_balance.to_i + overdraft_threshold 
         puts "WARNING: We cannot process this transaction. You have an allowable overdraft of $#{overdraft_threshold}. Your current balance is $#{@current_balance}."
           return @current_balance
         else @current_balance = @current_balance - money - overdraft_fee_per_check
