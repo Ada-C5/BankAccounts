@@ -15,6 +15,8 @@ module Bank
 #----------------------------------------------------------------------------------
 #
   class Account
+    # MINIMUMAMOUNT = 0 # how is this conneceted to the argumenterror method?
+    FEE = 0
     FILENAME = "./support/accounts.csv"
     attr_accessor :id, :balance, :owner
       def initialize(account)
@@ -25,7 +27,11 @@ module Bank
           # inside the :owner is all the info
           # @accounts = []
           @owner = account[:owner] # this will be an instance of owner class
+          @withdrawal_fee = 0
         end
+      end
+
+      def balance_warning
         unless @balance >= 0
           raise ArgumentError.new("WARNING!")
         end
@@ -40,64 +46,140 @@ module Bank
         return self.owner
       end
 
-      def withdraw(money_taken)
-        if @balance < money_taken
+      def withdraw(debit, fee = FEE)
+        if @balance - debit - fee < 0
           puts "WARNING!"
           return @balance
         else
-          @balance = @balance - money_taken # start with @balance bc it is the variable I am assigning the value to.
+          @balance = @balance - debit - fee  # start with @balance bc it is the variable I am assigning the value to.
           return @balance
         end
       end
 
-      def deposit(money_added)
-        @balance =  money_added + @balance
+      def deposit(credit)
+        @balance =  credit + @balance
         return @balance
       end
 
       def balance
         @balance
       end
-                  # this does work, but not for this assingment
-                  # this method is opening a csv and instantiating a new account for each row.
-                  # def self.all(filename)
-                  #   @accounts = []
-                  #   CSV.open(filename, "r") do |csv|
-                  #   csv.read.each do |row|
-                  #     # [1234, 100, 09-09283]
-                  #     # @accounts << row
-                  #     # account.first[0]
-                  #     @accounts << Account.new(id: row[0], balance: row[1].to_i, opendate: row[2])
-                  #     end
-                  #   end
-                  #     return @accounts
-                  # end
-      def self.all
-        accounts = []
-        CSV.open(FILENAME, "r") do |csv|
-        csv.read.each do |row|
-          # [1234, 100, 09-09283]
-          # @accounts << row
-          # account.first[0]
-          accounts << Account.new(id: row[0], balance: row[1].to_i, opendate: row[2])
-          end
-        end
-          return accounts
-      end
-      # or @@accounts << row
+  #                 # this does work, but not for this assingment
+  #                 # this method is opening a csv and instantiating a new account for each row.
+  #                 # def self.all(filename)
+  #                 #   @accounts = []
+  #                 #   CSV.open(filename, "r") do |csv|
+  #                 #   csv.read.each do |row|
+  #                 #     # [1234, 100, 09-09283]
+  #                 #     # @accounts << row
+  #                 #     # account.first[0]
+  #                 #     @accounts << Account.new(id: row[0], balance: row[1].to_i, opendate: row[2])
+  #                 #     end
+  #                 #   end
+  #                 #     return @accounts
+  #                 # end
+  #     def self.all
+  #       accounts = []
+  #       CSV.open(FILENAME, "r") do |csv|
+  #       csv.read.each do |row|
+  #         # [1234, 100, 09-09283]
+  #         # @accounts << row
+  #         # account.first[0]
+  #         accounts << Account.new(id: row[0], balance: row[1].to_i, opendate: row[2])
+  #         end
+  #       end
+  #         return accounts
+  #     end
+  #     # or @@accounts << row
+  #
+  #     # this is a way to find data using one of the attributes
+  #     def self.find(id)
+  #       # acct_to_find = nil
+  #       account_item = self.all
+  #         account_item.each do |acct| # acct is a temp name for reference as the loop iterates though the array
+  #         if acct.id == id # calling the method that saying whats the id
+  #           return acct
+  #         end
+  #       end
+  #     end
+  #
+  end
 
-      # this is a way to find data using one of the attributes
-      def self.find(id)
-        # acct_to_find = nil
-        account_item = self.all
-          account_item.each do |acct| # acct is a temp name for reference as the loop iterates though the array
-          if acct.id == id # calling the method that saying whats the id
-            return acct
-          end
-        end
+  class SavingsAccount < Account
+    FEE = 2
+    attr_accessor :interest_rate
+    def initialize(account)
+      super
+      @interest_rate = 0.03
+    end
+
+    # Updated withdrawal functionality:
+    # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
+    # Does not allow the account to go below the $10 minimum balance -
+    # Will output a warning message and return the original un-modified balance
+    def balance
+      super
+    end
+
+    def balance_warning
+      unless @balance > 10
+      raise ArgumentError.new("WARNING!")
       end
+      return @balance
+    end
+
+    def withdraw(debit, fee = FEE)
+      super(debit, fee)
+        balance_warning
+    end
+
+    def add_interest
+      interest = @balance * @interest_rate
+      return deposit(interest)
+    end
 
   end
+
+  class CheckingAccount < Account
+      FEE = 1
+      CHECK_FEE = 2
+    def initialize(account)
+      super
+      @checks = 0
+    end
+
+    def balance_warning
+      unless @balance >= 0
+        raise ArgumentError.new("WARNING!")
+      end
+      return @balance
+    end
+
+    def withdraw(debit, fee = FEE)
+      super(debit, fee)
+        balance_warning
+    end
+
+    # returning nil
+    def withdraw_using_check(amount)
+      fee = 0           # @balance - 
+        # if @checks > 3
+
+        # return @balance - amount
+        # elsif @checks > 3
+        # return @balance - amount - CHECK_FEE
+        # else @balance < -10
+        # puts "WARNING!"
+        # return @balance
+        #
+    end
+
+    def reset_checks
+      @checks = 0
+    end
+  end
+
+
 
           # this method is for the owner and the account file
           # def self.load
