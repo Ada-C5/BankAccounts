@@ -70,13 +70,18 @@ module Bank
       #Bank::Owner.name
     end
 
-    def withdraw(amount_to_withdraw)
+    def withdraw(amount_to_withdraw, instance_var)
       if amount_to_withdraw > @balance
         raise ArgumentError.new("This withdrawal would cause a negative balance.
         Do not attempt.")
       end
       @balance = @balance - amount_to_withdraw
-      show_balance
+      # included the following because otherwise "super" in the SavingsAccount
+      # and CheckingAccount withdrawal methods will do show_balance twice, once
+      # before the withdrawal has even occurred... and that's annoying :|
+      unless instance_var.is_a?(SavingsAccount) || instance_var.is_a?(CheckingAccount)
+        show_balance
+      end
       return @balance
     end
 
@@ -114,7 +119,7 @@ module Bank
 
     # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
     # But how do I make it so show_balance doesn't show twice?
-    def withdraw(amount_to_withdraw)
+    def withdraw(amount_to_withdraw, instance_var)
       # Does not allow the account to go below the $10 minimum balance - Will output a warning message
       if (@balance - amount_to_withdraw) < MINIMUM_BALANCE
         raise ArgumentError.new("Savings accounts must maintain at least
