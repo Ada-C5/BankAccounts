@@ -160,7 +160,7 @@ module Bank
     INITIAL_BALANCE_LIMIT = 1000
     
     def is_balance_enough(limit)
-      super(LOWER_BALANCE_LIMIT)
+      super(INITIAL_BALANCE_LIMIT)
     end
 
     def withdraw(money)
@@ -177,6 +177,7 @@ module Bank
     end
   end
 
+
   class CheckingAccount < Account
     attr_reader :number_of_checks
     TRANSACTION_FEE = 100
@@ -192,16 +193,90 @@ module Bank
     end
 
     def withdraw_using_check(amount)
-      fee = 0
+      fee = 0 # no fee until the 4th check
       @number_of_checks += 1
       if number_of_checks > 3
-        fee = CHECK_FEE
+        fee = CHECK_FEE # if 3 checks have already been used, each additional check has a $2 fee
       end
-      withdraw(amount, fee, -1000)
+      withdraw(amount, fee, -1000) # can have up to a $10 overdraft
     end
 
     def reset_checks
       @number_of_checks = 0
+    end
+
+  end
+
+
+  class MoneyMarketAccount < Account
+    attr_reader :number_of_transactions
+    INITIAL_BALANCE_LIMIT = 1000000 # initial balance can't be less than $10,000
+    LOWER_BALANCE_LIMIT = 1000000
+
+    def initialize(account_info)
+      super
+      @number_of_transactions = 0
+      @can_transact = true
+      @can_withdraw = true
+    end
+
+    def is_balance_enough(limit)
+      super(INITIAL_BALANCE_LIMIT)
+    end
+
+    def check_transaction_status
+      unless @can_withdraw == false
+        @number_of_transactions += 1
+      end
+      if number_of_transactions > 6
+        @can_transact = false
+      end
+    end
+
+    def give_transaction_message
+      puts "You have exceeded the max number of transactions for this month."
+      return balance
+    end
+
+    def give_withdrawal_message
+      puts "You may not withdraw any more money while balance is below #{Money.new(LOWER_BALANCE_LIMIT).format}"
+      return balance
+    end
+
+    def withdraw(money, fee = TRANSACTION_FEE, limit = 0)
+      check_transaction_status
+
+      if @can_transact == false
+        return give_transaction_message
+      elsif @can_withdraw == false
+        return give_withdrawal_message
+      end
+
+      super
+
+      if balance < LOWER_BALANCE_LIMIT
+        @can_withdraw = false
+        @balance -= 10000
+        return give_withdrawal_message
+      end
+
+      return balance
+    end
+
+    def deposit(money)
+      check_transaction_status
+
+      if @can_transact
+        super
+      else
+        return give_transaction_message
+      end
+
+      if balance > LOWER_BALANCE_LIMIT
+        @can_withdraw = true
+      end
+
+      return balance
     end
 
   end
