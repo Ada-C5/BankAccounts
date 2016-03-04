@@ -6,17 +6,23 @@ module Bank
   class Account
     MINIMUM_BALANCE = 0
     WITHDRAW_FEE = 0
+    MIN_INITIAL_BALANCE = 0
     attr_reader :id, :balance
 
     def initialize(id, initial_balance, opendate, owner=nil)
-      # raise ArgumentError, "Starting balance must be a number." unless initial_balance.is_a? Numeric
-      # raise ArgumentError, "You must not have a negative starting balance." unless initial_balance > 0
       @id = id
       @balance = initial_balance
+      @minimum_initial_balance = MIN_INITIAL_BALANCE
+      check_initial_balance
       @opendate = opendate
       @owner = owner
       @minimum_balance = MINIMUM_BALANCE
       @withdraw_fee = WITHDRAW_FEE
+    end
+
+    def check_initial_balance
+      raise ArgumentError, "Starting balance must be a number." unless balance.is_a? Numeric
+      raise ArgumentError, "Your starting balance is too low." unless balance > @minimum_initial_balance
     end
 
     # Creates an array containing data from "./support/accounts.csv" or another file
@@ -64,7 +70,7 @@ module Bank
       end
     end
 
-    def you_broke
+    def withdraw_error(amount)
       puts "You don't have enough money in your account."
     end
 
@@ -74,7 +80,7 @@ module Bank
     def withdraw(amount)
       amount = amount.abs
       if (@balance - (amount + @withdraw_fee)) < @minimum_balance
-        you_broke
+        withdraw_error(amount)
       else
         @balance = @balance - (amount + @withdraw_fee)
       end
@@ -99,7 +105,7 @@ module Bank
   class SavingsAccount < Account
     MINIMUM_BALANCE = 10
     WITHDRAW_FEE = 2
-    attr_reader :balance
+    attr_reader :balance, :minimum_initial_balance
     def initialize(id, initial_balance, opendate, owner=nil)
       super
       @minimum_balance = MINIMUM_BALANCE
@@ -133,7 +139,6 @@ module Bank
       @minimum_balance = -10
       if used_check >= 3
         @withdraw_fee = 2
-        puts "after 3!"
         withdraw(amount)
       else
         @withdraw_fee = 0
@@ -141,6 +146,25 @@ module Bank
         @used_check += 1
       end
       return balance
+    end
+
+  end
+
+
+  class MoneyMarketAccount < Account
+    MINIMUM_BALANCE = 10000
+    MIN_INITIAL_BALANCE = 10000
+
+    def initialize(id, initial_balance, opendate, owner=nil)
+      super
+      @minimum_initial_balance = MIN_INITIAL_BALANCE
+      check_initial_balance
+      @minimum_balance = MINIMUM_BALANCE
+    end
+
+    def withdraw_error(amount)
+      puts "You have been charged $100. You must increase your account balance to $10,000 before you can withdraw again."
+      @balance = @balance - (amount + @withdraw_fee + 100)
     end
 
   end
