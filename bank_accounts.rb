@@ -129,6 +129,21 @@ module Bank
   class CheckingAccount < Account
     BALANCE_MINIMUM = 0
     TRANSACTION_FEE = 1
+
+    def withdraw_using_check(money)
+      overdraft_threshold = BALANCE_MINIMUM + 10
+      if money > @current_balance.to_i + overdraft_threshold
+        puts "WARNING: We cannot process this transaction. You have an allowable overdraft of $#{overdraft_threshold}. Your current balance is $#{@current_balance}."
+        return @current_balance
+      else @current_balance = @current_balance - money
+        return @current_balance
+      end
+    end
+#The input amount gets taken out of the account as a result of a check
+#withdrawal. Returns the updated account balance.
+#Allows the account to go into overdraft up to -$10 but not any lower
+#The user is allowed three free check uses in one month,
+#but any subsequent use adds a $2 transaction fee
   end
 end
 
