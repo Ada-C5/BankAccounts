@@ -189,7 +189,7 @@ module Bank
     end
 
     def reset_checks
-
+      @checks_used = 0
     end
 
   end
