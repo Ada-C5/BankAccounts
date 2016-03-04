@@ -7,7 +7,33 @@ I18n.enforce_available_locales = false # need this not to trip an I18n error!
 
 
 module Bank
+
+  module BankMethod
+    # accepts 3 arguments: file where particular csv data is located,
+    # array of keys so that they can be given values from csv file,
+    # and class_name, which will just be whatever class is calling the method
+    def self.make_all(file, key_array, class_name)
+      # make empty array that will be filled with instances
+      instance_array = []
+
+      # iterate over each line of the file, which contains the data for one instance
+      CSV.open(file, 'r').each do |line|
+        info_hash = {} # make an empty hash each time it iterates to be filled with new instance data
+        key_array.each_with_index do |element, index| # iterate over the array of keys to give each a value
+          info_hash[element] = line[index]
+        end
+        instance_array << class_name.new(info_hash) # add new instance to the collection
+      end
+
+      return instance_array # return collection of all instances from the file given
+    end
+
+  end
+
+
   class Account
+    include BankMethod
+
     attr_reader :id, :owner, :creation_date, :balance
     TRANSACTION_FEE = 0
     BALANCE_MINIMUM = 0
@@ -51,24 +77,8 @@ module Bank
     # return a collection of Account instances, representing all of the
     # Accounts described in the CSV.
     def self.all
-      accounts = []
-      info_hash = {}
-
-      # open CSV file and iterate over each element (which is an array)
-      # each array element contains three components: id, balance, creation date
-      CSV.open("./support/accounts.csv", 'r').each do |line|
-        # index 0 will always be id
-        # index 1 will always be balance (convert to a Money obj)
-        # index 2 will always be creation date (in DateTime)
-        info_hash[:id] = line[0]
-        info_hash[:initial_balance] = line[1]
-        info_hash[:creation_date] = line[2]
-        # instantiate using the new hash, then push into accounts array
-        accounts << self.new(info_hash)
-      end
-
-      # return accounts array which now contains all the new Account objects
-      accounts
+      account_keys = [:id, :initial_balance, :creation_date]
+      BankMethod::make_all("./support/accounts.csv", account_keys, Account)
     end
 
     # return an instance of Account, where the value of the id field in
@@ -90,6 +100,8 @@ module Bank
 
 
   class Owner
+    include BankMethod
+
     attr_reader :owner_id, :first_name, :last_name, :street_address, :city, :state
 
     def initialize(owner_info)
@@ -118,22 +130,8 @@ module Bank
 # return a collection of Owner instances, representing all owners described
 # in the CSV.
     def self.all
-      owners = []
-      owners_hash = {}
-
-      # iterate through the lines of the CSV file owners.csv
-      CSV.open("./support/owners.csv", 'r').each do |line|
-        owners_hash[:owner_id] = line[0]
-        owners_hash[:last_name] = line[1]
-        owners_hash[:first_name] = line[2]
-        owners_hash[:street_address] = line[3]
-        owners_hash[:city] = line[4]
-        owners_hash[:state] = line[5]
-        owners << self.new(owners_hash)
-      end
-
-      #return array full of owner objects
-      owners
+      owner_keys = [:owner_id, :last_name, :first_name, :street_address, :city, :state]
+      BankMethod::make_all("./support/owners.csv", owner_keys, Owner)
     end
 
   # return an instance of Owner where the value of the id field in the CSV
@@ -202,7 +200,7 @@ class SavingsAccount < Account
         fee = check_fee # if 3 checks have already been used, each additional check has a $2 fee
       end
       withdraw(amount, fee, -1000) # can have up to a $10 overdraft
-    end 
+    end
 
     def reset_checks
       @number_of_checks = 0
