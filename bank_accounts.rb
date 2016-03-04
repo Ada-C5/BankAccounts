@@ -101,14 +101,6 @@ module Bank
         # the withdrawal fee for this account will always be the same so this seems like a good place for a constant.
         WITHDARAWL_FEE_IN_DOLLARS = 2
         ACCOUNT_MIN_BALANCE_IN_DOLLARS = 10
-        
-        # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
-        # def initialize(account_info)
-        #     super
-        #     if @balance < 10
-        #         raise ArgumentError.new("You think we give credit here? HAH!")
-        #     end
-        # end
 
     # It should include the following new methods:
     # #add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
