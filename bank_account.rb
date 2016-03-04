@@ -1,5 +1,4 @@
 module Bank
-require "money"
 require "CSV"
   class Account
 		attr_reader :balance, :account_id, :open_date
@@ -45,7 +44,7 @@ require "CSV"
 		end
 
     def say_balance(balance)
-      dollars = Money.new(balance, "USD")
+      dollars = balance/100.0
       puts "Your available balance is $#{dollars}."
     end
 
@@ -135,16 +134,18 @@ require "CSV"
         if debit > (@balance-1000)
           puts "Withdrawal amount is above the limit. Request denied."
         else
-          super-2        
+          @balance = super-200        
         end
         say_balance(@balance)
+        return @balance
     end
 
     def add_interest(rate)
-      @interest = @balance*(rate/100)
+      @interest = @balance*(rate/100.0)
       @balance = @interest +@balance
-      puts "The interest is #{@interest}." 
+      puts "The interest is $#{(@interest/100.0)}." 
       say_balance(@balance)
+      return @balance
     end
   end
 
@@ -160,8 +161,10 @@ require "CSV"
       if debit > (@balance)
         puts "Withdrawal amount is above the limit. Request denied."
       else
-        super-100        
+        @balance = super-100
       end
+      say_balance(@balance)
+      return @balance
     end
 
     def withdraw_using_check(amount)
@@ -169,12 +172,12 @@ require "CSV"
         puts "Withdrawal amount is above the limit. Request denied."
       elsif @check_count>=3
         @check_count+=1
-        @balance = withdraw(amount)-100
+        @balance = withdraw(amount+100)
       else
         @check_count+=1
-        @balance = withdraw(amount)+100
+        @balance = withdraw(amount-100)
       end
-      say_balance(@balance)
+      return @balance
     end
 
     def reset_check
