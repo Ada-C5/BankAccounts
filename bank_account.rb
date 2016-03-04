@@ -234,17 +234,22 @@ module Bank
     end
 
     def deposit(money)
-      super
       if @account_balance < 10_000
+        @account_balance = @account_balance + money
         return @account_balance
       end
       if @transactions >= 6
         puts "You have already used your 6 monthly transactions."
-        @account_balance = @account_balance - money
         return @account_balance
       end
+      @account_balance = @account_balance + money
       @transactions += 1
       return @account_balance
+    end
+
+    def add_interest(rate = 0.25)
+      interest = @account_balance * (rate / 100)
+      @account_balance = @account_balance + interest
     end
 
     def reset_transactions
