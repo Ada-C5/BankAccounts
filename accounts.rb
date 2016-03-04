@@ -16,7 +16,7 @@ module Bank
       @withdrawl_bal_min = 0
 
       unless @balance.is_a?(Integer) && @balance >= @balance_min
-        raise ArgumentError.new("New accounts must begin with a balance of #{@balance_min} or more.")
+        raise ArgumentError.new("New accounts must begin with a balance of $#{@balance_min} or more.")
       end
 
     end
@@ -83,7 +83,7 @@ module Bank
             @withdrawl_bal_min = 10
 
             unless @balance.is_a?(Integer) && @balance >= @balance_min
-              raise ArgumentError.new("New accounts must begin with a balance of #{@balance_min} or more.")
+              raise ArgumentError.new("New accounts must begin with a balance of $#{@balance_min} or more.")
             end
 
     end
@@ -101,7 +101,7 @@ module Bank
     def add_interest(rate)
       interest = @balance * rate/100
       @balance = @balance + interest
-      return interest
+      return "$#{interest} in interest added."
     end
 
   end
@@ -120,7 +120,7 @@ module Bank
       @no_checks_fee = 2
 
       unless @balance.is_a?(Integer) && @balance >= @balance_min
-        raise ArgumentError.new("New accounts must begin with a balance of #{@balance_min} or more.")
+        raise ArgumentError.new("New accounts must begin with a balance of $#{@balance_min} or more.")
       end
     end
 
