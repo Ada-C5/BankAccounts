@@ -16,7 +16,7 @@ module Bank
       @owner_id   = owner
 
       if @balance < 0
-          raise ArgumentError, "Balance can't be less than $0"
+        raise ArgumentError, "Balance can't be less than $0"
       end
 
     end
@@ -58,7 +58,7 @@ module Bank
 
     def deposit(deposit_amount)
       @balance += deposit_amount
-      puts "New account balance: $#{@balance}"
+      return "New account balance: $#{@balance}"
     end
 
     def add_owner(owner)
@@ -73,7 +73,7 @@ module Bank
     def initialize(account_id, balance, open_date)
       super
       if @balance < 10
-          raise ArgumentError, "Balance can't be less than $10.00"
+        raise ArgumentError, "Balance can't be less than $10.00"
       end
       puts "A savings account will incur a $#{WITHDRAWAL_FEE} fee per withdrawal."
     end
@@ -107,8 +107,6 @@ module Bank
       @check_count = 0
     end
 
-    # figure out how to make withdraw use super and inherit from base class
-    # how to replace constant variable in base class with value in subclass
     def withdraw(withdraw_amount)
       if @balance - withdraw_amount - WITHDRAWAL_FEE < 0
         puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
@@ -133,15 +131,50 @@ module Bank
         return "Account balance: #{@balance}"
       end
     end
-    
-      def reset_checks
-        @check_count = 0
-        return "Current check uses: #{@check_count}"
-      end
 
-
+    def reset_checks
+      @check_count = 0
+      return "Current check uses: #{@check_count}"
+    end
   end
 
+  class MoneyMarketAccount < Account
+    TRANSACTION_FEE = 100
+
+    def initialize(account_id, balance, open_date)
+      super
+      @transaction_count = 0
+
+      if @balance < 10000
+        raise ArgumentError, "Balance can't be less than $10,000."
+      end
+
+      puts "Please note: a maximum of 6 transactions are allowed per month with this account type."
+    end
+
+    def withdraw(withdraw_amount)
+      @transaction_count += 1
+      if @transaction_count > 6
+        raise NoMethodError, "You have reached the maximum number of transactions this month."
+      end
+      until @balance >= 10000
+        raise NoMethodError, "Can't withdraw until account balance reaches $10,000."
+      end
+      if @balance - withdraw_amount < 10000
+        puts "Your account is below $10,000. A fee of $#{TRANSACTION_FEE} will be incurred for this transaction. No more transactions are allowed until the balance is increased to $10,000."
+        @balance -= withdraw_amount - TRANSACTION_FEE
+      else
+        @balance -= withdraw_amount
+      end
+      puts "Current transactions this month: #{@transaction_count}"
+      return "Account balance: $#{@balance}"
+    end
+
+    def 
+
+    end
+
+  end
 
   class Owner
 
