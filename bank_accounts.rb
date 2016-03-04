@@ -4,7 +4,7 @@ I18n.enforce_available_locales = false
 module Bank
 
   class Account
-    attr_reader :id, :balance, :date_created, :min_bal
+    attr_reader :id, :balance, :date_created
     MINIMUM_BALANCE = 100
 
     def initialize(account_info)
@@ -115,13 +115,14 @@ module Bank
     # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
     # But how do I make it so show_balance doesn't show twice?
     def withdraw(amount_to_withdraw)
-      @balance = super - TRANSACTION_FEE
-      if @balance < MINIMUM_BALANCE
-        # nope you can't do that
+      if (@balance - amount_to_withdraw) < MINIMUM_BALANCE
+        raise ArgumentError.new("Savings accounts must maintain at least
+        $#{convert_cents(MINIMUM_BALANCE)}. Do not attempt.")
       else
+        @balance = super - TRANSACTION_FEE
         show_balance
+        return @balance
       end
-      return @balance
     end
 
     # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
