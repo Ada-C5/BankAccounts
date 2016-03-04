@@ -16,11 +16,9 @@ module Bank
    end
 
   def self.pull_from_csv
-  CSV.read('./support/accounts.csv')
+    CSV.read('./support/accounts.csv')
   end
 
-  def self.create_new
-  end
 
   def self.all
     accounts_hash = {}
