@@ -34,10 +34,23 @@ require_relative 'bank_account.rb'
 # my_account = Bank::SavingsAccount.new(2, 10000, 2005)
 # puts my_account.add_interest(0.25) #10025.0
 
+# # # # TESTS FOR MONEY MARKET CLASS # # # ## 
+### test withdraw
+w = Bank::MoneyMarketAccount.new(33, 5000000, 2009)
+puts w.withdraw(10000)
+puts w.withdraw(10000)
+puts w.withdraw(10000)
+puts w.withdraw(10000)
+puts w.withdraw(10000)
+
+
+### test deposit
+# w = Bank::MoneyMarketAccount.new(33, 5000000, 2009)
+# puts w.deposit(10000)
 
 # # # # # TESTS FOR OWNER CLASS # # # # #
 # ### TEST FOR SELF.CREATE_OWNERS(file)  ###
-puts Bank::Owner.create_owners("./support/owners.csv")
+# puts Bank::Owner.create_owners("./support/owners.csv")
 
 
 # ### TEST FOR SELF.ALL METHOD   ###
@@ -49,7 +62,7 @@ puts Bank::Owner.create_owners("./support/owners.csv")
 
 
 ###   TEST FOR GET_ACCOUNT METHOD   ###
-# get balance of first account with owner id
+#get balance of first account with owner id
 # my_owner = Bank::Owner.find(14)
 # puts my_owner.get_account[0].balance
 
