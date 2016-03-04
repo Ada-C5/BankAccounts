@@ -3,7 +3,8 @@ require 'csv'
 module Bank
 
   class Account
-    attr_accessor :id, :balance, :opendate, :transaction_fee, :balance_min
+    attr_accessor :id, :balance, :opendate, :transaction_fee, :balance_min,
+                  :withdrawl_bal_min
 
     def initialize(id, balance, opendate)
 
@@ -12,9 +13,10 @@ module Bank
       @opendate = opendate
       @transaction_fee = 0
       @balance_min = 0
+      @withdrawl_bal_min = 0
 
-      unless balance.is_a?(Integer) && balance >= @balance_min
-        raise ArgumentError.new("New accounts must begin with a balance of 0 or more.")
+      unless @balance.is_a?(Integer) && @balance >= @balance_min
+        raise ArgumentError.new("New accounts must begin with a balance of #{@balance_min} or more.")
       end
 
     end
@@ -49,7 +51,6 @@ module Bank
 
     def withdraw(amount)
       @amount = amount
-      @withdrawl_bal_min = 0
 
       if @balance - @amount < @withdrawl_bal_min
         return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}."
@@ -73,21 +74,25 @@ module Bank
   class SavingsAccount < Account
 
     def initialize(id, balance, opendate)
-      unless balance.is_a?(Integer) && balance >= 10
-        raise ArgumentError.new("New accounts must begin with a balance of $10 or more.")
-      end
 
-      @id = id
-      @balance = balance
-      @opendate = opendate
+            @id = id
+            @balance = balance
+            @opendate = opendate
+            @transaction_fee = 2
+            @balance_min = 10
+            @withdrawl_bal_min = 0
+
+            unless @balance.is_a?(Integer) && @balance >= @balance_min
+              raise ArgumentError.new("New accounts must begin with a balance of #{@balance_min} or more.")
+            end
 
     end
 
     def withdraw(amount)
-      @amount = amount+2
-      if @balance - @amount < 10
+      @amount = amount + @transaction_fee
+      if @balance - @amount < @balance_min
         return "Withdrawal Failure. Insufficient Funds. Your current balance is $#{@balance}"
-      elsif @balance - @amount >= 10
+      elsif @balance - @amount >= @balance_min
       @balance = @balance - @amount
       return "Withdrawal processed. Your current balance is: $#{@balance}."
       end
