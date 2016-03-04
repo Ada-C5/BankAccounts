@@ -35,7 +35,7 @@ module Bank
     end
 
     # withdraw money from account
-    def withdraw(amount)
+    def withdraw(amount, min = MIN_BAL)
       temp_balance = @balance - amount
       # make sure result is positive
       if temp_balance < MIN_BAL
@@ -112,17 +112,8 @@ module Bank
       end
     end
 
-    def withdraw(amount)
-      temp_balance = @balance - amount
-      temp_balance -= WITHDRAW_FEE
-      # make sure result is positive
-      if temp_balance < MIN_BAL
-        puts "You don't have enough money to complete this withdrawl."
-      else 
-        @balance = temp_balance
-      end
-      puts "#{money_convert(@balance)}"
-      return @balance
+    def withdraw(amount, min = MIN_BAL)
+      super
     end
 
     # rate as decimal percentage 25% => 0.25
@@ -143,7 +134,7 @@ module Bank
       @check_count = 0
     end
 
-    def withdraw(amount)
+    def withdraw(amount, min = MIN_BAL)
       temp_balance = @balance - amount
       temp_balance -= WITHDRAW_FEE
       # make sure result is positive
@@ -197,7 +188,7 @@ module Bank
       end
     end
 
-    def withdraw(amount)
+    def withdraw(amount, min = MIN_BAL)
       if @balance > 1000000
         temp_balance = @balance - amount
         # make sure result is positive
