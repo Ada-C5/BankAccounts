@@ -9,11 +9,12 @@ module Bank
 
     def initialize(hash)
       @id = hash[:id]
-      @money = hash[:money]
+      @money = hash[:money].to_f
       @start_date = hash[:start_date]
 
       if money < self.class::ACCOUNT_MIN
-        raise ArgumentError.new("Only positive amounts are allowed in the bank.")
+        raise ArgumentError.new("You cannot initiate a new bank account with a"+
+        " negative amount.")
       end
     end
 
@@ -29,7 +30,8 @@ module Bank
     def withdraw(take_out = 0)
       # @take_out = take_out
       if @money.to_f - take_out.to_f < self.class::ACCOUNT_MIN
-        puts "Account balance must remain above $#{self.class::ACCOUNT_MIN}."
+        puts "Transaction cancelled. Account balance must remain above "+
+        "$#{self.class::ACCOUNT_MIN}."
         balance
       else
         @money -= take_out.to_f + self.class::WITHDRAWAL_FEE
@@ -51,7 +53,7 @@ module Bank
     end
 
     def self.find(id)
-      var = self.account_info
+      var = self.all
       var.each do |num|
         if num.id == id.to_s
           return num
@@ -59,21 +61,22 @@ module Bank
       end
     end
 
-    def self.account_info
+    def self.all
       account_hash = {:id => nil, :money => nil, :start_date => nil}
       accounts = CSV.read('accounts.csv') #access into the accounts csv
       account_info = []  #create blank array that'll store all instances
       # create a loop to create new instances for each row in the Excel file
       CSV.foreach("accounts.csv") do |row|
-        info = self.new(id: row[0].to_f, money: row[1].to_f, start_date: row[2])
+        info = self.new(id: row[0].to_f, money: (row[1].to_f/100),
+                        start_date: row[2])
         account_info << info
       end
       return account_info #pushes each info into the array
     end
 
     def self.all_together_now
-      account = self.account_info
-      owner = Bank::Owner.owner_info
+      account = self.all
+      owner = Bank::Owner.all
       match = CSV.read('account_owners.csv')
 
       CSV.foreach("account_owners.csv") do |row|
@@ -102,7 +105,7 @@ module Bank
     end
 
     def self.find(list_num)
-      var = self.owner_info
+      var = self.all
       var.each do |hash|
         if hash.list_num == list_num.to_s
           return hash
@@ -110,7 +113,7 @@ module Bank
       end
     end
 
-    def self.owner_info
+    def self.all
       info_hash = {:list_num => "", :last_name => "",:first_name => "",
         :street =>"", :city => "", :state => ""}
       owners = CSV.read('owners.csv')
@@ -133,26 +136,6 @@ module Bank
   class SavingsAccount < Account
     ACCOUNT_MIN = 10
     WITHDRAWAL_FEE = 2
-    def initialize(hash)
-      @id = hash[:id]
-      @money = hash[:money]
-      @start_date = hash[:start_date]
-
-      if money < self.class::ACCOUNT_MIN
-        raise ArgumentError.new("Account balance must be above $#{self.class::ACCOUNT_MIN}.")
-      end
-    end
-
-    def withdraw(take_out = 0)
-      if @money.to_f - take_out.to_f < self.class::ACCOUNT_MIN
-        puts "Account balance must remain above $#{self.class::ACCOUNT_MIN}."
-        balance
-      else
-        @money -= take_out.to_f + self.class::WITHDRAWAL_FEE
-        puts "Withdrawal fees: $#{self.class::WITHDRAWAL_FEE}"
-        balance
-      end
-    end
 
     def add_interest(rate = 0.25)
       interest = (@money * rate / 100) - @money
@@ -161,22 +144,11 @@ module Bank
   end
 
   class CheckingAccount < Account
+    ACCOUNT_MIN = 0
+    WITHDRAWAL_FEE = 1
     def initialize(hash)
       super
       @num = 0
-    end
-
-    def withdraw(take_out = 0)
-      account_min = 0
-      withdrawal_fee = 1
-      if @money.to_f - take_out.to_f < account_min
-        puts "Account balance must remain above $#{account_min}."
-        balance
-      else
-        @money -= take_out.to_f + withdrawal_fee
-        puts "Withdrawal fees: $#{withdrawal_fee}"
-        balance
-      end
     end
 
     def withdraw_using_check(take_out = 0)
