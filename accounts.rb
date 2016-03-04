@@ -226,6 +226,12 @@ module Bank
       @transaction_count = 0
     end
 
+    def add_interest(rate)
+      interest = @balance * rate/100
+      @balance = @balance + interest
+      return interest
+    end
+
 
   end
 
