@@ -192,5 +192,52 @@ require "CSV"
   end
 
   class MoneyMarketAccount < Account
+    attr_reader
 
+    def initialize (id, balance, open_date)
+      super
+      @transactions = 0
+    end
+
+    def transaction_check
+      raise ArgumentError, "The maximum transaction frequency has been reached. Request denied." unless @transactions<7
+    end
+
+    def withdraw(debit)
+      if @balance < 1000000
+        puts "No more withdrawals are allowed until the balance goes above $10,000."
+      else
+        @fees = 10000
+        super
+        @transactions +=1
+      end
+      transaction_check
+    end
+
+    def deposit(credit)
+      if (@balance+credit) < 1000000
+        transactions+=1
+        transaction_check
+        super
+      elsif (@balance < 1000000)&& (@balance+credit>=1000000)
+        super
+      else
+        transactions+=1
+        transaction_check
+        super
+      end
+    end
+      
+    def add_interest(rate)
+      @interest = @balance*(rate/100.0)
+      @balance = @interest +@balance
+      puts "The interest is $#{(@interest/100.0)}." 
+      say_balance(@balance)
+      return @balance 
+    end
+
+    def reset_transactions
+      @transactions = 0
+    end
+  end
 end    
