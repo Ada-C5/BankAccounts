@@ -239,7 +239,7 @@ module Bank
       return @account_balance
     end
 
-    def reset_checks
+    def reset_transactions
       @transactions = 0
     end
 
