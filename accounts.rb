@@ -105,7 +105,7 @@ module Bank
       return owners_hash
    end
 
-   def self.find(id)
+   def self.find_by_account_id(id)
      owner_number = self.find_owner_number(id)
      puts owner_number
      self.all.each do |key, value|
@@ -115,6 +115,17 @@ module Bank
      end
    end
 
+   def self.find(owner_number)
+     owner_list = CSV.read('./support/owners.csv')
+     owner_list.each do |owner|
+      if owner[0].to_f == owner_number.to_f
+        puts "This is the account associated with owner number #{owner_number}"
+        return owner #returns owner number
+      end
+    end
+   end
+
+   private
    def self.find_owner_number(id) #search accounts by id number
      owner_list = CSV.read('./support/account_owners.csv')
      owner_list.each do |account|
@@ -182,7 +193,6 @@ module Bank
      else
        balance(amount, "withdraw", 1)
        puts "Successfully withdrew #{amount} from Checking plus $1 fee."
-      #  @balance = @balance - (amount + 1)
      end
    end
 
