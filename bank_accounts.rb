@@ -70,20 +70,21 @@ module Bank
       #Bank::Owner.name
     end
 
-    def withdraw(amount_to_withdraw, instance_var)
-      if amount_to_withdraw > @balance
-        raise ArgumentError.new("This withdrawal would cause a negative balance.
-        Do not attempt.")
-      end
-      @balance = @balance - amount_to_withdraw
-      # included the following because otherwise "super" in the SavingsAccount
-      # and CheckingAccount withdrawal methods will do show_balance twice, once
-      # before the withdrawal has even occurred... and that's annoying :|
-      unless instance_var.is_a?(SavingsAccount) || instance_var.is_a?(CheckingAccount)
-        show_balance
-      end
-      return @balance
-    end
+    ### BRB REFACTORING
+    # def withdraw(amount_to_withdraw, instance_var)
+    #   if amount_to_withdraw > @balance
+    #       raise ArgumentError.new("This withdrawal would cause a negative balance.
+    #       Do not attempt.")
+    #   end
+    #   @balance = @balance - amount_to_withdraw
+    #   # included the following because otherwise "super" in the SavingsAccount
+    #   # and CheckingAccount withdrawal methods will do show_balance twice, once
+    #   # before the withdrawal has even occurred... and that's annoying :|
+    #   unless instance_var.is_a?(SavingsAccount) || instance_var.is_a?(CheckingAccount)
+    #     show_balance
+    #   end
+    #   return @balance
+    # end
 
     def deposit(amount_to_deposit)
       @balance = @balance + amount_to_deposit
@@ -105,17 +106,22 @@ module Bank
   class CheckingAccount < Account
     TRANSACTION_FEE = 100
     # instance_var is the name of the instance variable you're calling the method on
-    def withdraw(amount_to_withdraw, instance_var)
-        @balance = super - TRANSACTION_FEE
-        show_balance
-        return @balance
-    end
 
-    def withdraw_using_check(amount) 
-      #The input amount gets taken out of the account as a result of a check withdrawal. Returns the updated account balance.
-      #Allows the account to go into overdraft up to -$10 but not any lower
-      #The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
-    end
+    ### BRB REFACTORING
+    # def withdraw(amount_to_withdraw, instance_var)
+    #     @balance = super - TRANSACTION_FEE
+    #     show_balance
+    #     return @balance
+    # end
+
+    ### BRB REFACTORING
+    # def withdraw_using_check(amount_to_withdraw, instance_var)
+    #   minimum_balance = -1000
+    #   if (@balance - amount_to_withdraw) < minimum_balance
+    #     raise ArgumentError.new("Withdrawal by check only allows accounts to go
+    #     into overdraft up to -$10. Do not attempt.")
+    #   end
+
 
   end
 
@@ -131,19 +137,18 @@ module Bank
       super
     end
 
-    # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
-    # But how do I make it so show_balance doesn't show twice?
-    def withdraw(amount_to_withdraw, instance_var)
-      # Does not allow the account to go below the $10 minimum balance - Will output a warning message
-      if (@balance - amount_to_withdraw) < MINIMUM_BALANCE
-        raise ArgumentError.new("Savings accounts must maintain at least
-        $#{convert_cents(MINIMUM_BALANCE)}. Do not attempt.")
-      else
-        @balance = super - TRANSACTION_FEE
-        show_balance
-        return @balance
-      end
-    end
+    ### BRB REFACTORING
+    # def withdraw(amount_to_withdraw, instance_var)
+    #   # Does not allow the account to go below the $10 minimum balance - Will output a warning message
+    #   if (@balance - amount_to_withdraw) < MINIMUM_BALANCE
+    #     raise ArgumentError.new("Savings accounts must maintain at least
+    #     $#{convert_cents(MINIMUM_BALANCE)}. Do not attempt.")
+    #   else
+    #     @balance = super - TRANSACTION_FEE
+    #     show_balance
+    #     return @balance
+    #   end
+    # end
 
     def add_interest(rate)
       interest = calculate_interest(rate)
