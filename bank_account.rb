@@ -23,7 +23,7 @@ module Bank
 
     def check_initial_balance
       raise ArgumentError, "Starting balance must be a number." unless balance.is_a? Numeric
-      raise ArgumentError, "Your starting balance is too low." unless balance > @minimum_initial_balance
+      raise ArgumentError, "Starting balance is too low." unless balance > @minimum_initial_balance
     end
 
     # Creates an array containing data from "./support/accounts.csv" or another file
@@ -72,7 +72,7 @@ module Bank
     end
 
     def withdraw_error(amount)
-      puts "You don't have enough money in your account."
+      puts "Not enough money in the account."
     end
 
     def one_transaction
@@ -85,7 +85,7 @@ module Bank
 
     # Accepts a single parameter for the amount of money to be withdrawn.
     # Absolute value to input for negative numbers.
-    # Returns the updated account balance with 2 decimal places.
+    # Returns the account balance.
     def withdraw(amount)
       amount = amount.abs
       if (@balance - (amount + @withdraw_fee)) < @minimum_balance
@@ -99,7 +99,7 @@ module Bank
 
     # Accepts a single parameter for the amount of money to be deposited.
     # Absolute value to input for negative numbers.
-    # Returns the updated account balance with 2 decimal places.
+    # Returns the account balance.
     def deposit(amount)
       amount = amount.abs
       @balance = @balance + amount
@@ -107,8 +107,15 @@ module Bank
       return @balance
     end
 
+    # Call this method for a people friendly view of account balance
     def balance_inquiry
       "$#{'%.2f' % @balance}"
+    end
+
+    def add_interest(rate)
+      interest = balance * rate/100
+      @balance = @balance + interest
+      return interest
     end
   end
 
@@ -116,17 +123,14 @@ module Bank
   class SavingsAccount < Account
     MINIMUM_BALANCE = 10
     WITHDRAW_FEE = 2
+    MIN_INITIAL_BALANCE = 10
     attr_reader :balance, :minimum_initial_balance
     def initialize(id, initial_balance, opendate, owner=nil)
       super
       @minimum_balance = MINIMUM_BALANCE
+      @minimum_initial_balance = MIN_INITIAL_BALANCE
+      check_initial_balance
       @withdraw_fee = WITHDRAW_FEE
-    end
-
-    def add_interest(rate)
-      interest = balance * rate/100
-      @balance = @balance + interest
-      return interest
     end
 
   end
@@ -159,6 +163,9 @@ module Bank
       return balance
     end
 
+    def add_interest(rate)
+      raise ArgumentError, "Cannot add interest on checking account."
+    end
   end
 
 
@@ -174,7 +181,6 @@ module Bank
     end
 
     def withdraw_error(amount)
-      puts "You have been charged $100. You must increase your account balance to $10,000 before you can withdraw again."
       @balance = @balance - (amount + @withdraw_fee + 100)
       one_transaction
       return balance
