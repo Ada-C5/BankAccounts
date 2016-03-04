@@ -6,6 +6,7 @@ module Bank
   class Account
     # minimum balance to open account
     MIN_BAL = 0
+    WITHDRAW_FEE = 0
     def initialize(id, balance, date)
       @id = id
       @balance = balance
@@ -35,8 +36,9 @@ module Bank
     end
 
     # withdraw money from account
-    def withdraw(amount, min = MIN_BAL)
+    def withdraw(amount, min = MIN_BAL, fee = WITHDRAW_FEE)
       temp_balance = @balance - amount
+      temp_balance -= fee
       # make sure result is positive
       if temp_balance < MIN_BAL
         puts "You don't have enough money to complete this withdrawl."
@@ -112,7 +114,7 @@ module Bank
       end
     end
 
-    def withdraw(amount, min = MIN_BAL)
+    def withdraw(amount, min = MIN_BAL, fee = WITHDRAW_FEE)
       super
     end
 
@@ -134,17 +136,8 @@ module Bank
       @check_count = 0
     end
 
-    def withdraw(amount, min = MIN_BAL)
-      temp_balance = @balance - amount
-      temp_balance -= WITHDRAW_FEE
-      # make sure result is positive
-      if temp_balance < MIN_BAL
-        puts "You don't have enough money to complete this withdrawl."
-      else 
-        @balance = temp_balance
-      end
-      puts "#{money_convert(@balance)}"
-      return @balance
+    def withdraw(amount, min = MIN_BAL, fee = WITHDRAW_FEE)
+      super
     end
 
     def withdraw_using_check(amount)
@@ -225,7 +218,6 @@ module Bank
       puts "Interest accumelated was #{money_convert(interest)}"
       return interest
     end
-
   end
   
   class Owner
