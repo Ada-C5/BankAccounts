@@ -112,13 +112,25 @@ module Bank
   end
 
   class CheckingAccount < Account
+    attr_reader :check_count
+    def initialize(account_info)
+      @check_count = 0
+      super
+    end
 
     def withdraw(amount_to_withdraw, minimum_balance=0, transaction_fee=100)
       @balance = super - transaction_fee
     end
 
     def withdraw_using_check(amount_to_withdraw, minimum_balance=-1000, transaction_fee=0)
-      withdraw(amount_to_withdraw, minimum_balance, transaction_fee)
+      # does this first so the final value returned is @balance
+      @check_count += 1
+      @balance = withdraw(amount_to_withdraw, minimum_balance, transaction_fee)
+      if @check_count > 3
+        transaction_fee = 200
+        @balance = @balance - transaction_fee
+      end
+      return @balance
     end
 
     ### BRB REFACTORING
