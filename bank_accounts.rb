@@ -1,4 +1,4 @@
-# Rowan Cota, wave 2, 3.1.2016
+# Rowan Cota, wave 3, 3.3.2016
 
 require 'csv'
 
@@ -7,33 +7,32 @@ module Bank
     # this class creates accounts, we can store account related things in it.
     class Account
         # Constants set for cents in a dollar (to convert balances for human readability), withdrawal fees and minimum balances.
-        CENTS_IN_A_DOLLAR = 100.0
-        WITHDARAWL_FEE_IN_DOLLARS = 0
-        ACCOUNT_MIN_BALANCE_IN_DOLLARS = 0
+        WITHDARAWL_FEE = 0
+        ACCOUNT_MIN_BALANCE = 0
 
-        attr_reader :id_number 
-        attr_accessor :owner
+        # returned :owner to just a reader since I have a method that allows it to be changed below.
+        attr_reader :id_number, :owner
 
         # initializes using a hash
         def initialize(account_info)
             @id_number = account_info[:id_num]
-            @balance = account_info[:balance]/CENTS_IN_A_DOLLAR
+            @balance = account_info[:balance]
             @start_date = account_info[:open_date]
             @owner = nil
 
-            if @balance < self.class::ACCOUNT_MIN_BALANCE_IN_DOLLARS
+            if @balance < self.class::ACCOUNT_MIN_BALANCE
                 raise ArgumentError.new("You think we give credit here? HAH!")
             end
         end
 
         # withdraw method
         def withdraw(amount)
-            if (@balance - (amount + self.class::WITHDARAWL_FEE_IN_DOLLARS)) >= self.class::ACCOUNT_MIN_BALANCE_IN_DOLLARS
-                @balance = @balance - ( amount + self.class::WITHDARAWL_FEE_IN_DOLLARS )
+            if (@balance - (amount + self.class::WITHDARAWL_FEE)) >= self.class::ACCOUNT_MIN_BALANCE
+                @balance = @balance - ( amount + self.class::WITHDARAWL_FEE )
                 puts "After withdrawing #{ amount } (and the withdrawal fee if applicable), the balance for account #{ @id_number } is #{ @balance }."
                 return @balance
-            elsif (@balance - amount) < self.class::ACCOUNT_MIN_BALANCE_IN_DOLLARS
-                puts "HEY! That is unpossible because this account MUST not go below $#{self.class::ACCOUNT_MIN_BALANCE_IN_DOLLARS}!"
+            elsif (@balance - amount) < self.class::ACCOUNT_MIN_BALANCE
+                puts "HEY! That is unpossible because this account MUST not go below $#{self.class::ACCOUNT_MIN_BALANCE}!"
                 puts "The balance for account #{ @id_number } is still #{ @balance }."
                 return @balance
             else
@@ -51,6 +50,7 @@ module Bank
         # show the balance
         def balance
             puts "The balance of account #{ @id_number } is #{ @balance }."
+            return @balance
         end
 
         # this will allow you to give a 
@@ -79,11 +79,9 @@ module Bank
 
 
         # this will find an account instance with a specified id
-        # ids are kept as strings and so must be passed as strings
-        # because of that, I'll convert ids (using to_s).
-        # this allows more extensible code because it enables
-        # ids to use alphabet characters too (and it's got the same
-        # cost as converting IDs to Fixnums.
+        # ids are kept as strings and so must be passed as strings because of that, I'll convert ids (using to_s).
+        # this allows more extensible code because it enables ids to use alphabet characters too (and it's got the same 
+        # cost as converting IDs to Fixnums when retrieved from the CSV.
         def self.find(id)
             accounts_to_search = []
             accounts_to_search = Bank::Account.all("./support/accounts.csv")
@@ -99,16 +97,13 @@ module Bank
     # add a savings account class that inherits from account
     class SavingsAccount < Account
         # the withdrawal fee for this account will always be the same so this seems like a good place for a constant.
-        WITHDARAWL_FEE_IN_DOLLARS = 2
-        ACCOUNT_MIN_BALANCE_IN_DOLLARS = 10
+        WITHDARAWL_FEE = 2
+        ACCOUNT_MIN_BALANCE = 10
 
-    # It should include the following new methods:
-    # #add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
     # Input rate is assumed to be a percentage (i.e. 0.25).
     # The formula for calculating interest is balance * rate/100
-    # Example: If the interest rate is 0.25% and the balance is $10,000, then the interest that is returned is $25 and the new balance becomes $10,025.
         def interest_rate(rate)
-            interest = @balance * rate
+            interest = @balance * (rate/100)
             @balance += interest
             puts "After compounding interest, your balance is: $#{@balance}!"
             return interest
@@ -117,18 +112,16 @@ module Bank
 
     # checking account class that inherits from account
     class CheckingAccount < Account
-        WITHDARAWL_FEE_IN_DOLLARS = 1
+        # set the constants for the expectations of a CheckingAccount
+        WITHDARAWL_FEE = 1
         CHECK_FEE_IN_DOLLARS = 2
         
-
+        # adds an instance variable to track how many checks are used monthly.
         def initialize(account_info)
             super
             @checks_used_in_month = 0
         end
 
-
-        # #withdraw_using_check(amount): The input amount gets taken out of the account as a result of a check withdrawal. 
-        # Returns the updated account balance.
         # Allows the account to go into overdraft up to -$10 but not any lower
         # The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
         def withdraw_with_check(amount)
@@ -217,13 +210,7 @@ module Bank
             owner_list
         end
 
-        # this will find an account instance with a specified id
-        # ids are kept as strings and so must be passed as strings
-        # because of that, I'll convert ids (using to_s).
-        # this allows more extensible code because it enables
-        # ids to use alphabet characters too (and it's got the same
-        # cost as converting IDs to Fixnums.
-        
+        # this works exactly the same way as the self.find in accounts, and is subject to the same constraints.        
         def self.find(id)
             owners_to_search = []
             owners_to_search = Bank::Owner.all("./support/owners.csv")
@@ -257,7 +244,7 @@ module Bank
                 # set the linkages by comparing ID numbers. really this should be two methods
                 # one to set owners and one to set accounts.
                 if account_to_link == account_collection[iteration_count].id_number
-                    account_collection[iteration_count].owner = owner_to_link
+                    account_collection[iteration_count].add_owner = owner_to_link
                     owner_collection[iteration_count].accounts << account_to_link
                     iteration_count += 1
                 end
