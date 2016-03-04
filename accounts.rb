@@ -14,7 +14,6 @@ module Bank
       @transaction_fee = 0
       @balance_min = 0
       @withdrawl_bal_min = 0
-      @checknum = 0
 
       unless @balance.is_a?(Integer) && @balance >= @balance_min
         raise ArgumentError.new("New accounts must begin with a balance of #{@balance_min} or more.")
