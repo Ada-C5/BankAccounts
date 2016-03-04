@@ -34,11 +34,11 @@ module Bank
         end
 
         def withdraw(amount)
-            if enough_money_to_transact
+            if enough_money_to_transact(amount)
                 @balance -= ( amount + self.class::WITHDARAWL_FEE )
                 return @balance
-            elsif (@balance - amount) < self.class::ACCOUNT_MIN_BALANCE
-                puts "HEY! That is unpossible because this account MUST not go below $#{self.class::ACCOUNT_MIN_BALANCE}!"
+            elsif !enough_money_to_transact(amount)
+                puts "HEY! That is unpossible because this account MUST not go below #{self.class::ACCOUNT_MIN_BALANCE}!"
                 return @balance
             end     
         end
@@ -90,8 +90,8 @@ module Bank
             return @balance
         end
 
-        def enough_money_to_transact
-            (@balance - (amount + self.class::WITHDARAWL_FEE)) >= self.class::ACCOUNT_MIN_BALANCE
+        def enough_money_to_transact(amount)
+            (balance - (amount + self.class::WITHDARAWL_FEE)) >= self.class::ACCOUNT_MIN_BALANCE
         end
     end
 
