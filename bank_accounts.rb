@@ -6,9 +6,7 @@ module Bank
     
     # this class creates accounts, we can store account related things in it.
     class Account
-        # I set a constant for cents in a dollar because balances in the CSV are delivered in cents.
-        # this constant allows me to set a balance in dollars which is more human understandable
-        # and will be how withdrawals and deposits are presumably handled.
+        # Constants set for cents in a dollar (to convert balances for human readability), withdrawal fees and minimum balances.
         CENTS_IN_A_DOLLAR = 100.0
         WITHDARAWL_FEE_IN_DOLLARS = 0
         ACCOUNT_MIN_BALANCE_IN_DOLLARS = 0
@@ -16,15 +14,14 @@ module Bank
         attr_reader :id_number 
         attr_accessor :owner
 
-        # resetting initializer to use a hash, because I am indecisive about the best
-        # method to do the thing I want to do. I will hate this again in an hour. 
+        # initializes using a hash
         def initialize(account_info)
             @id_number = account_info[:id_num]
             @balance = account_info[:balance]/CENTS_IN_A_DOLLAR
             @start_date = account_info[:open_date]
             @owner = nil
 
-            if @balance < 0
+            if @balance < self.class::ACCOUNT_MIN_BALANCE_IN_DOLLARS
                 raise ArgumentError.new("You think we give credit here? HAH!")
             end
         end
@@ -97,14 +94,6 @@ module Bank
                 end
             end
         end
-
-        # def self.find(collection_to_search, id)
-        #     collection_to_search.each do |account|
-        #         if account.id_number == id.to_s
-        #             return account
-        #         end
-        #     end
-        # end
     end
 
     # add a savings account class that inherits from account
@@ -114,30 +103,11 @@ module Bank
         ACCOUNT_MIN_BALANCE_IN_DOLLARS = 10
         
         # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
-        def initialize(account_info)
-            super
-            if @balance < 10
-                raise ArgumentError.new("You think we give credit here? HAH!")
-            end
-        end
-    
-    # Redefining withdraw for SavingsAccount because inheriting the previous method will require
-    # more complicated amendments if I call it with super.
-    # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
-    # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
-        # def withdraw(amount)
-        #     # changed the check here to make sure there would be $10 left in the account after.
-        #     if (@balance - (amount + WITHDARAWL_FEE_IN_DOLLARS)) >= 10
-        #         @balance = @balance - ( amount + WITHDARAWL_FEE_IN_DOLLARS )
-        #         puts "After withdrawing #{ amount } and the withdrawal fee the balance for account #{ @id_number } is #{ @balance }."
-        #         return @balance
-        #     elsif (@balance - amount) < 10
-        #         puts "HEY! That is unpossible because this account MUST have $10 in it!"
-        #         puts "The balance for account #{ @id_number } is still #{ @balance }."
-        #         return @balance
-        #     else
-        #         puts "You can't do that operation on a bank account."
-        #     end     
+        # def initialize(account_info)
+        #     super
+        #     if @balance < 10
+        #         raise ArgumentError.new("You think we give credit here? HAH!")
+        #     end
         # end
 
     # It should include the following new methods:
@@ -272,17 +242,6 @@ module Bank
                 end
             end
         end
-
-
-
-        # commented out because it works, but it's using the wrong method signature 
-        # def self.find(collection_to_search, id)
-        #     collection_to_search.each do |account|
-        #         if account.id_number == id.to_s
-        #             return account
-        #         end
-        #     end
-        # end
     end
 
     # write a linker that can tie an account to an owner
