@@ -166,17 +166,33 @@ module Bank
     # Each transaction will be counted against the maximum number of transactions
     # Exception to the above: A deposit performed to reach or exceed the minimum balance of $10,000 is not counted as part of the 6 transactions.
         def deposit(amount)
-            unless @transactions_this_month == MAXIMUM_TRANSACTIONS_MONTHLY && @overdraft_flag == true
-                @balance = @balance + amount
-                @transactions_this_month += 1
+            
+            if @overdraft_flag == true 
+                @balance += amount
+                if @balance > self.class::ACCOUNT_MIN_BALANCE
+                    @overdraft_flag = false
+                end
                 return @balance
+            end
+
+            if @transactions_this_month == MAXIMUM_TRANSACTIONS_MONTHLY && @overdraft_flag == false
+                @balance += amount
+                @transactions_this_month += 1
+                return @balance          
             end
         end
 
     # add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
-
+        def interest_rate(rate)
+            interest = @balance * (rate/100)
+            @balance += interest
+            return interest
+        end
 
     # reset_transactions: Resets the number of transactions to zero
+        def reset_transactions
+            @transactions_this_month = 0
+        end
     end
 
     # this will create owner objects. We can store info about account owners in it.
