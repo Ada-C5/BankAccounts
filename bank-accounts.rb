@@ -91,9 +91,8 @@ module Bank
 
     def add_interest(rate)
       @interest = @balance * rate/100
-      return "Amount added: $#{@interest}"
-      #figure out why interest is not added to balance when calling balance method
       @balance += @interest
+      return "Amount added: $#{@interest}"
     end
   end
 
@@ -186,6 +185,12 @@ module Bank
         @transaction_count += 1
         return "Transactions this month: #{@transaction_count}"
       end
+    end
+
+    def add_interest(rate)
+      @interest = @balance * rate/100
+      @balance += @interest
+      return "Amount added: $#{@interest}"
     end
 
     def reset_transactions
