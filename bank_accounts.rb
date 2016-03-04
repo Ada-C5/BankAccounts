@@ -89,11 +89,11 @@ module Bank
     end
 
     # add a savings account class that inherits from account
+    # due to refactoring, this account contains the specified methods through inheritance, but only currently needs its fees and minimum balance defined.
     class SavingsAccount < Account
         WITHDARAWL_FEE = 200
         ACCOUNT_MIN_BALANCE = 1000
 
-        
     end
 
     # checking account class that inherits from account
