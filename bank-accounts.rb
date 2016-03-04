@@ -51,7 +51,7 @@ module Bank
         puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
         return "Account balance: #{@balance}"
       else
-        @balance -= withdraw_amount - WITHDRAWAL_FEE
+        @balance = @balance - withdraw_amount - WITHDRAWAL_FEE
         return "Account balance: #{@balance}"
       end
     end
@@ -83,7 +83,7 @@ module Bank
         puts "You must maintain a balance of $10.00 in the account. Choose another amount to withdraw"
         puts "Account balance: #{@balance}"
       else
-        @balance -= withdraw_amount - WITHDRAWAL_FEE
+        @balance = @balance - withdraw_amount - WITHDRAWAL_FEE
         return "Account balance: #{@balance}"
       end
     end
@@ -112,7 +112,7 @@ module Bank
         puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
         return "Account balance: #{@balance}"
       else
-        @balance -= withdraw_amount - WITHDRAWAL_FEE
+        @balance = @balance - withdraw_amount - WITHDRAWAL_FEE
         return "Account balance: #{@balance}"
       end
     end
@@ -162,7 +162,7 @@ module Bank
       end
       if @balance - withdraw_amount < 10000
         puts "Your account is below $10,000. A fee of $#{TRANSACTION_FEE} will be incurred for this transaction. No more transactions are allowed until the balance is increased to $10,000."
-        @balance -= withdraw_amount - TRANSACTION_FEE
+        @balance = @balance - withdraw_amount - TRANSACTION_FEE
       else
         @balance -= withdraw_amount
       end
@@ -170,8 +170,15 @@ module Bank
       return "Account balance: $#{@balance}"
     end
 
-    def 
-
+    def deposit(deposit_amount)
+      @transaction_count += 1
+      if @transaction_count > 6
+        raise NoMethodError, "You have reached the maximum number of transactions this month."
+      end
+      # while @balance >= 10000
+      #   raise NoMethodError, "Can't withdraw until account balance reaches $10,000."
+      # end
+      super
     end
 
   end
