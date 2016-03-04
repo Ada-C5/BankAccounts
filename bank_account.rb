@@ -36,21 +36,21 @@ module Bank
       return nil
     end
 
-    # def connect(file = "./support/account_owners.csv")
-    #   CSV.read(file).each do |acct_id, own_id|
-    #     #puts acct_id
-    #     #puts own_id
-    #     Bank::Account.find(acct_id)
-    #     if @account_id == acct_id
-    #       @owner_id = own_id
-    #     end
-    #   end
-    #   return @owner_id
-    # end
-    #
-    # def owner
-    #   puts Bank::Owner.find(connect)
-    # end
+    def connect(file = "./support/account_owners.csv")
+      CSV.read(file).each do |acct_id, own_id|
+        #puts acct_id
+        #puts own_id
+        if @account_id == acct_id.to_i
+          @owner_id = own_id
+          puts "found matching id"
+        end
+      end
+      return @owner_id
+    end
+
+    def owner
+      puts Bank::Owner.find(connect)
+    end
 
 
     #Find an account by id, add owner to that account, add to mates array
