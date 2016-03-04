@@ -5,6 +5,7 @@ module Bank
   class Account
 
     WITHDRAWAL_FEE = 0
+    # CENTS_TO_DOLLARS = 100.00
 
     attr_reader   :balance, :account_id, :open_date
     attr_accessor :owner
@@ -52,13 +53,13 @@ module Bank
         return "Account balance: #{@balance}"
       else
         @balance = @balance - withdraw_amount - WITHDRAWAL_FEE
-        return "Account balance: #{@balance}"
+        return "Account balance: $#{@balance}"
       end
     end
 
     def deposit(deposit_amount)
       @balance += deposit_amount
-      puts "New account balance: $#{@balance}"
+      puts "New account balance: #{@balance}"
     end
 
     def add_owner(owner)
@@ -71,8 +72,11 @@ module Bank
     WITHDRAWAL_FEE = 2
     MIN_BALANCE = 10
 
+    attr_reader :interest
+
     def initialize(account_id, balance, open_date)
       super
+      @balance = balance.to_f
       if @balance < MIN_BALANCE
         raise ArgumentError, "Balance can't be less than $#{MIN_BALANCE}"
       end
@@ -82,7 +86,7 @@ module Bank
     def withdraw(withdraw_amount)
       if @balance - withdraw_amount - WITHDRAWAL_FEE < MIN_BALANCE
         puts "You must maintain a balance of $#{MIN_BALANCE} in the account. Choose another amount to withdraw"
-        puts "Account balance: #{@balance}"
+        return "Account balance: #{@balance}"
       else
         @balance = @balance - withdraw_amount - WITHDRAWAL_FEE
         return "Account balance: #{@balance}"
@@ -103,6 +107,7 @@ module Bank
 
     def initialize(account_id, balance, open_date)
       super
+      @balance = balance.to_f
       puts "A checking account will incur a $#{WITHDRAWAL_FEE} fee per withdrawal."
       @check_count = 0
     end
@@ -146,6 +151,7 @@ module Bank
 
     def initialize(account_id, balance, open_date)
       super
+      @balance = balance.to_f
       @transaction_count = 0
 
       if @balance < MIN_BALANCE
