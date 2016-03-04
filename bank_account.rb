@@ -4,16 +4,16 @@ require 'CSV'
 # input for withdraw and deposit must include cents without decimal ($1.50 - input at 150)
 module Bank
   class Account
-    # minimum balance to open account
     MIN_BAL = 0
     WITHDRAW_FEE = 0
+
     def initialize(id, balance, date, min = MIN_BAL)
       @id = id
       @balance = balance
       @date = date
       # raise error if trying to start new account with negative balance
       if balance < min
-        raise ArgumentError.new("New accounts must have at least a #{money_convert(min)} starting balance.")
+        raise ArgumentError.new("New accounts must have at least a $#{money_convert(min)} starting balance.")
       end
     end
 
@@ -66,6 +66,7 @@ module Bank
       return @balance
     end
 
+    # get id
     def get_id
       return @id
     end
@@ -85,13 +86,13 @@ module Bank
       return accounts
     end
     
-    # return all instances in array
+    # return all account instances in array
     def self.all(file)
       instances = self.create_accounts(file)
       return instances
     end
 
-    # return info about account with passed id
+    # return account instance from id
     def self.find(id)
       sought_account = nil
       accounts = self.create_accounts("./support/accounts.csv")
@@ -128,13 +129,9 @@ module Bank
   class CheckingAccount < Account
     MIN_BAL = 0
     WITHDRAW_FEE = 100
-    CHECK_FEE = 200
 
-    def initialize(id, balance, date)
+    def initialize(id, balance, date, min = MIN_BAL)
       super
-      if balance < MIN_BAL
-        raise ArgumentError.new("New savings accounts must have positive starting balance.")
-      end
       # check counter to track checks used, 3 free checks a month
       @check_count = 0
     end
@@ -145,15 +142,15 @@ module Bank
 
     def withdraw_using_check(amount)
       # tracks checks used per month, 3 free the rest +$2
-      overdraft = -1000
+      overdraft_limit = -1000
       check_fee = 200
-      ### cut and just call method if withdraw(amount, fee)
+      # do initial withdraw
       temp_balance = @balance - amount
       if @check_count >= 3
-        temp_balance -= CHECK_FEE
+        temp_balance -= check_fee
       end
-      # make sure result is positive
-      if temp_balance < overdraft
+      # make sure result is within overdraft limit
+      if temp_balance < overdraft_limit
         puts "You don't have enough money to complete this withdrawl."
       else 
         @balance = temp_balance
@@ -174,12 +171,9 @@ module Bank
     MIN_BAL = 1000000
     WITHDRAW_FEE = 100
 
-    def initialize(id, balance, date)
+    def initialize(id, balance, date, min = MIN_BAL)
       super
       @transactions = 0
-      if balance < MIN_BAL
-        raise ArgumentError.new("New Money Market Accounts must have at least $10,000 starting balance.")
-      end
     end
 
     def withdraw(amount, min = MIN_BAL)
@@ -213,11 +207,12 @@ module Bank
       @transactions = 0
     end
 
-    # update balance with interest, but return only interest
+    # update balance with interest, but return only interest, dividing causes floats so interest is rounded to the nearest cent
     def add_interest(rate)
-      temp = super
-      @balance = temp.round
+      temp_bal = super
+      @balance = temp_bal.round
       puts "New total in your account is #{money_convert(@balance)}"
+      # extract only interest
       interest = @balance * (rate/100)
       interest = interest.round
       puts "Interest accumelated was #{money_convert(interest)}"
@@ -259,6 +254,7 @@ module Bank
       return instances
     end
 
+    # get id
     def get_id
       return @id
     end
