@@ -115,6 +115,7 @@ module Bank
     # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
     # But how do I make it so show_balance doesn't show twice?
     def withdraw(amount_to_withdraw)
+      # Does not allow the account to go below the $10 minimum balance - Will output a warning message
       if (@balance - amount_to_withdraw) < MINIMUM_BALANCE
         raise ArgumentError.new("Savings accounts must maintain at least
         $#{convert_cents(MINIMUM_BALANCE)}. Do not attempt.")
@@ -125,8 +126,14 @@ module Bank
       end
     end
 
-    # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
+    def add_interest(rate)
+      interest = calculate_interest(rate)
+      @balance = @balance + interest
+    end
 
+    def calculate_interest(rate)
+      @balance * rate / 100
+    end
   end
 
 
