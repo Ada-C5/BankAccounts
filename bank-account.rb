@@ -8,16 +8,16 @@ I18n.enforce_available_locales = false # need this not to trip an I18n error!
 
 module Bank
   class Account
-    attr_reader :id, :owner, :creation_date
+    attr_reader :id, :owner, :creation_date, :balance
     TRANSACTION_FEE = 0
     LOWER_BALANCE_LIMIT = 0
     INITIAL_BALANCE_LIMIT = 0
     
     def initialize(account_info)
-      @id = account_info[:id]
+      @id = account_info[:id].to_i
       @owner = account_info[:owner]
       @creation_date = account_info[:creation_date]
-      @balance = account_info[:initial_balance]
+      @balance = account_info[:initial_balance].to_i
       is_balance_enough(INITIAL_BALANCE_LIMIT) # checks if balance meets criteria (is there enough money in it?)
     end
 
@@ -40,11 +40,11 @@ module Bank
 
     # turn balance into a Money object.  Format: $X.XX
     def get_balance
-      Money.new(@balance).format
+      Money.new(balance).format
     end
 
     def is_balance_enough(limit)
-      if @balance < limit
+      if balance < limit
         raise ArgumentError.new("Not enough money!!")
       end
     end
@@ -61,8 +61,8 @@ module Bank
         # index 0 will always be id
         # index 1 will always be balance (convert to a Money obj)
         # index 2 will always be creation date (in DateTime)
-        info_hash[:id] = line[0].to_i
-        info_hash[:initial_balance] = line[1].to_i
+        info_hash[:id] = line[0]
+        info_hash[:initial_balance] = line[1]
         info_hash[:creation_date] = line[2]
         # instantiate using the new hash, then push into accounts array
         accounts << self.new(info_hash)
@@ -94,7 +94,7 @@ module Bank
     attr_reader :owner_id, :first_name, :last_name, :street_address, :city, :state
 
     def initialize(owner_info)
-      @owner_id = owner_info[:owner_id]
+      @owner_id = owner_info[:owner_id].to_i
       @first_name = owner_info[:first_name]
       @last_name = owner_info[:last_name]
       @street_address = owner_info[:street_address]
@@ -106,8 +106,8 @@ module Bank
     def accounts
       owners_accounts = []
       CSV.open("./support/account_owners.csv", 'r').each do |line|
-        if @owner_id == line[1].to_i
-          account_num = line[0].to_i
+        if @owner_id == line[1]
+          account_num = line[0]
           owners_accounts << Bank::Account.find(account_num)
         end
       end
@@ -124,7 +124,7 @@ module Bank
 
       # iterate through the lines of the CSV file owners.csv
       CSV.open("./support/owners.csv", 'r').each do |line|
-        owners_hash[:owner_id] = line[0].to_i
+        owners_hash[:owner_id] = line[0]
         owners_hash[:last_name] = line[1]
         owners_hash[:first_name] = line[2]
         owners_hash[:street_address] = line[3]
@@ -173,14 +173,13 @@ module Bank
     end
 
     def calculate_interest(rate)
-      interest = @balance * rate / 100
+      interest = balance * rate / 100
     end
   end
 
   class CheckingAccount < Account
     attr_reader :number_of_checks
     TRANSACTION_FEE = 100
-    LOWER_BALANCE_LIMIT = -1000
     CHECK_FEE = 200
 
     def initialize(account_info)
@@ -189,7 +188,7 @@ module Bank
     end
 
     def withdraw(money, fee = TRANSACTION_FEE, limit = 0)
-      super(money, fee)
+      super(money, fee, limit)
     end
 
     def withdraw_using_check(amount)
@@ -198,7 +197,7 @@ module Bank
       if number_of_checks > 3
         fee = CHECK_FEE
       end
-      withdraw(amount, fee, LOWER_BALANCE_LIMIT)
+      withdraw(amount, fee, -1000)
     end
 
     def reset_checks
