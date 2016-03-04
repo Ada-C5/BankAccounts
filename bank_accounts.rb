@@ -118,7 +118,7 @@ module Bank
                 @balance -= amount
                 @checks_used_in_month += 1
                 return @balance
-            elsif (@balance - amount) > -1000 || @checks_used_in_month >= 3
+            elsif (@balance - amount) > -1000 && @checks_used_in_month >= 3
                 @balance -= (amount + CHECK_FEE)
                 @checks_used_in_month += 1
                 return @balance
@@ -211,7 +211,7 @@ module Bank
 
         # this adds accounts to the owner's list of accounts
         def add_account(account)
-            @accounts.push(account)
+            accounts.push(account)
         end
 
         # make a Class method that will instantiate accounts from a csv
