@@ -14,6 +14,7 @@ module Bank
       @current_balance = account[:initial_balance]
       @balance = account[:initial_balance]
       @open_date = account[:open_date]
+      @owner_info = account[:owner_info]
       account_values
       argument_error
     end
@@ -59,8 +60,6 @@ module Bank
         account_info = Bank::Account.find((line[0].to_i))
         owner_info = Bank::Owner.find((line[1].to_i))
         account_owner << [account_info, owner_info]
-        # account_owner << [account_info: account_info, owner_info: owner_info]
-
       end
       return account_owner
     end
@@ -91,8 +90,8 @@ module Bank
       return @current_balance
     end
 
-    def owner_info (owner)
-      @account_info[:owner]= (owner.owner_property[:owner])
+    def add_owner (owner)
+      @owner_info = Bank::Owner.new(owner)
     end
   end
 
@@ -106,6 +105,7 @@ module Bank
       @street_address = owner_info[:street_address]
       @city = owner_info[:city]
       @state = owner_info[:state]
+      @account_info = owner_info[:account_info]
     end
 
     def self.all
@@ -137,8 +137,14 @@ module Bank
       accounts.each do |line|
         if id == line[1].id
           return line
+        else
+          nil
         end
       end
+    end
+
+    def add_account (account)
+      @account_info = Bank::Account.new(account)
     end
   end
 
@@ -166,7 +172,7 @@ module Bank
 
     attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts, :balance
 
-    def account_constants
+    def account_values
       super(MINIMUM_ACCOUNT_BALANCE, INITIAL_BALANCE_MIN, TRANSACION_FEE)
     end
 
@@ -212,8 +218,6 @@ module Bank
       new_balance = @current_balance - @transaction_check_fee - withdraw_amount
       if new_balance >= check_min
         check_count
-        puts "transaction_fee #{@transaction_fee}"
-        puts "check count #{@check_withdraw_count}"
         @current_balance = new_balance
       else
         puts "WARNING: invalid withdraw amount. Current balance is: #{@current_balance}"
@@ -253,11 +257,11 @@ module Bank
         balance = super(amount)
         if balance < 10000
           @total_transactions += 1
-          puts "Number of monthly transactions: #{@total_transactions}"
-          @current_balance = balance - 100
+          below_min_fee = 100
+          puts "Balance is below $10,000, a fee of $100 is imposed."
+          @current_balance = balance - below_min_fee
         else
           @total_transactions += 1
-          puts "Number of monthly transactions: #{@total_transactions}"
           @current_balance = balance
         end
       end
@@ -265,12 +269,10 @@ module Bank
 
     def deposit (amount)
       if @current_balance < 10000
-        puts "Number of monthly transactions: #{@total_transactions}"
         @current_balance = super(amount)
       end
       if transaction_count? == true
         @total_transactions += 1
-        puts "Number of monthly transactions: here #{@total_transactions}"
         @current_balance = super(amount)
       end
     end
