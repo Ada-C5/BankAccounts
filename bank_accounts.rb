@@ -102,9 +102,7 @@ module Bank
       @open_date = allaccountscsv[csv_index][2]
     end
 
-    # be able to instantiate a new account from each line in the csv.
-    # class method.
-    # similar to above.
+    # Class method traces file pathway and puts csv data into array.
     def self.read_csv(file)
       require 'csv'
       read_csv = CSV.read(file, 'r')
@@ -147,17 +145,19 @@ module Bank
 
 
   class SavingsAccount < Account
+    attr_reader :balance
     # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
     # Override constants from base class Account.
     WITHDRAWAL_FEE = 2
     MIN_INIT_BALANCE = 10
     MIN_NEG_BALANCE = 10
-    MIN_NEG_MSG = "Savings account balance remain above $#{MIN_NEG_BALANCE}. Current balance $#{@balance}. Insufficient funds for this withdrawal."
+    MIN_NEG_MSG = "Savings account balance remain above $#{MIN_NEG_BALANCE}. Insufficient funds for this withdrawal."
 
     #add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
     # Input rate is assumed to be a percentage (i.e. 0.25).
     # The formula for calculating interest is balance * rate/100
     # Example: If the interest rate is 0.25% and the balance is $10,000, then the interest that is returned is $25 and the new balance becomes $10,025.
+
     # Defining interest_rate in isolated, easily changed method.
     def interest_rate
       interest_rate = (0.25)
@@ -183,6 +183,7 @@ module Bank
   CHECK_LIMIT = 3
   CHECK_FEE = 2
 
+    # Initialize from Account, add instance variable @checktally.
     def initialize(accountdata)
     super
     @checktally = 0
@@ -214,8 +215,7 @@ module Bank
       end
     end
 
-
-    #reset_checks: Resets the number of checks used to zero
+    #Resets the number of checks used to zero.
     def reset_checks
       @checktally = 0
     end
@@ -253,8 +253,9 @@ module Bank
     end
 
 
-    # The data, in order in the CSV, consists of:
+    # Wave 2 Optionals.
     #
+    # The data, in order in the CSV, consists of:
     # ID - (Fixnum) a unique identifier for that Owner
     # Last Name - (String) the owner's last name
     # First Name - (String) the owner's first name
