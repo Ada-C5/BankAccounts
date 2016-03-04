@@ -167,8 +167,8 @@ WITHDRAWAL_FEE = 2
       # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
       # It should include the following new methods:
     def withdraw(withdrawal)
-      if (@balance - withdrawal - WITHDRAWAL_FEE)) >= 10
-        @balance -= withdrawal - WITHDRAWAL_FEE
+      if (@balance - withdrawal - WITHDRAWAL_FEE) >= 10
+        @balance -= (withdrawal + WITHDRAWAL_FEE)
       else puts "Savings account balance must be above $10. Current balance $#{@balance}. Insufficient funds for this withdrawal."
       end
     end
@@ -197,7 +197,7 @@ WITHDRAWAL_FEE = 2
 
 
   class CheckingAccount < Account
-
+  CHECK_LIMIT = 3
     def initialize(accountdata)
     # @owner = accountdata[:owner] # string
     super
@@ -223,11 +223,11 @@ WITHDRAWAL_FEE = 2
     end
 
     def withdraw_using_check(withdrawal)
-      if @checktally >= 3 && checking_min_balance(withdrawal)
+      if @checktally >= CHECK_LIMIT && checking_min_balance(withdrawal)
         @balance -= (withdrawal + WITHDRAWAL_FEE)
         @checktally += 1
         return @balance
-      elsif @checktally < 3 && checking_min_balance(withdrawal)
+      elsif @checktally < CHECK_LIMIT && checking_min_balance(withdrawal)
         @balance -= withdrawal
         @checktally += 1
         return @balance
