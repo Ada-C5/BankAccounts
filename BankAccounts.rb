@@ -131,6 +131,8 @@ module Bank
     def initialize
       super(fee,min_amount)
       @fee = 1
+      @checks_used = 0
+      @counter = 0
     end
 
     def withdraw(withdraw_amount)
@@ -142,12 +144,22 @@ module Bank
       if amount + @fee > @initial_balance + 10
         puts "You don't have enough money to take that out."
         return @initial_balance
-      else
-      @initial_balance = @initial_balance - amount - @fee
-      return @initial_balance = @initial_balance
+      elsif @checks_used > 3
+       @initial_balance = @initial_balance - amount - 2
+       return @initial_balance
+
+      else @initial_balance = @initial_balance - amount - @fee
+          @checks_used = @checks_used + 1
+          return @initial_balance = @initial_balance
+
       end
     end
 
+
+    
+
   end
+
+
 
 end
