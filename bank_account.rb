@@ -156,18 +156,51 @@ module Bank
   end
 
   class CheckingAccount < Account
-      TRANSACTION_FEE = 1
-      def withdraw(amount)
-        if @balance - amount >= 1
-          super
+    TRANSACTION_FEE = 1
+    attr_reader :checks_used
+    def initialize(info)
+      super(info)
+      @checks_used = 0
+    end
+
+    def withdraw(amount)
+      if @balance - amount >= 1
+        super
+      else
+        printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.", @balance)
+      end
+    end
+
+
+    def withdraw_using_check(amount)
+      if @checks_used < 3
+        if @balance - amount > -10
+          @balance -= amount
+          @checks_used += 1
+          printf("You have withdrawn $%.2f.  Your current balance is $%.2f.", amount, @balance)
+        else
+          printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.", @balance)
+        end
+
+      else
+        if @balance - amount > -10
+          @balance -= amount
+          @balance -= 2
+          @checks_used += 1
+          printf("You have withdrawn $%.2f.  Your current balance is $%.2f.", amount, @balance)
         else
           printf("Sorry, you don't have enough money in your account to make that withdrawl. Your current balance is $%.2f.", @balance)
         end
       end
+    end
+
+    def reset_checks
+      @checks_used = 0
+    end
+
+    def checks_used
+      puts "You have used #{@checks_used} checks."
+    end
   end
-
-
-
-
 
 end
