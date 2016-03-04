@@ -4,14 +4,15 @@ require 'money'
 module Bank
   class Account
     attr_reader :id, :money, :start_date
+    ACCOUNT_MIN = 0
+    WITHDRAWAL_FEE = 0
 
     def initialize(hash)
       @id = hash[:id]
       @money = hash[:money]
       @start_date = hash[:start_date]
 
-      account_min = 0
-      if money < account_min
+      if money < self.class::ACCOUNT_MIN
         raise ArgumentError.new("Only positive amounts are allowed in the bank.")
       end
     end
@@ -26,14 +27,13 @@ module Bank
     # end
 
     def withdraw(take_out = 0)
-      account_min = 0
-      withdrawal_fee = 0
       # @take_out = take_out
-      if @money.to_f - take_out.to_f < account_min
-        puts "You don't have enough money in the bank for this transaction."
+      if @money.to_f - take_out.to_f < self.class::ACCOUNT_MIN
+        puts "Account balance must remain above $#{self.class::ACCOUNT_MIN}."
         balance
       else
-        @money -= take_out.to_f + withdrawal_fee
+        @money -= take_out.to_f + self.class::WITHDRAWAL_FEE
+        puts "Withdrawal fees: $#{self.class::WITHDRAWAL_FEE}"
         balance
       end
     end
@@ -78,11 +78,10 @@ module Bank
 
       CSV.foreach("account_owners.csv") do |row|
         puts row[1]
-        account.each do |instance|
-          puts instance.
-          if row[1] == instance.id
-            puts "MEOW"
-            return instance
+        owner.each do |num|
+          puts num.list_num
+          if row[1] == num.list_num
+            return num
           end
         end
       end
@@ -91,6 +90,7 @@ module Bank
   end
 
   class Owner
+
     attr_reader :list_num
     def initialize(info_hash)
       @list_num = info_hash[:list_num]
@@ -115,7 +115,6 @@ module Bank
         :street =>"", :city => "", :state => ""}
       owners = CSV.read('owners.csv')
       owner_info = []
-
       # loop down each row and creates a new hash each time
       CSV.foreach("owners.csv") do |row|
         hashes = info_hash
@@ -132,26 +131,25 @@ module Bank
   end
 
   class SavingsAccount < Account
+    ACCOUNT_MIN = 10
+    WITHDRAWAL_FEE = 2
     def initialize(hash)
       @id = hash[:id]
       @money = hash[:money]
       @start_date = hash[:start_date]
 
-      account_min = 10
-      if money < account_min
-        raise ArgumentError.new("Only amounts above $10 are allowed in the bank.")
+      if money < self.class::ACCOUNT_MIN
+        raise ArgumentError.new("Account balance must be above $#{self.class::ACCOUNT_MIN}.")
       end
     end
 
     def withdraw(take_out = 0)
-      account_min = 10
-      withdrawal_fee = 2
-
-      if @money.to_f - take_out.to_f < account_min
-        puts "$10 must be left in the savings account at all times."
+      if @money.to_f - take_out.to_f < self.class::ACCOUNT_MIN
+        puts "Account balance must remain above $#{self.class::ACCOUNT_MIN}."
         balance
       else
-        @money -= take_out.to_f + withdrawal_fee
+        @money -= take_out.to_f + self.class::WITHDRAWAL_FEE
+        puts "Withdrawal fees: $#{self.class::WITHDRAWAL_FEE}"
         balance
       end
     end
@@ -171,13 +169,12 @@ module Bank
     def withdraw(take_out = 0)
       account_min = 0
       withdrawal_fee = 1
-
-      # @take_out = take_out
       if @money.to_f - take_out.to_f < account_min
-        puts "You don't have enough money in the bank for this transaction."
+        puts "Account balance must remain above $#{account_min}."
         balance
       else
         @money -= take_out.to_f + withdrawal_fee
+        puts "Withdrawal fees: $#{withdrawal_fee}"
         balance
       end
     end
@@ -189,13 +186,15 @@ module Bank
       @num += 1
 
       if @money.to_f - take_out.to_f < account_min
-        puts "You may only overdraft up to $10."
+        puts "You may only overdraft up to $#{account_min.abs}."
         balance
       elsif @num > free_withdrawal #After 3 withdrawals, fees start
         @money -= take_out.to_f + withdrawal_fee
+        puts "Withdrawal fees: $#{withdrawal_fee}"
         balance
       else
         @money -= take_out.to_f
+        puts "Withdrawal fees: $0"
         balance
       end
     end
