@@ -45,6 +45,8 @@ module Bank
   # Class has constants to simplify changing minimum initial balances and fees.
   WITHDRAWAL_FEE = 0
   MIN_INIT_BALANCE = 0
+  MIN_NEG_BALANCE = 0
+  MIN_NEG_MSG = "Withdrawal cannot be completed with available funds."
 
     attr_reader :balance
 
@@ -62,9 +64,9 @@ module Bank
 
     # Withdraw method accepts a single parameter which represents the amount of the withdrawal. Method should return the updated account balance.
     def withdraw(withdrawal)
-      if @balance - (withdrawal + self.class::WITHDRAWAL_FEE)>= 0
+      if @balance - (withdrawal + self.class::WITHDRAWAL_FEE)>= self.class::MIN_NEG_BALANCE
         @balance -= (withdrawal + self.class::WITHDRAWAL_FEE)
-          else puts "Withdrawal cannot be completed with available funds."
+      else puts self.class::MIN_NEG_MSG
         balance
       end
     end
@@ -149,17 +151,8 @@ module Bank
     # Override constants from base class Account.
     WITHDRAWAL_FEE = 2
     MIN_INIT_BALANCE = 10
-
-      # Updated withdrawal functionality:
-      # Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
-      # Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
-      # It should include the following new methods:
-    def withdraw(withdrawal)
-      if (@balance - withdrawal - WITHDRAWAL_FEE) >= 10
-        @balance -= (withdrawal + WITHDRAWAL_FEE)
-      else puts "Savings account balance must be above $10. Current balance $#{@balance}. Insufficient funds for this withdrawal."
-      end
-    end
+    MIN_NEG_BALANCE = 10
+    MIN_NEG_MSG = "Savings account balance remain above $#{MIN_NEG_BALANCE}. Current balance $#{@balance}. Insufficient funds for this withdrawal."
 
     #add_interest(rate): Calculate the interest on the balance and add the interest to the balance. Return the interest that was calculated and added to the balance (not the updated balance).
     # Input rate is assumed to be a percentage (i.e. 0.25).
