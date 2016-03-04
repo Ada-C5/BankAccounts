@@ -10,17 +10,17 @@ module Bank
   class Account
     attr_reader :id, :owner, :creation_date, :balance
     TRANSACTION_FEE = 0
-    BALANCE_LIMIT = 0
+    BALANCE_MINIMUM = 0
     
     def initialize(account_info)
       @id = account_info[:id].to_i
       @owner = account_info[:owner]
       @creation_date = account_info[:creation_date]
       @balance = account_info[:initial_balance].to_i
-      is_balance_enough(BALANCE_LIMIT) # checks if balance meets criteria (is there enough money in it?)
+      is_balance_enough(BALANCE_MINIMUM) # checks if balance meets criteria (is there enough money in it?)
     end
 
-    def withdraw(money, fee = TRANSACTION_FEE, limit = BALANCE_LIMIT)
+    def withdraw(money, fee = TRANSACTION_FEE, limit = BALANCE_MINIMUM)
       if @balance >= (money + limit + fee) # if balance will stay above the lower limit after money is withdrawn
         @balance -= (money + fee)
       else
@@ -153,18 +153,7 @@ module Bank
   end
 
 
-  class SavingsAccount < Account
-    TRANSACTION_FEE = 200 # $2.00 transaction fee (200 in cents)
-    BALANCE_LIMIT = 1000 # $10.00 lower balance limit
-    
-    def is_balance_enough(limit)
-      super(BALANCE_LIMIT)
-    end
-
-    def withdraw(money)
-      super(money, TRANSACTION_FEE, BALANCE_LIMIT)
-    end
-
+  module Interest
     def add_interest(rate)
       interest = calculate_interest(rate)
       @balance += interest
@@ -172,6 +161,22 @@ module Bank
 
     def calculate_interest(rate)
       interest = balance * rate / 100
+    end
+  end
+
+
+class SavingsAccount < Account
+    include Interest
+
+    TRANSACTION_FEE = 200 # $2.00 transaction fee (200 in cents)
+    BALANCE_MINIMUM = 1000 # $10.00 lower balance limit
+
+    def is_balance_enough(limit)
+      super(BALANCE_MINIMUM)
+    end
+
+    def withdraw(money)
+      super(money, TRANSACTION_FEE, BALANCE_MINIMUM)
     end
   end
 
@@ -197,7 +202,7 @@ module Bank
         fee = check_fee # if 3 checks have already been used, each additional check has a $2 fee
       end
       withdraw(amount, fee, -1000) # can have up to a $10 overdraft
-    end
+    end 
 
     def reset_checks
       @number_of_checks = 0
@@ -207,8 +212,10 @@ module Bank
 
 
   class MoneyMarketAccount < Account
+    include Interest
+
     attr_reader :number_of_transactions
-    BALANCE_LIMIT = 1000000 # initial balance can't be less than $10,000
+    BALANCE_MINIMUM = 1000000 # initial balance can't be less than $10,000
 
     def initialize(account_info)
       super
@@ -218,7 +225,7 @@ module Bank
     end
 
     def is_balance_enough(limit)
-      super(BALANCE_LIMIT)
+      super(BALANCE_MINIMUM)
     end
 
     def check_transaction_status
@@ -237,7 +244,7 @@ module Bank
     end
 
     def give_withdrawal_message
-      puts "You may not withdraw any more money while balance is below #{Money.new(BALANCE_LIMIT).format}"
+      puts "You may not withdraw any more money while balance is below #{Money.new(BALANCE_MINIMUM).format}"
       return balance
     end
 
@@ -252,7 +259,7 @@ module Bank
 
       super
 
-      if balance < BALANCE_LIMIT
+      if balance < BALANCE_MINIMUM
         @can_withdraw = false
         @balance -= 10000
         return give_withdrawal_message
@@ -270,16 +277,21 @@ module Bank
         return give_transaction_message
       end
 
-      if balance > BALANCE_LIMIT
+      if balance > BALANCE_MINIMUM
         @can_withdraw = true
       end
 
       return balance
     end
 
+    def reset_transactions
+      @number_of_transactions = 0
+    end
+
   end
 
 end
+
 
 
 
