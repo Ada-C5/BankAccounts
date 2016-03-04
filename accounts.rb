@@ -158,14 +158,72 @@ module Bank
   class MoneyMarketAccount < Account
     TRANSACTION_LIMIT = 6
 
-    attr_reader :balance, :id
+    attr_reader :balance, :id, :transaction_count
     def initialize(id, balance, open_date, its_owner = nil)
       raise ArgumentError, "A new account cannot be created with initial balance lower than $10,000." if balance < 10000
       @id = id
       @balance = balance
       @open_date = open_date
       @owner_id = its_owner
-      #@account_owner = owner #link this??
+      @transaction_count = 0
+    end
+
+    def withdraw(amount)
+      #If a withdrawal causes the balance to go below $10,000, a fee of $100
+      #is imposed and no more transactions are allowed until the balance is increased using a deposit transaction
+      if @transaction_count < 6
+        if balance < 10000
+          puts "WARNING: No more transactions allowed until balance is increased above $10,000"
+        else
+          if amount <= @balance
+            new_balance = @balance - amount
+            if new_balance < 10000
+              imposed_fee = 100
+            else
+              imposed_fee = 0
+            end
+            @balance = @balance - amount - imposed_fee
+            @transaction_count = @transaction_count + 1
+            if imposed_fee > 0
+              puts "WARNING: The balance has gone below $10,000 and a fee of $100 was applied. No more transactions allowed until balance is increased."
+            end
+            return @balance
+
+          else
+            puts "WARNING: The amount requested is greater than the account's balance."
+            return @balance
+          end
+        end
+      else
+        puts "The maximum number of transactions for the month has been reached. Withdrawal refused."
+        return @balance
+      end
+    end #withdraw method end
+
+    def deposit(amount)
+      #A deposit performed to reach or exceed the minimum balance of $10,000
+      #is not counted as part of the 6 transactions.
+      if @balance < 10000
+        @balance = @balance + amount
+        puts "This transaction did not count towards your transaction count."
+        return @balance
+
+      else
+        if @transaction_count < 6
+          @balance = @balance + amount
+          @transaction_count = @transaction_count + 1
+          return @balance
+        else
+          puts "The maximum number of transactions for the month has been reached. Withdrawal refused."
+          return @balance
+        end #conditional for transaction_count end
+
+      end # balance < 10000 conditional end
+    end #deposit method end
+
+
+    def reset_transactions
+      @transaction_count = 0
     end
 
 
