@@ -107,11 +107,12 @@ module Bank
   class CheckingAccount < Account
     WITHDRAW_FEE = 1
     TRANSACTION_FEE = 2
-    attr_reader :number_free_checks
+    attr_reader :number_free_checks, :number_incurred_checks
 
     def initialize(id, balance, open_date, its_owner = nil)
       super
       @number_free_checks = 3
+      @number_incurred_checks = 0
     end
 
     def withdraw(amount)
@@ -140,6 +141,7 @@ module Bank
         else
           @balance = new_balance
           @number_free_checks = @number_free_checks - 1
+          @number_incurred_checks = @number_incurred_checks + 1
           return @balance
         end
       else
@@ -151,6 +153,22 @@ module Bank
     def reset_checks
       @number_free_checks = 3
     end
+  end
+
+  class MoneyMarketAccount < Account
+    TRANSACTION_LIMIT = 6
+
+    attr_reader :balance, :id
+    def initialize(id, balance, open_date, its_owner = nil)
+      raise ArgumentError, "A new account cannot be created with initial balance lower than $10,000." if balance < 10000
+      @id = id
+      @balance = balance
+      @open_date = open_date
+      @owner_id = its_owner
+      #@account_owner = owner #link this??
+    end
+
+
   end
 
   class Owner
