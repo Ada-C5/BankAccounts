@@ -22,3 +22,15 @@ class AccountLinker
         owner_to_link.accounts << account_to_link
     end
 end
+
+# find methods I want to save (still not really sandboxed, this is badly named.)
+
+        # def self.find(collection_to_search, id)
+        #     collection_to_search.each do |account|
+        #         if account.id_number == id.to_s
+        #             return account
+        #         end
+        #     end
+        # end
+
+        
