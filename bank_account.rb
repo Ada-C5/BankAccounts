@@ -7,6 +7,9 @@ require "CSV"
 			@account_id = id
 			@balance = balance
 			@open_date = open_date
+      @minimum_amount = 0
+      @fees = 0
+      @check_fees = 0
 
 			raise ArgumentError, "Balance must be greater than zero." unless @balance>=0
 		end
@@ -30,10 +33,10 @@ require "CSV"
     end
 
 		def withdraw(debit)
-			if debit>@balance
+			if (@balance-debit)<@minimum_amount
 				puts "Doing this will make your account overdrawn!"
 			else
-				@balance = @balance - debit
+				@balance = @balance - debit - @fees -@check_fees
 			end
 			return @balance
 		end
@@ -134,7 +137,8 @@ require "CSV"
         if debit > (@balance-1000)
           puts "Withdrawal amount is above the limit. Request denied."
         else
-          @balance = super-200        
+          @fees = 200
+          @balance = super        
         end
         say_balance(@balance)
         return @balance
@@ -158,24 +162,26 @@ require "CSV"
     end
 
     def withdraw(debit)
-      if debit > (@balance)
-        puts "Withdrawal amount is above the limit. Request denied."
-      else
-        @balance = super-100
-      end
+      @fees = 100
+      @balance = super
       say_balance(@balance)
       return @balance
     end
 
     def withdraw_using_check(amount)
-      if amount > (@balance+1000)
-        puts "Withdrawal amount is above the limit. Request denied."
-      elsif @check_count>=3
+      #Sets minimum account balance to -$10 then
+      #starts counting check usage and applies fee
+      #accordingly.
+      @minimum_amount=-1000
+      
+      if @check_count>=3
         @check_count+=1
-        @balance = withdraw(amount+100)
+        @check_fees = 100
+        @balance = withdraw(amount)
       else
         @check_count+=1
-        @balance = withdraw(amount-100)
+        @check_fees = -100
+        @balance = withdraw(amount)
       end
       return @balance
     end
@@ -184,4 +190,7 @@ require "CSV"
       @check_count = 0
     end
   end
+
+  class MoneyMarketAccount < Account
+
 end    
