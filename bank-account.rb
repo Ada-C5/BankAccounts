@@ -201,6 +201,10 @@ module Bank
       withdraw(amount, fee, LOWER_BALANCE_LIMIT)
     end
 
+    def reset_checks
+      @number_of_checks = 0
+    end
+
   end
 
 end
