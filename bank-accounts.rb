@@ -58,7 +58,7 @@ module Bank
 
     def deposit(deposit_amount)
       @balance += deposit_amount
-      return "New account balance: $#{@balance}"
+      puts "New account balance: $#{@balance}"
     end
 
     def add_owner(owner)
@@ -142,6 +142,8 @@ module Bank
   class MoneyMarketAccount < Account
     TRANSACTION_FEE = 100
 
+    attr_reader :transaction_count
+
     def initialize(account_id, balance, open_date)
       super
       @transaction_count = 0
@@ -167,19 +169,19 @@ module Bank
       else
         @balance -= withdraw_amount
       end
-      puts "Current transactions this month: #{@transaction_count}"
+      puts "Transactions this month: #{@transaction_count}"
       return "Account balance: $#{@balance}"
     end
 
     def deposit(deposit_amount)
-      @transaction_count += 1
+      super
       if @transaction_count > 6
         raise NoMethodError, "You have reached the maximum number of transactions this month."
       end
-      # while @balance >= 10000
-      #   raise NoMethodError, "Can't withdraw until account balance reaches $10,000."
-      # end
-      super
+      if @balance < 10000
+        @transaction_count =+ 0
+        return "Transactions this month: #{@transaction_count}"
+      end
     end
 
   end
