@@ -6,7 +6,7 @@ module Bank
 	class Account
 		attr_reader :account_id, :show_balance, :account_open_date, :withdraw_money, :deposit_money
 		
-		# magic number. Initial balance is in pennies This convers pennies to dollars 
+		# magic number. Initial balance is in pennies This converts pennies to dollars 
 		PENNY_CONVERTER = 100.0
 		WITHDRAW_FEE = 0.00
 		
@@ -30,14 +30,11 @@ module Bank
 		def withdraw_money(amount)
 			check_entry = check_entry(amount)
 			if check_entry == false
-				puts "*** ERROR ***"
-				puts "That is not a valid amount to withdraw." 
-				show_balance
+				show_error
 			end
 			new_balance = @balance - amount - WITHDRAW_FEE
 			if new_balance < 0
-				puts "*** ERROR ***"
-				puts "Insufficent Funds."
+				show_insufficient_funds
 				new_balance = @balance + amount + WITHDRAW_FEE
 				show_balance
 			else 
@@ -56,9 +53,7 @@ module Bank
 				@balance = new_balance
 				show_balance
 			else 
-				puts "*** ERROR ***"
-				puts "That is not a valid amount to deposit."
-				show_balance
+				show_error
 			end
 		end
 
@@ -70,6 +65,16 @@ module Bank
 			return amount.match(regex) !=nil
 		end
 
+		def show_error
+			puts "*** ERROR ***"
+			puts "That is not a valid amount for your transaction."
+			show_balance					
+		end
+
+		def show_insufficient_funds
+			puts "*** ERROR ***"
+			puts "Insufficent Funds."
+		end
 		def show_balance
 			puts format("Currently you have an account balance of $%.2f", @balance)
 		end
@@ -86,7 +91,6 @@ module Bank
 			   	)
 			 end
 			end
-
 			return accounts
 		end 
 		
@@ -117,14 +121,11 @@ module Bank
 		def withdraw_money(amount)
 		check_entry = check_entry(amount)
 			if check_entry == false
-				puts "*** ERROR ***"
-				puts "That is not a valid amount to withdraw." 
-				show_balance
+				show_error
 			end
 			new_balance = @balance - amount - WITHDRAW_FEE
 			if new_balance < 10
-				puts "*** ERROR ***"
-				puts "Insufficent Funds."
+				show_insufficient_funds
 				new_balance = @balance + amount + WITHDRAW_FEE
 				show_balance
 			else 
@@ -161,15 +162,12 @@ module Bank
 		def	withdraw_money(amount) 
 			check_entry = check_entry(amount)
 			if check_entry == false
-				puts "*** ERROR ***"
-				puts "That is not a valid amount to withdraw." 
-				show_balance
+				show_error
 			end
 			if @checks < 3
 				new_balance = @balance - amount - WITHDRAW_FEE 
 				if new_balance < -10
-					puts "*** ERROR ***"
-					puts "Insufficent Funds."
+					show_insufficient_funds
 					new_balance = @balance + amount + WITHDRAW_FEE 
 					show_balance
 				else 
@@ -183,8 +181,7 @@ module Bank
 			else @checks > 3
 				new_balance = @balance - amount - WITHDRAW_FEE - TRANSACTION_FEE
 				if new_balance < -10
-					puts "*** ERROR ***"
-					puts "Insufficent Funds."
+					show_insufficient_funds
 					new_balance = @balance + amount + WITHDRAW_FEE + TRANSACTION_FEE
 					show_balance
 				else 
@@ -254,40 +251,21 @@ end
 # Testing Below
 #
 
-# accounts 	= Bank::Account.get_all('./support/accounts.csv')
-# account 	= Bank::Account.find(1212, accounts)
-
+accounts 	= Bank::Account.get_all('./support/accounts.csv')
+account 	= Bank::Account.find(1212, accounts).withdraw_money(20)
+pp account
 
 # savings_accounts 	= Bank::SavingsAccount.get_all('./support/savings_accounts.csv')
 
 # savings_account 	= Bank::SavingsAccount.find(1112, savings_accounts).show_balance
 # savings_account 	= Bank::SavingsAccount.find(1112, savings_accounts).withdraw_money(20)
 
-checking_accounts = Bank::CheckingAccount.get_all('./support/checking_accounts.csv')
+# checking_accounts = Bank::CheckingAccount.get_all('./support/checking_accounts.csv')
 
-checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).show_balance
-puts checking_account
-checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
-puts checking_account
-pp @checks
-checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
-puts checking_account
-pp @checks
-checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
-puts checking_account
-pp @checks
-checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
-puts checking_account
-pp @checks
-checking_account = Bank::CheckingAccount.find(1012, checking_accounts).reset_checks
-puts checking_account
-pp @checks
-checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
-puts checking_account
-pp @checks
-checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
-puts checking_account
-pp @checks
+# checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).show_balance
+# puts checking_account
+# checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
+
 
 # owners = Bank::Owner.get_all('./support/owners.csv') 
 
