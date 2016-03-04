@@ -73,14 +73,14 @@ module Bank
 
     def initialize(account_id, balance, open_date)
       super
-      if @balance < 10
+      if @balance < MIN_BALANCE
         raise ArgumentError, "Balance can't be less than $#{MIN_BALANCE}"
       end
       puts "A savings account will incur a $#{WITHDRAWAL_FEE} fee per withdrawal."
     end
 
     def withdraw(withdraw_amount)
-      if @balance - withdraw_amount - WITHDRAWAL_FEE < 10
+      if @balance - withdraw_amount - WITHDRAWAL_FEE < MIN_BALANCE
         puts "You must maintain a balance of $#{MIN_BALANCE} in the account. Choose another amount to withdraw"
         puts "Account balance: #{@balance}"
       else
@@ -141,6 +141,7 @@ module Bank
 
   class MoneyMarketAccount < Account
     TRANSACTION_FEE = 100
+    MIN_BALANCE = 10000
 
     attr_reader :transaction_count
 
@@ -148,25 +149,26 @@ module Bank
       super
       @transaction_count = 0
 
-      if @balance < 10000
-        raise ArgumentError, "Balance can't be less than $10,000."
+      if @balance < MIN_BALANCE
+        raise ArgumentError, "Balance can't be less than $#{MIN_BALANCE}."
       end
 
       puts "Please note: a maximum of 6 transactions are allowed per month with this account type."
     end
 
     def withdraw(withdraw_amount)
-      @transaction_count += 1
-      if @transaction_count > 6
+      if @transaction_count >= 6
         raise NoMethodError, "You have reached the maximum number of transactions this month."
       end
-      until @balance >= 10000
+      until @balance >= MIN_BALANCE
         raise NoMethodError, "Can't withdraw until account balance reaches $10,000."
       end
-      if @balance - withdraw_amount < 10000
+      if @balance - withdraw_amount < MIN_BALANCE
+        @transaction_count += 1
         puts "Your account is below $10,000. A fee of $#{TRANSACTION_FEE} will be incurred for this transaction. No more transactions are allowed until the balance is increased to $10,000."
         @balance = @balance - withdraw_amount - TRANSACTION_FEE
       else
+        @transaction_count += 1
         @balance -= withdraw_amount
       end
       puts "Transactions this month: #{@transaction_count}"
@@ -174,14 +176,21 @@ module Bank
     end
 
     def deposit(deposit_amount)
-      super
-      if @transaction_count > 6
+      if @transaction_count >= 6
         raise NoMethodError, "You have reached the maximum number of transactions this month."
       end
-      if @balance < 10000
-        @transaction_count =+ 0
+      super
+      if @balance <= MIN_BALANCE
+        return "Transactions this month: #{@transaction_count}"
+      else
+        @transaction_count += 1
         return "Transactions this month: #{@transaction_count}"
       end
+    end
+
+    def reset_transactions
+      @transaction_count = 0
+      return "Current transaction count: #{@transaction_count}"
     end
 
   end
