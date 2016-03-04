@@ -36,12 +36,15 @@ require_relative 'bank_account.rb'
 
 # # # # TESTS FOR MONEY MARKET CLASS # # # ## 
 ### test withdraw
-w = Bank::MoneyMarketAccount.new(33, 5000000, 2009)
-puts w.withdraw(10000)
-puts w.withdraw(10000)
-puts w.withdraw(10000)
-puts w.withdraw(10000)
-puts w.withdraw(10000)
+# w = Bank::MoneyMarketAccount.new(33, 5000000, 2009)
+# puts w.withdraw(10000)
+# puts w.withdraw(10000)
+# puts w.withdraw(10000)
+# puts w.withdraw(10000)
+# puts w.withdraw(10000)
+
+w = Bank::MoneyMarketAccount.new(33, 1000000, 2011)
+puts w.add_interest(0.25)
 
 
 ### test deposit
