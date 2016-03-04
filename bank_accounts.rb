@@ -2,6 +2,16 @@
 
 require 'csv'
 
+module InterestRate
+    # Input rate is assumed to be a percentage (i.e. 0.25).
+    # The formula for calculating interest is balance * rate/100
+    def interest_rate(rate)
+        interest = @balance * rate / 100
+        @balance += interest
+        return interest
+    end
+end
+
 module Bank
     
     # this class creates accounts, we can store account related things in it.
@@ -272,12 +282,4 @@ module Bank
     end
 end
 
-module InterestRate
-    # Input rate is assumed to be a percentage (i.e. 0.25).
-    # The formula for calculating interest is balance * rate/100
-    def interest_rate(rate)
-        interest = @balance * rate / 100
-        @balance += interest
-        return interest
-    end
-end
+
