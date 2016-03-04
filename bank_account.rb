@@ -205,7 +205,8 @@ module Bank
     def withdraw(money)
       balance = @account_balance - money
       if @transactions >= 6
-
+        puts "You have already used your 6 monthly tranactions."
+        return @account_balance
       end
       if balance < 9_900
         puts "All transactions are suspended until balance is $10,000.00."
@@ -224,6 +225,9 @@ module Bank
       return @account_balance
     end
 
+    def deposit
+      
+    end
 
   end
 
