@@ -178,8 +178,13 @@ module Bank
         puts "Your balance cannot go below -$10.00."
         return @account_balance
       end
-      @checks_used += 1
+      if @checks_used >= 3
+        @account_balance = balance - 2
+        @checks_used += 1
+        return @account_balance
+      end
       @account_balance = balance
+      @checks_used += 1
       return @account_balance
     end
 
