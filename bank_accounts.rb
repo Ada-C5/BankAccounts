@@ -2,20 +2,30 @@ require 'CSV'
 
 module Bank
   class Account
+    TRANSACION_FEE = 0
+    INITIAL_BALANCE_MIN = 0
+    MINIMUM_ACCOUNT_BALANCE = 0
+
     attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts, :balance
 
     def initialize(account) # account is a hash ex. Account.new(id: 1234, amount: 50)
+      @id = account[:id]
+      @initial_balance = account[:initial_balance]
+      @current_balance = account[:initial_balance]
+      @balance = account[:initial_balance]
+      @open_date = account[:open_date]
+      account_values
+      argument_error
+    end
 
-        @id = account[:id]
-        @initial_balance = account[:initial_balance]
-        @current_balance = account[:initial_balance]
-        @balance = account[:initial_balance]
-        @open_date = account[:open_date]
-      # @account_info = {account: account}
+    def account_values(min_account_balance = MINIMUM_ACCOUNT_BALANCE, initial_balance_min = INITIAL_BALANCE_MIN, transaction_fee = TRANSACION_FEE)
+      @min_account_balance = min_account_balance
+      @initial_balance_min = initial_balance_min
+      @transaction_fee = transaction_fee
     end
 
     def argument_error
-      raise ArgumentError, "ERROR: invalid initial amount. Please deposit more than $#{@initial_balance_min}. Please try creating an account again" unless @initial_balance >= @initial_balance_min
+      raise ArgumentError, "ERROR: invalid initial amount. Please deposit more than $#{@initial_balance_min}. Please try again" unless @initial_balance >= @initial_balance_min
     end
 
     def self.all
@@ -25,7 +35,6 @@ module Bank
       account_info.each do |line|
         accounts << self.new(id: line[0], initial_balance: line[1].to_i, open_date: line[2])
       end
-
       return accounts
     end
 
@@ -56,14 +65,21 @@ module Bank
       return account_owner
     end
 
-
     def withdraw (withdraw_amount) # parameter represents the amount of money that will be withdrawn
-      if @balance < withdraw_amount
-        @current_balance = @balance - withdraw_amount
+      new_balance = @current_balance - @transaction_fee - withdraw_amount
+
+      if new_balance >= @min_account_balance
+        @current_balance = new_balance
       else
-        puts "WARNING: invalid withdraw amount. Current balance is: #{@current_balance}"
+        withdraw_error
       end
+
       return @current_balance # return the updated account balance.
+
+    end
+
+    def withdraw_error
+      puts "WARNING: invalid withdraw amount. Current balance is: #{@current_balance}"
     end
 
     def deposit(deposit_amount) #   parameter which represents the amount of money that will be deposited.
@@ -83,15 +99,13 @@ module Bank
   class Owner
     attr_reader :id, :last_name, :first_name, :address, :street_address, :city, :state
     def initialize (owner_info)
-      if owner_info != nil
-        @id = owner_info [:id]
-        @last_name = owner_info[:last_name]
-        @first_name = owner_info[:first_name]
-        @address = owner_info[:address]
-        @street_address = owner_info[:street_address]
-        @city = owner_info[:city]
-        @state = owner_info[:state]
-      end
+      @id = owner_info [:id]
+      @last_name = owner_info[:last_name]
+      @first_name = owner_info[:first_name]
+      @address = owner_info[:address]
+      @street_address = owner_info[:street_address]
+      @city = owner_info[:city]
+      @state = owner_info[:state]
     end
 
     def self.all
@@ -100,7 +114,6 @@ module Bank
 
       owner_info_csv.each do |line|
         owner_info << self.new(id: line[0].to_i, last_name: line[1], first_name: line[2], address: line[3], street_address: line[4], city: line[5], state: line[6])
-
       end
       return owner_info
     end
@@ -138,51 +151,36 @@ module Bank
 
     def self.view
       account_all = Bank::Account.owner_account
-        puts "Account List"
-        account_all.each do |account|
+      puts "Account List"
+      account_all.each do |account|
         puts "Account ID: #{account[0].id} Owner ID: #{account[1].id} Balance: #{account[0].balance} Name: #{account[1].first_name} #{account[1].last_name} "
       end
       return nil
     end
   end
 
-#   1. Create a SavingsAccount class which should inherit behavior from the Account class.
-# 		1. It should include the following updated functionality:
-# 			§ The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
-# 			§ Updated withdrawal functionality:
-# 				□ Each withdrawal 'transaction' incurs a fee of $2 that is taken out of the balance.
-# Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
-
   class SavingsAccount < Account
     TRANSACION_FEE = 2
-    MINIMUM_BALANCE = 10
+    INITIAL_BALANCE_MIN = 10
+    MINIMUM_ACCOUNT_BALANCE = 10
+
     attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts, :balance
 
-    def initialize(account)
-
-        @id = account[:id]
-        @initial_balance = account[:initial_balance]
-        @current_balance = account[:initial_balance]
-        @balance = account[:initial_balance]
-        @open_date = account[:open_date]
-      # @account_info = {account: account}
-
-        raise ArgumentError, "ERROR: invalid initial amount. Please try creating account" unless @initial_balance >= 10
+    def account_constants
+      super(MINIMUM_ACCOUNT_BALANCE, INITIAL_BALANCE_MIN, TRANSACION_FEE)
     end
 
-    def withdraw (withdraw_amount) # parameter represents the amount of money that will be withdrawn
-      new_balance = @balance - TRANSACION_FEE - withdraw_amount
-      if new_balance > withdraw_amount
-        @current_balance = @balance - withdraw_amount
-      else
-        puts "WARNING: invalid withdraw amount. Current balance is: #{@current_balance}"
-      end
-      return @current_balance # return the updated account balance.
+    def add_interest(rate)
+      interest_on_balance = @current_balance * (rate/100) # formula for calculating interest is balance * rate/100
+      @current_balance = @current_balance + interest_on_balance
+      puts "Interest earned on balance is #{interest_on_balance} and current balance is #{@current_balance}"
+      return interest_on_balance
     end
 
+
     def withdraw (withdraw_amount) # parameter represents the amount of money that will be withdrawn
-      new_balance = @balance - TRANSACION_FEE - withdraw_amount
-      if new_balance >= 10
+      new_balance = @current_balance - @transaction_fee - withdraw_amount
+      if new_balance >= @min_account_balance
         @current_balance = new_balance
       else
         puts "WARNING: invalid withdraw amount. Current balance is: #{@current_balance}"
@@ -190,17 +188,117 @@ module Bank
       return @current_balance # return the updated account balance.
     end
 
-    def deposit(deposit_amount) #   parameter which represents the amount of money that will be deposited.
-      @current_balance = @current_balance + deposit_amount
-      return @current_balance
+  end
+
+  class CheckingAccount < Account
+    TRANSACION_FEE = 1
+    INITIAL_BALANCE_MIN = 10
+    MINIMUM_ACCOUNT_BALANCE = 0 # for withdraw but not for check withdrawals
+
+    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts, :balance
+
+    def account_values
+      super(MINIMUM_ACCOUNT_BALANCE, INITIAL_BALANCE_MIN, TRANSACION_FEE)
+      @check_withdraw_count = 0
+      @transaction_check_fee = 0
     end
 
-    def current_balance
-      return @current_balance
+    def reset_check_count
+      @check_withdraw_count = 0
     end
 
-    def owner_info (owner)
-      @account_info[:owner]= (owner.owner_property[:owner])
+    def withdraw_using_check (withdraw_amount) # parameter represents the amount of money that will be withdrawn
+      check_min = -10
+      new_balance = @current_balance - @transaction_check_fee - withdraw_amount
+      if new_balance >= check_min
+        check_count
+        puts "transaction_fee #{@transaction_fee}"
+        puts "check count #{@check_withdraw_count}"
+        @current_balance = new_balance
+      else
+        puts "WARNING: invalid withdraw amount. Current balance is: #{@current_balance}"
+      end
+      return @current_balance # return the updated account balance.
     end
+
+    def check_count
+      @check_withdraw_count += 1
+      if @check_withdraw_count > 3
+        @transaction_check_fee = 2
+      end
+    end
+  end
+
+  class MoneyMarketAccount < Account
+    TRANSACION_FEE = 0
+    INITIAL_BALANCE_MIN = 10000
+    MINIMUM_ACCOUNT_BALANCE = 0 # for withdraw but not for check withdrawals
+
+    attr_reader :id, :initial_balance, :current_balance, :owner, :account_info, :accounts, :balance
+
+    def account_values
+      super(MINIMUM_ACCOUNT_BALANCE, INITIAL_BALANCE_MIN, TRANSACION_FEE)
+      @check_withdraw_count = 0
+      @transaction_check_fee = 0
+      @total_transactions = 0
+    end
+
+    def reset_check_count
+      @check_withdraw_count = 0
+      @total_transactions = 0
+    end
+
+    def withdraw (amount)
+      if transaction? == true
+        balance = super(amount)
+        if balance < 10000
+          @total_transactions += 1
+          puts "Number of monthly transactions: #{@total_transactions}"
+          @current_balance = balance - 100
+        else
+          @total_transactions += 1
+          puts "Number of monthly transactions: #{@total_transactions}"
+          @current_balance = balance
+        end
+      end
+    end
+
+    def deposit (amount)
+      if @current_balance < 10000
+        puts "Number of monthly transactions: #{@total_transactions}"
+        @current_balance = super(amount)
+      end
+      if transaction_count? == true
+        @total_transactions += 1
+        puts "Number of monthly transactions: here #{@total_transactions}"
+        @current_balance = super(amount)
+      end
+    end
+
+    def transaction_count?
+      if @total_transactions >= 6
+        puts "You have reached your monthly transaction use. Please wait until next month to complete a transaction"
+        false
+      else
+        true
+      end
+    end
+
+    def transaction?
+      min_account_balance = 10000
+      if @current_balance >= min_account_balance && transaction_count?
+       true
+     elsif @current_balance < 10000
+        puts "WARNING: invalid withdraw amount. Current balance is: #{@current_balance}"
+      end
+    end
+
+    def add_interest(rate)
+      interest_on_balance = @current_balance * (rate/100) # formula for calculating interest is balance * rate/100
+      @current_balance = @current_balance + interest_on_balance
+      puts "Interest earned on balance is #{interest_on_balance} and current balance is #{@current_balance}"
+      return interest_on_balance
+    end
+
   end
 end
