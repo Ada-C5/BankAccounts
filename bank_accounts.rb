@@ -5,7 +5,7 @@ module Bank
 
   class Account
     attr_reader :id, :balance, :date_created
-    MINIMUM_BALANCE = 100
+    MINIMUM_STARTING_BALANCE = 100
 
     def initialize(account_info)
       # manually choose the data from the first line of the CSV file and ensure
@@ -15,7 +15,7 @@ module Bank
       # from reading accounts.csv (which turns it into an array), and use indexes
       # of given array to shovel into account_info hash?
 
-      if account_info[:balance] < MINIMUM_BALANCE
+      if account_info[:balance] < MINIMUM_STARTING_BALANCE
        raise ArgumentError.new("You must have at least $1 to open an account.")
       end
       @id = account_info[:id]
@@ -70,6 +70,14 @@ module Bank
       #Bank::Owner.name
     end
 
+    def withdraw(amount_to_withdraw, minimum_balance=0, transaction_fee=0)
+      if @balance - amount_to_withdraw < minimum_balance
+        raise ArgumentError.new("This withdrawal would cause a negative balance.")
+      end
+      @balance = @balance - amount_to_withdraw
+      # show_balance
+    end
+
     ### BRB REFACTORING
     # def withdraw(amount_to_withdraw, instance_var)
     #   if amount_to_withdraw > @balance
@@ -104,8 +112,14 @@ module Bank
   end
 
   class CheckingAccount < Account
-    TRANSACTION_FEE = 100
-    # instance_var is the name of the instance variable you're calling the method on
+
+    def withdraw(amount_to_withdraw, minimum_balance=0, transaction_fee=100)
+      @balance = super - transaction_fee
+    end
+
+    def withdraw_using_check(amount_to_withdraw, minimum_balance=-1000, transaction_fee=0)
+      withdraw(amount_to_withdraw, minimum_balance, transaction_fee)
+    end
 
     ### BRB REFACTORING
     # def withdraw(amount_to_withdraw, instance_var)
@@ -113,6 +127,8 @@ module Bank
     #     show_balance
     #     return @balance
     # end
+
+
 
     ### BRB REFACTORING
     # def withdraw_using_check(amount_to_withdraw, instance_var)
@@ -126,12 +142,11 @@ module Bank
   end
 
   class SavingsAccount < Account
-    TRANSACTION_FEE = 200
-    MINIMUM_BALANCE = 1000
+    MINIMUM_STARTING_BALANCE = 1000
 
     # The initial balance cannot be less than $10.
     def initialize(account_info)
-      if account_info[:balance] < MINIMUM_BALANCE
+      if account_info[:balance] < MINIMUM_STARTING_BALANCE
         raise ArgumentError.new("You must have at least $10 to open a savings account.")
       end
       super
@@ -174,7 +189,7 @@ module Bank
 end
 
 # for testing the different methods in IRB?
-@checking_instance = Bank::CheckingAccount.new({id: "1001", balance: 120045, date_created: "March 5, 2016"})
-@savings_instance = Bank::SavingsAccount.new({id: "1000", balance: 503030, date_created: "March 5, 2016"})
-
+@checking_instance = Bank::CheckingAccount.new({id: "1001", balance: 20045, date_created: "March 5, 2016"})
+@savings_instance = Bank::SavingsAccount.new({id: "1000", balance: 55000, date_created: "March 5, 2016"})
+@account_instance = Bank::Account.new({id: "0999", balance: 20000, date_created: "March 3, 2016"})
 @owner_instance = Bank::Owner.new("Barbara Thompson", "545-665-5535", "looploop@loo.org", "5545 Apple Drive Issaquah, WA 98645")
