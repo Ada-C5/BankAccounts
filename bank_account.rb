@@ -152,10 +152,11 @@ module Bank
   class CheckingAccount < Account
     attr_reader :account_balance, :initial_balance, :checks_used
 
-    def initialize(initial_balance)
+    def initialize(initial_balance, account_id, open_date, owner_id = nil)
       if initial_balance < 0
         raise ArgumentError, "Initial balance must be greater than $0.00."
       end
+      super
       @account_balance = initial_balance
       @checks_used = 0
     end
@@ -194,10 +195,11 @@ module Bank
   class MoneyMarketAccount < Account
     attr_reader :account_balance, :initial_balance, :transactions
 
-    def initialize(initial_balance)
+    def initialize(initial_balance, account_id, open_date, owner_id = nil)
       if initial_balance < 10_000
         raise ArgumentError, "Initial balance must be greater than $10,000.00."
       end
+      super
       @account_balance = initial_balance
       @transactions = 0
     end
@@ -206,6 +208,12 @@ module Bank
       balance = @account_balance - money
       if @transactions >= 6
         puts "You have already used your 6 monthly transactions."
+        return @account_balance
+        #puts balance
+        #puts @account_balance
+      end
+      if balance < 9_900 && @account_balance > 10_000
+        puts "You do not have enough money in your account."
         return @account_balance
       end
       if balance < 9_900
