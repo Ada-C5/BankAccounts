@@ -6,11 +6,12 @@ module Bank
     
     # this class creates accounts, we can store account related things in it.
     class Account
-        # Constants set for cents in a dollar (to convert balances for human readability), withdrawal fees and minimum balances.
         WITHDARAWL_FEE = 0
         ACCOUNT_MIN_BALANCE = 0
 
         # returned :owner to just a reader since I have a method that allows it to be changed below.
+        # added an accessor for balance since the spec says to make the balance accessible.
+        attr_accessor :balance
         attr_reader :id_number, :owner
 
         # initializes using a hash
@@ -25,35 +26,22 @@ module Bank
             end
         end
 
-        # withdraw method
         def withdraw(amount)
             if (@balance - (amount + self.class::WITHDARAWL_FEE)) >= self.class::ACCOUNT_MIN_BALANCE
                 @balance = @balance - ( amount + self.class::WITHDARAWL_FEE )
-                puts "After withdrawing #{ amount } (and the withdrawal fee if applicable), the balance for account #{ @id_number } is #{ @balance }."
                 return @balance
             elsif (@balance - amount) < self.class::ACCOUNT_MIN_BALANCE
                 puts "HEY! That is unpossible because this account MUST not go below $#{self.class::ACCOUNT_MIN_BALANCE}!"
-                puts "The balance for account #{ @id_number } is still #{ @balance }."
                 return @balance
-            else
-                puts "You can't do that operation on a bank account."
             end     
         end
 
-        # deposit method
         def deposit(amount)
             @balance = @balance + amount
-            puts "Congrats account #{ @id_number }, your new balance is #{ @balance }!"
             return @balance
         end
 
-        # show the balance
-        def balance
-            puts "The balance of account #{ @id_number } is #{ @balance }."
-            return @balance
-        end
-
-        # this will allow you to give a 
+        # this will allow you to give an account an owner, without exposing owner for other kinds of method calls. 
         def add_owner(owner_object_name)
             @owner = owner_object_name
         end
@@ -66,7 +54,8 @@ module Bank
             open_date = nil
             
             account_list = []
-            # this needs to iterate through the CSV
+            
+            # this iterates through the CSV and assigns values to variables to be used in the account initialization hash.
             CSV.foreach(path_to_csv) do |row|
                 id_num = row[0]
                 balance = row[1].to_i
@@ -78,10 +67,7 @@ module Bank
         end
 
 
-        # this will find an account instance with a specified id
-        # ids are kept as strings and so must be passed as strings because of that, I'll convert ids (using to_s).
-        # this allows more extensible code because it enables ids to use alphabet characters too (and it's got the same 
-        # cost as converting IDs to Fixnums when retrieved from the CSV.
+        # this will find an account instance with a specified id, and since CSVs deliver values as strings and the conversion is the same amount of work either way, ids must be passed as strings.
         def self.find(id)
             accounts_to_search = []
             accounts_to_search = Bank::Account.all("./support/accounts.csv")
@@ -96,7 +82,6 @@ module Bank
 
     # add a savings account class that inherits from account
     class SavingsAccount < Account
-        # the withdrawal fee for this account will always be the same so this seems like a good place for a constant.
         WITHDARAWL_FEE = 200
         ACCOUNT_MIN_BALANCE = 1000
 
@@ -105,7 +90,6 @@ module Bank
         def interest_rate(rate)
             interest = @balance * (rate/100)
             @balance += interest
-            puts "After compounding interest, your balance is: $#{@balance}!"
             return interest
         end
     end
@@ -127,12 +111,10 @@ module Bank
         def withdraw_with_check(amount)
             if (@balance - amount) > -1000 && @checks_used_in_month < 3
                 @balance -= amount
-                puts "Your new balance is $#{@balance}"
                 @checks_used_in_month += 1
                 return @balance
             elsif (@balance - amount) > -1000 && @checks_used_in_month >= 3
                 @balance -= (amount + CHECKFEE)
-                puts "Your new balance is $#{@balance}"
                 @checks_used_in_month += 1
                 return @balance
             else
@@ -241,8 +223,7 @@ module Bank
                 account_to_link = row[0]
                 owner_to_link = row[1]
 
-                # set the linkages by comparing ID numbers. really this should be two methods
-                # one to set owners and one to set accounts.
+                # set the linkages by comparing ID numbers. 
                 if account_to_link == account_collection[iteration_count].id_number
                     account_collection[iteration_count].add_owner = owner_to_link
                     owner_collection[iteration_count].accounts << account_to_link
