@@ -126,7 +126,7 @@ module Bank
   end
 
   class SavingsAccount < Account
-    attr_reader :initial_balance
+    attr_reader :initial_balance, :account_balance
 
     def initialize(initial_balance)
       if initial_balance < 10
@@ -139,7 +139,6 @@ module Bank
         balance = @account_balance - money - 2
         if balance < 10
           puts "Your balance cannot go below $10.00."
-          @account_balance = balance + money + 2
           return @account_balance
         end
         @account_balance = balance
@@ -153,11 +152,41 @@ module Bank
   end
 
   class CheckingAccount < Account
-    attr_reader :
+    attr_reader :account_balance, :initial_balance, :checks_used
 
-    def initialize
-      
+    def initialize(initial_balance)
+      if initial_balance < 0
+        raise ArgumentError, "Initial balance must be greater than $0.00."
+      end
+      @account_balance = initial_balance
+      @checks_used = 0
     end
+
+    def withdraw(money)
+      balance = @account_balance - money - 1
+      if balance < 0
+        puts "Your balance cannot go below $0.00."
+        return @account_balance
+      end
+      @account_balance = balance
+      return @account_balance
+    end
+
+    def withdraw_using_check(amount)
+      balance = @account_balance - amount
+      if balance < -10
+        puts "Your balance cannot go below -$10.00."
+        return @account_balance
+      end
+      @checks_used += 1
+      @account_balance = balance
+      return @account_balance
+    end
+
+    def reset_checks
+
+    end
+
   end
 
 end
