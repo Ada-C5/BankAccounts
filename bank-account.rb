@@ -178,10 +178,27 @@ module Bank
   end
 
   class CheckingAccount < Account
+    attr_reader :number_of_checks
     TRANSACTION_FEE = 100
+    LOWER_BALANCE_LIMIT = -1000
+    CHECK_FEE = 200
 
-    def withdraw(money)
-      super(money, TRANSACTION_FEE)
+    def initialize(account_info)
+      super
+      @number_of_checks = 0
+    end
+
+    def withdraw(money, fee = TRANSACTION_FEE, limit = 0)
+      super(money, fee)
+    end
+
+    def withdraw_using_check(amount)
+      fee = 0
+      @number_of_checks += 1
+      if number_of_checks > 3
+        fee = CHECK_FEE
+      end
+      withdraw(amount, fee, LOWER_BALANCE_LIMIT)
     end
 
   end
