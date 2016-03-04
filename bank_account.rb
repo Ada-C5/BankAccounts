@@ -1,14 +1,14 @@
 module Bank
 require "CSV"
   class Account
-		attr_reader :balance, :ACCOUNT_ID, :open_date
+		attr_reader :balance, :account_id, :open_date
 
 		def initialize (id, balance, open_date)
 			@account_id = id
 			@balance = balance
 			@open_date = open_date
 
-			raise ArgumentError, "Initial balance must be greater than zero." unless @balance>=0
+			raise ArgumentError, "Balance must be greater than zero." unless @balance>=0
 		end
 
 		def self.all 
@@ -43,13 +43,48 @@ require "CSV"
 			return @balance
 		end
 
-		#def add_owner(customer)
-		#	@customer = customer
+    #def add_owner(id)
+    #  full = []
+    #  owner_id = 0
+      #finds corresponding owner id using account id
+    #  CSV.foreach("./support/account_owners.csv", "r") do |line|
+    #    if id ==line[0]
+    #      owner_id = line[1]
+    #      #finds account information for the id
+    #      CSV.foreach("./support/accounts.csv") do |row|
+    #        if id == row[0]
+    #          full << row
+    #          CSV.foreach("./support/owners.csv") do |x|
+    #            if owner_id = x[0]
+    #              full << x
+    #            end
+    #          end
+    #        end
+    #      end
+    #    end
+    #  end
+    #  return full
+    #end
+
+		#def add_owner(owner)
+    #  full = []
+    #  acc_id = nil
+    #  CSV.foreach("./support/account_owners.csv", "r") do |line|
+    #    if owner.owner_id ==line[1]
+    #      acc_id = line[0]
+    #      CSV.foreach("./support/accounts.csv") do |row|
+    #        if acc_id == row[0]
+    #          full = row << owner
+    #        end
+    #      end
+    #    end
+		#	end
+    #  return full
 		#end
 	end
 	
   class Owner
-		attr_reader :OWNER_ID, :first, :last, :address, :city, :state
+		attr_reader :owner_id, :first, :last, :address, :city, :state
 
 		def initialize (id, last, first, address, city, state)
 			@owner_id = id
@@ -78,4 +113,61 @@ require "CSV"
       return owner_find
     end
 	end
-end
+
+  class SavingsAccount < Account
+    attr_reader :balance, :account_id, :open_date
+
+    def initialize(id, balance, open_date)
+      super
+      @interest = nil
+      raise ArgumentError, "Initial balance cannot be less than $10." unless @balance>=10
+    end
+
+    def withdraw(debit)
+        if debit > (@balance-10)
+          puts "Withdrawal amount is above the limit. Request denied."
+        else
+          super-2        
+        end
+    end
+
+    def add_interest(rate)
+      @interest = @balance*(rate/100)
+      @balance = @interest +@balance
+      return "The interest is #{@interest} and the new balance $#{@balance}." 
+    end
+  end
+
+  class CheckingAccount < Account
+    attr_reader :balance, :account_id, :open_date
+
+    def initialize(id, balance, open_date)
+      super
+      @check_count = 0
+    end
+
+    def withdraw(debit)
+      if debit > (@balance)
+        puts "Withdrawal amount is above the limit. Request denied."
+      else
+        super-1        
+      end
+    end
+
+    def withdraw_using_check(amount)
+      if amount > (@balance+10)
+        puts "Withdrawal amount is above the limit. Request denied."
+      elsif @check_count>=3
+        @check_count+=1
+        @balance = withdraw(amount)-1
+      else
+        @check_count+=1
+        @balance = withdraw(amount)+1
+      end
+    end
+
+    def reset_check
+      @check_count = 0
+    end
+  end
+end    
