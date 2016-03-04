@@ -26,29 +26,24 @@ module Bank
       csv_array.each do |row|
         one_account = self.new(row[0],row[1].to_f,row[2])
         array_accounts << one_account
-        # puts "accounts"
       end
-        return array_accounts
-        # => [[@id="1212", @balance="1235667", @date = "1999-03-27 11:30:09 -0800"],
-        #     [@id="1213", @balance="66367", @date = "2010-12-21 12:21:12 -0800"],
-        # =>  [@id="1214", @balance="9876890", @date = "2007-09-22 11:53:00 -0800"], ["1215", "919191", "2011-10-31 13:55:55 -0800"], ["1216", "100022", "2000-07-07 15:07:55 -0800"], ["1217", "12323", "2003-11-07 11:34:56 -0800"], ["15151", "9844567", "1993-01-17 13:30:56 -0800"], ["15152", "34343434343", "1999-02-12 14:03:00 -0800"], ["15153", "2134", "2013-11-07 09:04:56 -0800"], ["15154", "43567", "1996-04-17 08:44:56 -0800"], ["15155", "999999", "1990-06-10 13:13:13 -0800"], ["15156", "4356772", "1994-11-17 14:04:56 -0800"]]
+      return array_accounts
+      # => [[@id="1212", @balance="1235667", @date = "1999-03-27 11:30:09 -0800"],
     end
 
     def self.find_with_id(id)
       all_accounts = Bank::Account.all
       all_accounts.each do |account|
-        puts account.id
-         puts account.id.class, id.class
         if account.id == id.to_s
           return account
         end
       end
     end
 
-    def withdraw(withdraw)
-      @balance = @balance - withdraw
+    def withdraw(ammount)
+      @balance = @balance - ammount
       if @balance < 0
-        @balance = @balance + withdraw
+        @balance = @balance + ammount
         puts "You dont have all that money"
         return @balance
       end
@@ -56,8 +51,8 @@ module Bank
       # balance_printed
     end
 
-    def deposit(money)
-      @balance = @balance + money
+    def deposit(ammount)
+      @balance = @balance + ammount
       balance_printed
       return @balance
     end
@@ -71,15 +66,12 @@ module Bank
   class SavingsAccount < Account
     def initialize (id, balance, date)
       initializer = super
-      # @id = id
-      # @balance = balance
-      # @date = date
       if balance < 10
         raise ArgumentError.new("The initial balance for a Saving Account can not be less than 10 USD")
       end
     end
 
-    def withdraw(withdraw)
+    def withdraw(ammount)
       regular_withdraw = super
       savings_withdraw_fee = 2
       @balance = regular_withdraw - savings_withdraw_fee
@@ -96,27 +88,56 @@ module Bank
       @balance = @balance + interest
       return interest
     end
+
   end
 
   class CheckingAccount < Account
+    def initialize(id, balance, date)
+      initializer = super
+      @number_of_checks = 3
+    end
 
-    # def initialize (id, balance, date)
-    #   @id = id
-    #   @balance = balance
-    #   @date = date
-    #   if balance < 10
-    #     raise ArgumentError.new("The initial balance for a Saving Account can not be less than 10 USD")
-    #   end
-    # end
-
-    def withdraw
+    def withdraw(ammount)
       regular_withdraw = super
-      savings_withdraw_fee = 1
-      @balance = regular_withdraw - savings_withdraw_fee
+      #It charges  a 1 dollar fee even when the withdraw is canceled for lacking of founds
+      @checking_withdraw_fee = 1
+      @balance = regular_withdraw - @checking_withdraw_fee
+    end
+
+    def withdraw_using_check(ammount)
+      @ammount = ammount
+
+      @balance = @balance - @ammount
+      checks_dropper
+      if @balance < -10
+        @balance = @balance + @ammount + @extra_checks_fee
+        puts "You can go into overdraft up to -$10"
+      end
       return @balance
 
     end
+
+    #every time the method withdraw_using_check is called
+
+    def checks_dropper
+      name = :withdraw_using_check
+      TracePoint.trace(:call) do |t|
+        @number_of_checks -= 1 if t.method_id == name
+        end
+
+        while @number_of_checks < 0
+          @extra_checks_fee = 2
+          @balance = @balance - @extra_checks_fee
+          return @balance
+        end
+    end
+
+    def checks_acounter
+
+      return @balance
+    end
   end
+
 
   class Owner #< Account
     attr_accessor :name, :last_name, :address, :email, :mobile
