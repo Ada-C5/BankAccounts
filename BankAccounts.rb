@@ -3,9 +3,10 @@ module Bank
   class Account
     #FEE = 0.0
     #INITIAL_BALANCE = 0.0
-    attr_reader :initial_balance, :owner, :open_date, :id, :fee
+    attr_reader :initial_balance, :owner, :open_date, :id, :fee, :min_amount
     attr_accessor
-    def initialize(id=nil,initial_balance=nil,open_date=nil,fee = nil)
+    def initialize(id=nil,initial_balance=nil,open_date=nil,fee = nil,min_amount=nil)
+      @min_amount = 0.0
       @fee = 0.0.to_f
       @owner = []
       @id = id
@@ -18,12 +19,12 @@ module Bank
 
 
     def withdraw(withdraw_amount)
-      if withdraw_amount > @initial_balance + @fee
+      if withdraw_amount > @initial_balance + @min_amount
         puts "You don't have enough money to take that out."
-        return @initial_balance
+        return @initial_balance 
       else
       @initial_balance = @initial_balance - withdraw_amount
-      return @initial_balance
+      return @initial_balance = @initial_balance - @fee
       end
     end
 
@@ -107,11 +108,10 @@ module Bank
 
 
   class SavingsAccount < Account
-    #FEE = -12
-    #INITIAL_BALANCE = 12 #this inludes the 2 dollar transaction fee and the 10 minimum balance
     def initialize
-      super(fee)
-      @fee = -12
+      super(fee,min_amount)
+      @fee = 2
+      @min_amount = -10
     end
 
     def withdraw(withdraw_amount)
@@ -128,10 +128,9 @@ module Bank
 
 
   class CheckingAccount < Account
-    INITIAL_BALANCE = 0.0
-    FEE = 1
     def initialize
-      super
+      super(fee)
+      @fee = -1
     end
 
     def withdraw(withdraw_amount)
