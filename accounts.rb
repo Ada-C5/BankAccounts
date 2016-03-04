@@ -3,15 +3,15 @@ require 'csv'
 #require_relative './support/accounts'
 module Bank
  class Account
-   attr_accessor :balance, :owner, :accounts_hash
-   attr_reader :id
+   attr_accessor :balance, :accounts_hash
+   attr_reader :id, :owner
 
    def initialize(id_number, initial_balance, account_date)
      unless initial_balance.to_f > 0
        raise ArgumentError.new("Account must have money in it.")
      end
      @id = id_number
-     @balance = initial_balance
+     @balance = initial_balance.to_f
      @account_date = account_date
    end
 
@@ -44,10 +44,11 @@ module Bank
 
    def self.find(id)
      self.all.each do |account|
-       if account[0] == id
+       if account[0] == id.to_s
          return account
        end
      end
+     puts "Account not found."
    end
 
  end
@@ -106,19 +107,78 @@ module Bank
       end
     end
    end
-
-    # def self.find_owner_info_with_number(id) #USER COMMAND TO FIND OWNER
-    #   owner_number = self.find_owner_number(id)
-    #   owner_list = CSV.read('./support/account_owners.csv')
-    #   owner_list.each do |owner|
-    #     if owner[1] == owner_number
-    #       return owner_number
-    #       puts "OWNER ID #{id} belongs to owner #{owner_number}"
-    #     end
-    #   end
-    # end
-
  end
 
 
+ class SavingsAccount < Account
+
+
+   def initialize(id_number, initial_balance, account_date)
+     unless initial_balance.to_f > 10
+       raise ArgumentError.new("Account must have money in it.")
+     end
+     @id = id_number
+     @balance = initial_balance.to_f
+     @account_date = account_date
+   end
+
+   def withdraw(amount)
+     puts "Available balance: #{@balance - 10}" #accounts for 10 minimum rule
+     if (amount + 2) > (@balance - 10) #account for ability to withdraw $2 fee
+       puts "Warning: requested amount is greater than available balance. Please make another selection, and be aware that withdrawl from Savings results in a $2 fee, which your balance must cover in addition to your withdrawl amount"
+       return @balance
+     else
+       puts "Successfully withdrew #{amount} plus $2 fee."
+       @balance = @balance - (amount + 2)
+     end
+   end
+
+   def add_interest(rate)
+     @balance =  balance * (rate/100)
+     return (@balance * (rate/100))
+   end
+ end
+
+
+ class CheckingAccount < Account
+   attr_accessor :number_checks
+
+   def initialize(id_number, initial_balance, account_date)
+     super
+     @number_checks = 0
+   end
+
+
+   def withdraw(amount)
+     puts "Available balance: #{@balance}"
+     if (amount + 1) > (@balance) #account for ability to withdraw $2 fee
+       puts "Warning: requested amount is greater than available balance. Please make another selection, and be aware that withdrawal from Checking results in a $1 fee, which your balance must cover in addition to your withdrawal amount"
+       return @balance
+     else
+       puts "Successfully withdrew #{amount} from Checking plus $1 fee."
+       @balance = @balance - (amount + 1)
+     end
+   end
+
+   def withdraw_using_check(amount)
+     puts "Available balance: #{@balance}" #accounts for 10 minimum rule
+     if (amount > (@balance + 10) || ( (@number_checks > 2) && ((amount + 2) > (@balance + 10))))#account for ability to overdraft to -10
+       puts "Warning: requested amount is greater than available balance. Please make another selection, and be aware that withdrawal from Checking results in a $1 fee, which your balance must cover in addition to your withdrawal amount"
+       return @balance
+     elsif @number_checks > 2 && ((amount + 2) < (@balance + 10))
+       puts "Successfully withdrew #{amount} from Checking plus $2 fee for checks after the 3 monthly allowance."
+       @balance = @balance - amount - 2 #$2 fee for check
+     else
+       puts "Successfully withdrew #{amount} from Checking. #{3-@number_checks} free check(s) remaining this month"
+       @number_checks += 1
+       @balance = @balance - amount
+     end
+   end
+
+   def reset_checks
+     @number_checks = 0
+   end
+ end
+
 end
+#Does not allow the account to go below the $10 minimum balance - Will output a warning message and return the original un-modified balance
