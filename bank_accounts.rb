@@ -6,16 +6,18 @@ module Bank
   BALANCE_MINIMUM = 0
   TRANSACTION_FEE = 0
   attr_reader :current_balance, :all_accounts
-  attr_accessor :id, :initial_balance, :owner
+  attr_accessor :id, :initial_balance, :owner, :reset_checks, :day
 
     def initialize(account)
       if account != nil
         @id = account[:id]
-        @initial_balance = account[:initial_balance]
-        @current_balance = account[:initial_balance]
-        @start_date = account[:start_date]
-        @all_accounts = account[:all_accounts]
-        @owner = nil
+        @initial_balance  = account[:initial_balance]
+        @current_balance  = account[:initial_balance]
+        @start_date       = account[:start_date]
+        @all_accounts     = account[:all_accounts]
+        @day              = nil
+        @reset_checks     = 3
+        @owner            = nil
         raise ArgumentError.new("We cannot process your transaction-you need a minimum $#{self.class::BALANCE_MINIMUM} amount.") unless @initial_balance.to_i >= self.class::BALANCE_MINIMUM
       end
     end
@@ -132,18 +134,36 @@ module Bank
 
     def withdraw_using_check(money)
       overdraft_threshold = BALANCE_MINIMUM + 10
-      if money > @current_balance.to_i + overdraft_threshold
+      overdraft_fee_per_check = TRANSACTION_FEE + 1
+
+      until @reset_checks == 0
+        if money > @current_balance.to_i + overdraft_threshold
+          puts "WARNING: We cannot process this transaction. You have an allowable overdraft of $#{overdraft_threshold}. Your current balance is $#{@current_balance}."
+          return @current_balance
+        elsif @reset_checks > 0
+          @current_balance = @current_balance - money
+          @reset_checks = @reset_checks - 1
+          puts "You have #{@reset_checks} free check(s) left."
+          return @current_balance
+        end
+      end
+
+      if @reset_checks == 0
+        if money > @current_balance.to_i + overdraft_threshold + overdraft_fee_per_check
         puts "WARNING: We cannot process this transaction. You have an allowable overdraft of $#{overdraft_threshold}. Your current balance is $#{@current_balance}."
-        return @current_balance
-      else @current_balance = @current_balance - money
-        return @current_balance
+          return @current_balance
+        else @current_balance = @current_balance - money - overdraft_fee_per_check
+          return @current_balance
+        end
       end
     end
-#The input amount gets taken out of the account as a result of a check
-#withdrawal. Returns the updated account balance.
-#Allows the account to go into overdraft up to -$10 but not any lower
-#The user is allowed three free check uses in one month,
-#but any subsequent use adds a $2 transaction fee
+
+    def reset_checks(day)
+      if day == 1
+        @reset_checks = 3
+      puts "It's a new month and you have 3 free checks!"
+      end
+    end
   end
 end
 
