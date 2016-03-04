@@ -1,11 +1,10 @@
-# use money gem
-
 require 'CSV'
 
 # input for withdraw and deposit must include cents without decimal ($1.50 - input at 150)
 module Bank
   class Account
-    attr_reader :balance, :id
+    attr_accessor :id
+    attr_reader :balance
     MIN_BAL = 0
     WITHDRAW_FEE = 0
 
@@ -35,7 +34,7 @@ module Bank
     def money_convert(money)
       if money != 0 
         print_mon = money.to_s
-        print_mon = print_mon.insert -3, "."
+        print_mon = "$#{print_mon.insert -3, "."}"
       else
         print_mon = 0
       end
@@ -51,21 +50,25 @@ module Bank
       else 
         @balance = temp_balance
       end
-      puts "#{money_convert(@balance)}"
+      puts "#{money_convert(balance)}"
       return @balance
     end
 
     # deposit money in account
     def deposit(amount)
-      balance += amount
-      puts "#{money_convert(@balance)}"
+      @balance += amount
+      puts "#{money_convert(balance)}"
       return @balance
     end
 
     # show current balance
-    def balance
-      puts "#{money_convert(balance)}"
-      return @balance
+    def show_balance
+      if money != 0 
+        print_mon = money.to_s
+        print_mon = print_mon.insert -3, "."
+      else
+        print_mon = 0
+      end
     end
 
     # create new accounts from csv information & returns all account instances in array
@@ -98,6 +101,7 @@ module Bank
   end
 
   class SavingsAccount < Account
+    attr_accessor :id
     attr_reader :balance
     MIN_BAL = 1000
     WITHDRAW_FEE = 200
@@ -112,13 +116,14 @@ module Bank
 
     # rate as decimal percentage 25% => 0.25
     def add_interest(rate)
-      balance += balance * (rate/100)
-      puts "#{money_convert(@balance)}"
+      @balance += balance * (rate/100)
+      puts "#{money_convert(balance)}"
       return @balance
     end
   end
 
   class CheckingAccount < Account
+    attr_accessor :id
     attr_reader :balance, :check_count
     MIN_BAL = 0
     WITHDRAW_FEE = 100
@@ -150,8 +155,8 @@ module Bank
         @balance = temp_balance
       end
       @check_count += 1
-      puts "Current check count is #{@check_count}"
-      puts "#{money_convert(@balance)}"
+      puts "Current check count is #{check_count}"
+      puts "#{money_convert(balance)}"
       return @balance
     end
 
@@ -177,16 +182,16 @@ module Bank
         temp_balance = balance - amount
         # make sure withdraw didn't cause balance to go under 10,000
         if temp_balance < MIN_BAL
-          puts "You're balance is under $#{money_convert(MIN_BAL)}, no more withdrawls are possible."
-          balance -= WITHDRAW_FEE
+          puts "You're balance is under #{money_convert(MIN_BAL)}, no more withdrawls are possible."
+          @balance -= WITHDRAW_FEE
         else 
           @balance = temp_balance
         end
         @transactions += 1
-        puts "#{money_convert(@balance)}"
+        puts "#{money_convert(balance)}"
         return @balance
       else
-        puts "Sorry, your account must be over $#{money_convert(MIN_BAL)} to make a withdrawl."
+        puts "Sorry, your account must be over #{money_convert(MIN_BAL)} to make a withdrawl."
       end
     end
 
@@ -196,6 +201,7 @@ module Bank
       if new_bal - amount > MIN_BAL
         @transactions += 1
       end
+      return new_bal = @balance
     end
 
     def reset_transactions
@@ -206,7 +212,7 @@ module Bank
     def add_interest(rate)
       temp_bal = super
       @balance = temp_bal.round
-      puts "New total in your account is #{money_convert(@balance)}"
+      puts "New total in your account is #{money_convert(balance)}"
       # extract only interest
       interest = balance * (rate/100)
       interest = interest.round
