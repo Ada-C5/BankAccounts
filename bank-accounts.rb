@@ -150,7 +150,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       return @balance = updated_balance
     end
 
-    
+
 
     ##### CLASS METHODS BELOW #####
     def self.find(data_file = "./support/accounts.csv", id) # returns an instance of Account where the value of the id field in the CSV matches the passed parameter.
@@ -279,10 +279,15 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
 
       updated_balance = (balance + amount)
 
-      if balance_below_limit? #meaning of reach or exceed
+      if balance_below_limit? && updated_balance >= MINIMUM_BALANCE # the deposit needs to make us REACH OR EXCEED the minimum balance.
         puts "After depositing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
         undo_transaction_count # deposits to bring out account back above the limit don't count as transactions
         return @balance = updated_balance
+
+      elsif updated_balance < MINIMUM_BALANCE #we can't make a deposit that doesn't help us reach or exceed the minimum
+        puts "WARNING: You cannot deposit $#{ sprintf("%.2f", amount) }.  Your current balance is $#{ sprintf("%.2f", balance) }. You must make a deposit that causes your account to reach or exceed the minimum of $#{ sprintf("%.2f", MINIMUM_BALANCE) }."
+
+        undo_transaction_count #unsuccessful deposits don't count as transactions.
 
       elsif !balance_below_limit? && transactions_remaining?
         puts "After depositing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
@@ -318,7 +323,6 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
     end
 
   end
-
 
   class Owner
     attr_reader :id, :first_name
@@ -396,7 +400,7 @@ mm_acct.withdraw(10)
 puts mm_acct.transaction_count
 mm_acct.withdraw(10)
 puts mm_acct.transaction_count
-mm_acct.deposit(200)
+mm_acct.deposit(20)
 puts mm_acct.transaction_count
 
 #checking_account = Bank::CheckingAccount.new(initial_balance: 10000)
