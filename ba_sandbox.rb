@@ -6,7 +6,7 @@ module InterestRate
     # Input rate is assumed to be a percentage (i.e. 0.25).
     # The formula for calculating interest is balance * rate/100
     def interest_rate(rate)
-        interest = @balance * rate / 100
+        interest = balance * rate / 100
         @balance += interest
         return interest
     end
@@ -19,7 +19,7 @@ module Bank
         WITHDARAWL_FEE = 0
         ACCOUNT_MIN_BALANCE = 0
 
-        attr_reader :id_number, :owner
+        attr_reader :id_number, :owner, :balance
 
         # initializes using a hash
         def initialize(account_info)
@@ -34,18 +34,18 @@ module Bank
         end
 
         def withdraw(amount)
-            if enough_money_to_transact(amount)
+            if enough_money_to_withdraw(amount)
                 @balance -= ( amount + self.class::WITHDARAWL_FEE )
-                return @balance
-            elsif !enough_money_to_transact(amount)
+                return balance
+            elsif !enough_money_to_withdraw(amount)
                 puts "HEY! That is unpossible because this account MUST not go below #{self.class::ACCOUNT_MIN_BALANCE}!"
-                return @balance
+                return balance
             end     
         end
 
         def deposit(amount)
-            @balance = @balance + amount
-            return @balance
+            @balance += amount
+            return balance
         end
 
         # this will allow you to give an account an owner, without exposing owner for other kinds of method calls. 
@@ -55,10 +55,7 @@ module Bank
 
         # make a Class method that will instantiate accounts from a csv
         def self.all(path_to_csv)
-            id_num = nil
-            balance = nil
-            open_date = nil
-            
+            # this is sitting here because if it doesn't exist outside the iteration it will be garbage collected at the end of iterating.
             account_list = []
             
             # this iterates through the CSV and assigns values to variables to be used in the account initialization hash.
@@ -75,7 +72,6 @@ module Bank
 
         # this will find an account instance with a specified id, and since CSVs deliver values as strings and the conversion is the same amount of work either way, ids must be passed as strings.
         def self.find(id)
-            accounts_to_search = []
             accounts_to_search = Bank::Account.all("./support/accounts.csv")
 
             accounts_to_search.each do |account|
@@ -90,9 +86,11 @@ module Bank
             return @balance
         end
 
-        def enough_money_to_transact(amount)
+        def enough_money_to_withdraw(amount)
             (balance - (amount + self.class::WITHDARAWL_FEE)) >= self.class::ACCOUNT_MIN_BALANCE
         end
+
+
     end
 
     # add a savings account class that inherits from account
@@ -159,16 +157,16 @@ module Bank
         # If a withdrawal causes the balance to go below $10,000, a fee of $100 is imposed and no more transactions are allowed until the balance is increased using a deposit transaction.
         # Each transaction will be counted against the maximum number of transactions
         def withdraw(amount)
-            unless @transactions_this_month == MAXIMUM_TRANSACTIONS_MONTHLY
-                if (@balance - amount) >= self.class::ACCOUNT_MIN_BALANCE
+            unless @transactions_this_month >= MAXIMUM_TRANSACTIONS_MONTHLY
+                if enough_money_to_withdraw
                     @balance -= amount
                     @transactions_this_month += 1
-                    return @balance
-                elsif ((@balance - amount) < self.class::ACCOUNT_MIN_BALANCE) && (@overdraft_flag == false)
+                    return balance
+                elsif !enough_money_to_withdraw && (@overdraft_flag == false)
                     @balance -= ( amount + self.class::WITHDARAWL_FEE )
                     @transactions_this_month += 1
                     @overdraft_flag = true
-                    return @balance
+                    return balance
                 end
             end    
         end
@@ -182,10 +180,10 @@ module Bank
                 if @balance > self.class::ACCOUNT_MIN_BALANCE
                     @overdraft_flag = false
                 end
-                return @balance
+                return balance
             end
 
-            if @transactions_this_month == MAXIMUM_TRANSACTIONS_MONTHLY && @overdraft_flag == false
+            if @transactions_this_month < MAXIMUM_TRANSACTIONS_MONTHLY && @overdraft_flag == false
                 @balance += amount
                 @transactions_this_month += 1
                 return @balance          
@@ -263,9 +261,7 @@ module Bank
 
         # this will link all accounts to their owners
         def link_accounts(path_to_csv)
-            # set variables outside the iteration 
-            account_to_link = ""
-            owner_to_link = ""
+            # set iteration count outside the iteration since it is used for indexing in the method.
             iteration_count = 0
 
             owner_collection = Bank::Owner.all("./support/owners.csv")
