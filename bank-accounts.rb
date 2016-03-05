@@ -24,8 +24,6 @@ module Bank
       if @balance < 0
         raise ArgumentError, "Balance can't be less than $0".colorize(:red)
       end
-
-      puts "Welcome to the Penny Bank! Please enter all amounts in pennies. Don't worry, we'll convert it for you. 💰 ".colorize(:green)
     end
 
     # returns list of all instances of accounts
@@ -84,6 +82,7 @@ module Bank
 
     def initialize(account_id, balance, open_date)
       super
+      puts "Welcome to the Penny Bank! Please enter all amounts in pennies. Don't worry, we'll convert it for you. 💰 ".colorize(:green)
       if @balance < MIN_BALANCE
         raise ArgumentError, "Balance can't be less than #{Money.new(MIN_BALANCE, "USD").format}. Please add more pennies.".colorize(:red)
       end
@@ -114,6 +113,7 @@ module Bank
 
     def initialize(account_id, balance, open_date)
       super
+      puts "Welcome to the Penny Bank! Please enter all amounts in pennies. Don't worry, we'll convert it for you. 💰 ".colorize(:green)
       puts "A checking account will incur a #{Money.new(WITHDRAWAL_FEE, "USD").format} fee per withdrawal."
       @check_count = 0
     end
@@ -157,6 +157,7 @@ module Bank
 
     def initialize(account_id, balance, open_date)
       super
+      puts "Welcome to the Penny Bank! Please enter all amounts in pennies. Don't worry, we'll convert it for you. 💰 ".colorize(:green)
       @transaction_count = 0
 
       if @balance < MIN_BALANCE
