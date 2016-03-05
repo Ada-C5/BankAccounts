@@ -2,6 +2,7 @@ require 'CSV'
 require 'money'
 # This weird thing is necessary to run the money gem for whatever reason
 I18n.enforce_available_locales = false
+require 'colorize'
 
 module Bank
 
@@ -12,6 +13,8 @@ module Bank
     attr_reader   :balance, :account_id, :open_date
     attr_accessor :owner
 
+# Everything is entered in pennies and converted by the awesome money gem.
+
     def initialize(account_id, balance, open_date)
       @account_id = account_id.to_i
       @balance    = balance.to_i
@@ -19,12 +22,13 @@ module Bank
       @owner_id   = owner
 
       if @balance < 0
-        raise ArgumentError, "Balance can't be less than $0"
+        raise ArgumentError, "Balance can't be less than $0".colorize(:red)
       end
 
+      puts "Welcome to the Penny Bank! Please enter all amounts in pennies. Don't worry, we'll convert it for you. 💰 ".colorize(:green)
     end
 
-    #returns list of all instances of accounts
+    # returns list of all instances of accounts
     def self.all
       accounts = []
       CSV.foreach("support/accounts.csv") do |row|
@@ -33,7 +37,7 @@ module Bank
       return accounts
     end
 
-    #returns info on account when passed the id number
+    # returns info on account when passed the id number
     def self.find(id)
       accounts = self.all
       found_id = nil
@@ -49,6 +53,7 @@ module Bank
       end
     end
 
+# Transactions! Using the money gem, this will convert all cents to dollars and format correctly.
     def withdraw(withdraw_amount)
       if @balance - withdraw_amount - WITHDRAWAL_FEE < 0
         puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
@@ -80,7 +85,7 @@ module Bank
     def initialize(account_id, balance, open_date)
       super
       if @balance < MIN_BALANCE
-        raise ArgumentError, "Balance can't be less than #{Money.new(MIN_BALANCE, "USD").format}. Please add more pennies."
+        raise ArgumentError, "Balance can't be less than #{Money.new(MIN_BALANCE, "USD").format}. Please add more pennies.".colorize(:red)
       end
       puts "A savings account will incur a #{Money.new(WITHDRAWAL_FEE, "USD").format} fee per withdrawal."
     end
@@ -155,7 +160,7 @@ module Bank
       @transaction_count = 0
 
       if @balance < MIN_BALANCE
-        raise ArgumentError, "Balance can't be less than #{Money.new(MIN_BALANCE, "USD").format}."
+        raise ArgumentError, "Balance can't be less than #{Money.new(MIN_BALANCE, "USD").format}.".colorize(:red)
       end
 
       puts "Please note: a maximum of 6 transactions are allowed per month with this account type."
@@ -163,14 +168,14 @@ module Bank
 
     def withdraw(withdraw_amount)
       if @transaction_count >= 6
-        raise NoMethodError, "You have reached the maximum number of transactions this month."
+        raise NoMethodError, "You have reached the maximum number of transactions this month.".colorize(:red)
       end
       until @balance >= MIN_BALANCE
-        raise NoMethodError, "Can't withdraw until account balance reaches $10,000."
+        raise NoMethodError, "Can't withdraw until account balance reaches $10,000.".colorize(:red)
       end
       if @balance - withdraw_amount < MIN_BALANCE
         @transaction_count += 1
-        puts "Your account is below $10,000. A fee of $#{TRANSACTION_FEE} will be incurred for this transaction. No more transactions are allowed until the balance is increased to $10,000."
+        puts "Your account is below $10,000. A fee of #{Money.new(TRANSACTION_FEE, "USD").format} will be incurred for this transaction. No more transactions are allowed until the balance is increased to $10,000."
         @balance = @balance - withdraw_amount - TRANSACTION_FEE
       else
         @transaction_count += 1
@@ -182,7 +187,7 @@ module Bank
 
     def deposit(deposit_amount)
       if @transaction_count >= 6
-        raise NoMethodError, "You have reached the maximum number of transactions this month."
+        raise NoMethodError, "You have reached the maximum number of transactions this month.".colorize(:red)
       end
       super
       if @balance <= MIN_BALANCE
