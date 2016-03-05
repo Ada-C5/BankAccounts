@@ -1,11 +1,13 @@
 require 'CSV'
+require 'money'
+# This weird thing is necessary to run the money gem for whatever reason
+I18n.enforce_available_locales = false
 
 module Bank
 
   class Account
 
     WITHDRAWAL_FEE = 0
-    # CENTS_TO_DOLLARS = 100.00
 
     attr_reader   :balance, :account_id, :open_date
     attr_accessor :owner
@@ -50,16 +52,16 @@ module Bank
     def withdraw(withdraw_amount)
       if @balance - withdraw_amount - WITHDRAWAL_FEE < 0
         puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
-        return "Account balance: #{@balance}"
+        return "Account balance: #{Money.new(@balance, "USD").format}"
       else
         @balance = @balance - withdraw_amount - WITHDRAWAL_FEE
-        return "Account balance: $#{@balance}"
+        return "Account balance: #{Money.new(@balance, "USD").format}"
       end
     end
 
     def deposit(deposit_amount)
       @balance += deposit_amount
-      puts "New account balance: #{@balance}"
+      puts "New account balance: #{Money.new(@balance, "USD").format}"
     end
 
     def add_owner(owner)
@@ -68,64 +70,63 @@ module Bank
 
   end
 
-  class SavingsAccount < Account
-    WITHDRAWAL_FEE = 2
-    MIN_BALANCE = 10
 
-    attr_reader :interest
+# Savings, checking, and money market accounts also only work with pennies (cents)
+
+  class SavingsAccount < Account
+    WITHDRAWAL_FEE = 200 # pennies
+    MIN_BALANCE = 1000 # many pennies
 
     def initialize(account_id, balance, open_date)
       super
-      @balance = balance.to_f
       if @balance < MIN_BALANCE
-        raise ArgumentError, "Balance can't be less than $#{MIN_BALANCE}"
+        raise ArgumentError, "Balance can't be less than #{Money.new(MIN_BALANCE, "USD").format}. Please add more pennies."
       end
-      puts "A savings account will incur a $#{WITHDRAWAL_FEE} fee per withdrawal."
+      puts "A savings account will incur a #{Money.new(WITHDRAWAL_FEE, "USD").format} fee per withdrawal."
     end
 
     def withdraw(withdraw_amount)
       if @balance - withdraw_amount - WITHDRAWAL_FEE < MIN_BALANCE
-        puts "You must maintain a balance of $#{MIN_BALANCE} in the account. Choose another amount to withdraw"
-        return "Account balance: #{@balance}"
+        puts "You must maintain a balance of #{Money.new(MIN_BALANCE, "USD").format} in the account. Choose another amount to withdraw"
+        return "Account balance: #{Money.new(@balance, "USD").format}"
       else
         @balance = @balance - withdraw_amount - WITHDRAWAL_FEE
-        return "Account balance: #{@balance}"
+        return "Account balance: #{Money.new(@balance, "USD").format}"
       end
     end
 
     def add_interest(rate)
-      @interest = @balance * rate/100
+      @interest = (@balance * rate) / 10 # dividing by 10 because pennies are coming in
       @balance += @interest
-      return "Amount added: $#{@interest}"
+      return "Amount added: #{Money.new(@interest, "USD").format}"
     end
   end
 
   class CheckingAccount < Account
-    WITHDRAWAL_FEE = 1
-    CHECK_FEE = 2
-    OVERDRAFT = 10
+    WITHDRAWAL_FEE = 100 # all constants in pennies
+    CHECK_FEE = 200
+    OVERDRAFT = 1000
 
     def initialize(account_id, balance, open_date)
       super
-      @balance = balance.to_f
-      puts "A checking account will incur a $#{WITHDRAWAL_FEE} fee per withdrawal."
+      puts "A checking account will incur a #{Money.new(WITHDRAWAL_FEE, "USD").format} fee per withdrawal."
       @check_count = 0
     end
 
     def withdraw(withdraw_amount)
       if @balance - withdraw_amount - WITHDRAWAL_FEE < 0
         puts "You can't withdraw more than is in the account. Choose another amount to withdraw"
-        return "Account balance: #{@balance}"
+        return "Account balance: #{Money.new(@balance, "USD").format}"
       else
         @balance = @balance - withdraw_amount - WITHDRAWAL_FEE
-        return "Account balance: #{@balance}"
+        return "Account balance: #{Money.new(@balance, "USD").format}"
       end
     end
 
     def withdraw_using_check(amount)
-      puts "You are allowed three free check uses per month. Each subsequent use will incur a $2 fee"
+      puts "You are allowed three free check uses per month. Each subsequent use will incur a #{Money.new(CHECK_FEE, "USD").format} fee"
       if @balance - amount < -OVERDRAFT
-        return "You may not overdraft by more than $#{OVERDRAFT}."
+        return "You may not overdraft by more than #{Money.new(OVERDRAFT, "USD").format}."
       else
         @check_count += 1
         if @check_count > 3
@@ -133,7 +134,7 @@ module Bank
         end
         puts "Current check uses this month: #{@check_count}"
         @balance -= amount
-        return "Account balance: #{@balance}"
+        return "Account balance: #{Money.new(@balance, "USD").format}"
       end
     end
 
@@ -144,18 +145,17 @@ module Bank
   end
 
   class MoneyMarketAccount < Account
-    TRANSACTION_FEE = 100
-    MIN_BALANCE = 10000
+    TRANSACTION_FEE = 10000
+    MIN_BALANCE = 1000000 # that's a lot of pennies
 
     attr_reader :transaction_count
 
     def initialize(account_id, balance, open_date)
       super
-      @balance = balance.to_f
       @transaction_count = 0
 
       if @balance < MIN_BALANCE
-        raise ArgumentError, "Balance can't be less than $#{MIN_BALANCE}."
+        raise ArgumentError, "Balance can't be less than #{Money.new(MIN_BALANCE, "USD").format}."
       end
 
       puts "Please note: a maximum of 6 transactions are allowed per month with this account type."
@@ -177,7 +177,7 @@ module Bank
         @balance -= withdraw_amount
       end
       puts "Transactions this month: #{@transaction_count}"
-      return "Account balance: $#{@balance}"
+      return "Account balance: #{Money.new(@balance, "USD").format}"
     end
 
     def deposit(deposit_amount)
@@ -194,9 +194,9 @@ module Bank
     end
 
     def add_interest(rate)
-      @interest = @balance * rate/100
+      @interest = (@balance * rate) / 10 # Diving by 10 because pennies are entered in
       @balance += @interest
-      return "Amount added: $#{@interest}"
+      return "Amount added: #{Money.new(@interest, "USD").format}"
     end
 
     def reset_transactions
