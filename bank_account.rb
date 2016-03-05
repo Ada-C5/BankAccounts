@@ -61,7 +61,7 @@ module Bank
     def self.find_owner(account_id)
       csv_owner_data.each_index do |i|
         if csv_owner_data[i][0] == account_id.to_s
-          return Bank::Owner.find(csv_owner_data[i][1])
+          return Owner.find(csv_owner_data[i][1])
         end
       end
     end
@@ -262,7 +262,7 @@ module Bank
     def self.find_accounts(owner_id)
       csv_owner_data.each_index do |i|
         if csv_owner_data[i][1] == owner_id.to_s
-          return Bank::Account.find(csv_owner_data[i][0])
+          return Account.find(csv_owner_data[i][0])
         end
       end
     end
