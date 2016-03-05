@@ -2,7 +2,7 @@ require 'csv'
 #require money ?* (gonna do printf instead)
 
 module Bank
-  
+
     #this is WAVE 1:
   class Account
     attr_accessor :id, :balance, :creation_date #these are like the instance variables, but now methods!
