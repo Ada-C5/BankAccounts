@@ -47,15 +47,41 @@ module Bank
     end
 
     def balance
-      var = '%0.7s' % @money.to_s
-      #sprintf("%0.02f", total/100)
+      var = sprintf("%0.02f", @money)
+      #'%0.7s' % @money.to_s
       return "Current balance: $#{var}"
     end
 
+    # searches for owner AND account info based on the id!
     def self.find(id)
+      list_number = ""
+
+      # matches the given id to the list number
+      # association by account_owners.csv -- searches down the id column
+      CSV.foreach("account_owners.csv") do |row|
+        # if the id matches, assign the associating list_number
+        if row[0].to_f == id.to_f
+          list_number = row[1]
+        end
+      end
+
+      if list_number.inspect == nil
+        puts "ID does not match existing records."
+      end
+
+        # use the list_number to provide owner information
+      owner = Bank::Owner.all # initiates all owner data
+      owner.each do |num|
+        if list_number == num.list_num
+          print num.inspect
+        end
+      end
+
+        # use the given id to provide account information
       var = self.all
       var.each do |num|
-        if num.id == id.to_s
+        if num.id == id
+          num
           return num
         end
       end
@@ -73,23 +99,6 @@ module Bank
       end
       return account_info #pushes each info into the array
     end
-
-    def self.all_together_now
-      account = self.all
-      owner = Bank::Owner.all
-      match = CSV.read('account_owners.csv')
-
-      CSV.foreach("account_owners.csv") do |row|
-        puts row[1]
-        owner.each do |num|
-          puts num.list_num
-          if row[1] == num.list_num
-            return num
-          end
-        end
-      end
-    end
-
   end
 
   class Owner
@@ -177,3 +186,20 @@ module Bank
   end
 
 end
+
+
+    # def self.all_together_now
+    #   account = self.all
+    #   owner = Bank::Owner.all
+    #   match = CSV.read('account_owners.csv')
+    #
+    #   CSV.foreach("account_owners.csv") do |row|
+    #     puts row[1]
+    #     owner.each do |num|
+    #       puts num.list_num
+    #       if row[1] == num.list_num
+    #         return num
+    #       end
+    #     end
+    #   end
+    # end
