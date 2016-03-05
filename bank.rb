@@ -65,6 +65,7 @@ module Bank
   end
 
   class SavingsAccount < Account
+    SAVINGS_WITHDRAW_FEE = 2
     def initialize (id, balance, date, owner_info = false)
       initializer = super
       if balance < 10
@@ -74,10 +75,9 @@ module Bank
 
     def withdraw(ammount)
       regular_withdraw = super
-      savings_withdraw_fee = 2
-      @balance = regular_withdraw - savings_withdraw_fee
+      @balance = regular_withdraw - SAVINGS_WITHDRAW_FEE
         if @balance < 10
-          @balance = @balance + withdraw + savings_withdraw_fee
+          @balance = @balance + withdraw + SAVINGS_WITHDRAW_FEE
           puts "Your saving account can not have less than 10 USD"
           return @balance
         end
@@ -89,10 +89,10 @@ module Bank
       @balance = @balance + interest
       return interest
     end
-
   end
 
   class CheckingAccount < Account
+    EXTRA_CHECKS_FEE = 2
     def initialize(id, balance, date, owner_info = false)
       initializer = super
       @@number_of_checks = 0
@@ -108,32 +108,19 @@ module Bank
     def withdraw_using_check(ammount)
       @ammount = ammount
       @balance = @balance - @ammount
-      @extra_checks_fee = 2
-      # return @balance
-
       # checks_dropper
       if @balance < -10
         puts "You can go into overdraft up to -$10"
         @balance = @balance + @ammount
-        # return @balance
         else
         @@number_of_checks += 1
         while @@number_of_checks > 3
-          @balance = @balance - @extra_checks_fee
+          @balance = @balance - EXTRA_CHECKS_FEE
           return @balance
         end
       end
-      #   #
-      #
-      #   return @balance
-      #   else
-      #   @@number_of_checks += 1
-      # end
       return @balance
-
     end
-
-    #every time the method withdraw_using_check is called
 
     # def checks_dropper
     #   name = :withdraw_using_check
@@ -148,18 +135,32 @@ module Bank
     #   end
     # end
 
-  end
-
-
-  class Owner
-    attr_accessor :name, :last_name, :address, :email, :mobile
-    def initialize(user_hash)
-      @name = user_hash[:name]
-      @last_name = user_hash[:last_name]
-      @address = user_hash[:address]
-      @email = user_hash[:email]
-      @mobile = user_hash[:mobile]
+    def reset_checks
+      @number_of_checks = 0
     end
   end
 
+  class Owner
+    attr_accessor :id, :name, :last_name, :address, :city, :state, :email, :mobile
+    def initialize(user_hash)
+      @id = user_hash[:id]
+      @name = user_hash[:name]
+      @last_name = user_hash[:last_name]
+      @address = user_hash[:address]
+      @city = user_hash[:city]
+      @state = user_hash[:state]
+      @email = user_hash[:email]
+      @mobile = user_hash[:mobile]
+    end
+
+    def self.all
+      csv_array = CSV.read('support/owners.csv')
+      array_owners = []
+      csv_array.each do |row|
+        one_owner = self.new(id:row [0],last_name: row[1], name: row[2], address: row[3], city: row[4], state: row[5])
+        array_owners << one_owner
+      end
+      return array_owners
+    end
+  end
 end
