@@ -1,4 +1,6 @@
 require "CSV"
+require "money"
+I18n.enforce_available_locales = false
 
 module Bank
   class Account
@@ -42,7 +44,7 @@ module Bank
         #puts own_id
         if @account_id == acct_id.to_i
           @owner_id = own_id
-          puts "found matching id"
+          #puts "Found matching id"
         end
       end
       return @owner_id
@@ -84,6 +86,10 @@ module Bank
     def deposit(money)
       @account_balance = @account_balance + money
       return @account_balance
+    end
+
+    def money_pp
+      puts Money.new(@account_balance * 100, "USD").format
     end
   end
 
