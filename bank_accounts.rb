@@ -145,7 +145,6 @@ module Bank
 
 
   class SavingsAccount < Account
-    attr_reader :balance
     # The initial balance cannot be less than $10. If it is, this will raise an ArgumentError
     # Override constants from base class Account.
     WITHDRAWAL_FEE = 2
