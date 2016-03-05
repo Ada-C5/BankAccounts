@@ -2,9 +2,10 @@ require 'csv'
 #require money ?* (gonna do printf instead)
 
 module Bank
+  
     #this is WAVE 1:
   class Account
-    attr_accessor :id, :balance, :creation_date #these are like the instance variables, but now methods
+    attr_accessor :id, :balance, :creation_date #these are like the instance variables, but now methods!
 
     def initialize (account_hash)   #initialize is actually a class method
       @id = account_hash[:id].to_i
@@ -12,7 +13,7 @@ module Bank
         if @balance < 0
           raise ArgumentError.new("Nope.")
         end
-      @creation_date = account_hash[:creation_date] #these are the hash key
+      @creation_date = account_hash[:creation_date] #these are the hash keys
 
     end
 
@@ -34,7 +35,6 @@ module Bank
         @balance = @balance + (amount)
         printf("Balance: $%.2f\n", balance)
     end
-
 
 
 
@@ -87,12 +87,12 @@ module Bank
           return nil   #return nil if the id is not found (this needs to be outside the method that is finding the id)
     end
 
-
-
-
-
   end
+
+
+
       #this is WAVE 3:
+
 
   class Savings_Account < Account
     attr_accessor :id, :balance, :creation_date   #these are now methods!
@@ -107,10 +107,9 @@ module Bank
 
     end
 
-    def withdraw(amount) #local variable
-     #puts "How much would you like to withdraw?"
-     # amount = gets.chomp          #I DIDNT DO @balance HERE (Metz-ing it!)
-      if ((amount) < balance) && ((balance - (amount) - 2) >= 10)  #if amount wanting to withdraw -2 does not leave more than or at least $10 in account
+    def withdraw(amount) # amount is a local variable
+        #I DIDNT DO @balance HERE (Metz-ing it!)
+      if ((amount) < balance) && ((balance - (amount) - 2) >= 10)  #if amount wanting to withdraw $2 fee and must leave at least $10 in account
           @balance = (@balance - (amount)) - 2
           printf("Balance: $%.2f\n", balance) #* why is this orange? test this...
       else
@@ -147,12 +146,10 @@ module Bank
 
      #Each withdrawal 'transaction' incurs a fee of $1 that is taken out of the balance. Returns the updated account balance.
      #Does not allow the account to go negative. Will output a warning message and return the original un-modified balance.
-    def withdraw(amount) #local variable
-     #puts "How much would you like to withdraw?"
-     # amount = gets.chomp
-      if ((amount) < balance) && ((balance - (amount)) > 0) #*****TEST THIS AGAIN!!*****
+    def withdraw(amount)
+      if ((amount) < balance) && ((balance - (amount)) > 0)
           @balance = (@balance - (amount)) - 1
-          printf("Balance: $%.2f\n", balance) #**why is this orange? test this ***
+          printf("Balance: $%.2f\n", balance)
       else
           puts "Nope.\n"
           printf("Balance: $%.2f\n", balance)
@@ -181,7 +178,7 @@ module Bank
       else
 
         if  ((balance - (amount)) >= -10)  #Allows the account to go into overdraft up to -$10 but not any lower
-          @balance = (@balance - (amount)) - 2
+          @balance = (@balance - (amount)) - 2   #The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
           printf("Balance: $%.2f\n", balance)
           @checks_used = checks_used + 1
           puts "Checks used: #{@checks_used}"
@@ -202,11 +199,6 @@ module Bank
 
 
   end
-
-
-    #***should i try to do constants??? meh.....? **
-
-
 
 
 end
@@ -274,19 +266,3 @@ end
   #Bank::Savings_Account.all
 
   #myaccount = Bank::Checking_Account.new(id:1212, initial_balance:20)
-
-
-
-  #
-  # account_hash = {id:"1212", initial_balance:"1235667", creation_date:"1999-03-27"}
-  # => {:id=>"1212", :initial_balance=>"1235667", :creation_date=>"1999-03-27"}
-  # [3] pry(main)> Bank::Account.new(account_hash)
-  # => #<Bank::Account:0x007ffa440260c0 @balance=1235667, @creation_date="1999-03-27", @id=1212>
-  # [4] pry(main)> test_account = Bank::Account.new(account_hash)
-  # => #<Bank::Account:0x007ffa42a8b440 @balance=1235667, @creation_date="1999-03-27", @id=1212>
-  # [5] pry(main)> test_account
-  # => #<Bank::Account:0x007ffa42a8b440 @balance=1235667, @creation_date="1999-03-27", @id=1212>
-  # [6] pry(main)> test_account.balance
-  # => 1235667
-  # [7] pry(main)> test_account.withdraw(5000)
-  # 1230667
