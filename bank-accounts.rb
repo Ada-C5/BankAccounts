@@ -40,7 +40,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       else
         updated_balance = remove_money(amount, fee)
         puts "After withdrawing $#{ sprintf("%.2f", amount) }, the new account balance is $#{  sprintf("%.2f", updated_balance) }. "
-        updated_balance #gross?
+        updated_balance
 
       end
     end
@@ -128,13 +128,14 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       super
     end
 
-    def withdraw_using_check(amount, fee = check_transaction_fee, minimum_balance = -10)
+    def withdraw_using_check(amount, minimum_balance = -10)
+    update_check_count
+    fee = check_transaction_fee
     withdraw(amount, fee, minimum_balance)
 
     end
-
+    #Private?
     def check_transaction_fee
-      update_check_count #we updated the check count first because we want the first check to count towards the three free in calculating check transaction fee.  Each time we are calling check transaction fee, we need to update the check count. ? Pattern breaking :(.  Works in this case because there is no limit - is different than "transactions" in money market account...
       if check_count > MONTHLY_FREE_CHECK_USES
         return fee = 2
       else
@@ -165,7 +166,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
       super
     end
 
-    def withdraw(amount, fee = 0, minimum_balance = 10000)
+    def withdraw(amount, fee = 0, minimum_balance = 10000) #makes more sense to say nil for fee since I want to set it later? (so the method can have access to the user input of the amount)
     increase_transaction_count
 
     fee = balance_below_minimum_fee(amount) #fee is 0 unless withdrawl amount brings us below min. balance
@@ -226,7 +227,7 @@ CENTS_IN_DOLLAR = 100 #1 dollar = 100 cents for this particular CSV file. (other
 
       end
     end
-
+    #Private?
     def transactions_remaining?
       if transaction_count <= MONTHLY_TRANSACTION_MAXIMUM
         return true
