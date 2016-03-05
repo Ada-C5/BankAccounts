@@ -32,27 +32,22 @@ module Bank
     end
 
     # Created an array containing account instances from the data in csv_data csv file
-    def self.create_accounts
-      create_accounts = []
+    def self.all
+      all_accounts = []
       csv_data.each_index do |i|
         id = csv_data[i][0]
         initial_balance = csv_data[i][1].to_f
         opendate = csv_data[i][2]
-        create_accounts << self.new(id, initial_balance, opendate)
+        all_accounts << self.new(id, initial_balance, opendate)
       end
-      return create_accounts
-    end
-
-    # Right now this just returns the accounts array created in create_accounts, idk mang
-    def self.all
-      self.create_accounts
+      return all_accounts
     end
 
     # Find and return an Account instance when you pass in its account ID number
     def self.find(find_id)
-      self.create_accounts.each_index do |i|
-        if self.create_accounts[i].id == find_id.to_s
-          return self.create_accounts[i]
+      self.all.each_index do |i|
+        if self.all[i].id == find_id.to_s
+          return self.all[i]
         end
       end
     end
@@ -232,8 +227,8 @@ module Bank
 
     # Creates an array of Owner instances, each of which was created from the data
     # in csv_data after it was placed in owner hash
-    def self.create_owners
-      create_owners = []
+    def self.all
+      all_owners = []
       csv_data.each_index do |i|
       owner = {
         id: csv_data[i][0],
@@ -243,21 +238,16 @@ module Bank
         city: csv_data[i][4],
         state: csv_data[i][5]
       }
-        create_owners << self.new(owner)
+        all_owners << self.new(owner)
       end
-      return create_owners
-    end
-
-    # Right now this just returns the accounts array created in create_owners, idk mang
-    def self.all
-      self.create_owners
+      return all_owners
     end
 
     # Finds and returns an Owner instance if you pass in its ID number
     def self.find(find_id)
-      self.create_owners.each_index do |i|
-        if self.create_owners[i].id == find_id.to_s
-          return self.create_owners[i]
+      self.all.each_index do |i|
+        if self.all[i].id == find_id.to_s
+          return self.all[i]
         end
       end
     end
