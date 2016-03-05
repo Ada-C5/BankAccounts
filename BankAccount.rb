@@ -39,31 +39,19 @@ module Bank
 
 
      #this is WAVE 2:
-     #this method will access the id, amount and date
-     #and on each iteration put the cooresponding indexes together in a new array
-     #since each line in the csv file is a seperate array, i want to return the ______
 
-    #THIS ISNT WORKING YET*******
-    # def create_new(csv_index)
-    #   account_array = []
-    #   account_array = CSV.read("./support/accounts.csv", 'r')
-    #   #So this is going through the file and it's saying that whatever the person choses for the csv_index,
-    #   #Go through that index and assign each of the internal indexes to instance variables****
-    #       @id = account_array[csv_index][0]
-    #       @balance = account_array[csv_index][1]
-    #       @open_date = account_array[csv_index][2]
-    #
-    #   puts "#{@id}"
-    #   printf("Balance: $%.2f\n", balance),
-    #   puts "#{@open_date}."
-    # end
+     #Update the Account class to be able to handle all of these fields from the CSV file used as input
+      #see Account above ( now a hash which accepts all fields of csv file)
 
+
+     #self.all - returns a collection of Account instances
+     #representing all of the Accounts described in the CSV.
 
     def self.all
       final_accounts = []
       account_array = []
       account_array = CSV.read("./support/accounts.csv", 'r') #this is reading the csv file and creating and array of arrays
-       #at this point we could say:
+       #at this point we COULD ask:
        #account_array[0][0] to get the ID of the first inner array; bc its an array still so we can call on the index
 
        #iterating through the array and setting each index within the inner array to the hash below(then we can call on a key instead of an index)
@@ -79,7 +67,7 @@ module Bank
 
 
 
-      # Now....find the bank account array where the id matches the user-requested id
+      # self.find(id) - returns an instance of Account where the value of the id field in the CSV matches the passed parameter
     def self.find(id) #need to switch either this to a string or the string in the array to fixnums
       id = id.to_s
       account_array = []
@@ -96,24 +84,12 @@ module Bank
           return your_acct   #break out of the loop when you find the id that matchs
         end
       end
-          return nil     #return nil if the id is not found (this needs to be outside the method that is finding the id)
+          return nil   #return nil if the id is not found (this needs to be outside the method that is finding the id)
     end
 
 
-     #******remember the balances include cents at the last two positions.
-     #install money gem on terminal then require it up top***********
-     #turns into a money object
-     #or
-     #printf, but not for interest, otherwise if interest amount is small and you round it to the 2nd decimal it will not look like much
 
-     #This is for if interacting with ppl running in terminal (but not irb)
-      #"Welsome to whatever bank....what would you like to do?"
-      # action = gets.chomp
-      #if action == withdraw
-       #withdraw
-      #elsif action == deposit
-        #deposit
-      #end
+
 
   end
       #this is WAVE 3:
@@ -225,32 +201,28 @@ module Bank
     end
 
 
-
-      #*******************
-      # The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
-      #reset_checks: Resets the number of checks used to zero
-      #*******************
-
-
-
-
   end
 
 
-    #***should i try to do constants??? meh.....? ***
-
-
-    #*** this works with the balance that you get from the csv file....need to test first then implement
-    #def get_balance **remember printf("Your balance %.2f",@balance)
-    #Money.new(@balance).format
-    #end
-
+    #***should i try to do constants??? meh.....? **
 
 
 
 
 end
 
+
+
+
+
+   #This is for if interacting with ppl running in terminal (but not irb)
+   #puts "Welsome to whatever bank....what would you like to do?"
+   # action = gets.chomp
+   #if action == withdraw
+   #withdraw
+   #elsif action == deposit
+   #deposit
+   #end
 
 
   #OPTIONAL FROM WAVE 1
@@ -268,6 +240,16 @@ end
 
 
 
+  #******remember the balances include cents at the last two positions.
+  #install money gem on terminal then require it up top***********
+  #(turns into a money object)
+  #OR
+  #printf ;but not for interest, otherwise if interest amount is small and you round it to the 2nd decimal it will not look like much
+
+
+
+
+
   # TESTS AND STUFF
 
   #load "BankAccount.rb"
@@ -277,8 +259,6 @@ end
 
   # my_account = Account.new
   # my_account.create_new(4)
-
-  #1212,1235667,1999-03-27 11:30:09 -0800
 
   #account_hash = {id:"1212", initial_balance:"1235667", creation_date:"1999-03-27"}
 
@@ -295,8 +275,8 @@ end
 
   #myaccount = Bank::Checking_Account.new(id:1212, initial_balance:20)
 
-  #Bank::Account.all
-  #Bank::Account.find(1212)
+
+
   #
   # account_hash = {id:"1212", initial_balance:"1235667", creation_date:"1999-03-27"}
   # => {:id=>"1212", :initial_balance=>"1235667", :creation_date=>"1999-03-27"}
@@ -310,28 +290,3 @@ end
   # => 1235667
   # [7] pry(main)> test_account.withdraw(5000)
   # 1230667
-
-
-
-
-
-#FAIL:
-  #account_hash = {id:"1212", initial_balance:"1235667", creation_date:"1999-03-27"}
-# => {:id=>"1212", :initial_balance=>"1235667", :creation_date=>"1999-03-27"}
-# [3] pry(main)> Bank::Account.new(account_hash)
-# => #<Bank::Account:0x007f9b02824e58 @balance=1235667, @creation_date="1999-03-27", @id=1212>
-# [4] pry(main)> test_account = Bank::Account.new(account_hash)
-# => #<Bank::Account:0x007f9b03941a10 @balance=1235667, @creation_date="1999-03-27", @id=1212>
-# [5] pry(main)> test_account
-# => #<Bank::Account:0x007f9b03941a10 @balance=1235667, @creation_date="1999-03-27", @id=1212>
-# [6] pry(main)> test_account.withdraw(100)
-# 1235567
-# => nil
-# [7] pry(main)> test_account.deposit(500)
-# => 1236067
-# [8] pry(main)> test_account.withdraw(1236068)
-# Nope.
-# => nil
-# [9] pry(main)> test_account.balance
-# NoMethodError: undefined method `balance' for #<Bank::Account:0x007f9b03941a10>
-# from (pry):9:in `__pry__'
