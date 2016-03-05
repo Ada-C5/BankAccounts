@@ -5,8 +5,8 @@ module Bank
   class Account
   BALANCE_MINIMUM = 0
   TRANSACTION_FEE = 0
-  attr_reader :current_balance, :all_accounts
-  attr_accessor :id, :initial_balance, :owner, :reset_checks, :day
+  attr_reader :current_balance, :all_accounts, :id, :initial_balance, :owner, :reset_checks, :day
+  attr_accessor :current_balance
 
     def initialize(account)
       if account != nil
@@ -16,7 +16,7 @@ module Bank
         @start_date         = account[:start_date]
         @all_accounts       = account[:all_accounts]
         @day                = nil
-        @reset_checks       = 3
+        @used_transactions  = 3
         @owner              = nil
         @reset_transactions = 6
         raise ArgumentError.new("We cannot process your transaction-you need a minimum $#{self.class::BALANCE_MINIMUM} amount.") unless @initial_balance.to_i >= self.class::BALANCE_MINIMUM
@@ -27,7 +27,7 @@ module Bank
       all_accounts = []
       CSV.open(filename, 'r') do |csv|
         csv.read.each do |line|
-        all_accounts << self.new(id: line[0], initial_balance: line[1].to_f, start_date: line[2])
+        all_accounts << self.new(id: line[0], initial_balance: line[1].to_f/100, start_date: line[2])
         end
       end
       return all_accounts
@@ -37,7 +37,7 @@ module Bank
       CSV.foreach(filename, 'r') do |line|
         #csv.read.each do |line|
             if line[0].to_s == id_num.to_s
-              selected_account = self.new(id: line[0], initial_balance: line[1].to_f, start_date: line[2])
+              selected_account = self.new(id: line[0], initial_balance: line[1].to_f/100, start_date: line[2])
               return selected_account
             end
             #self.new(id: line[0], initial_balance: line[1].to_f, start_date: line[2])
@@ -59,27 +59,27 @@ module Bank
       ap test_array
     end
 
+    def balance
+      return @current_balance
+    end
+
     def withdraw(money)
       fees = self.class::BALANCE_MINIMUM + self.class::TRANSACTION_FEE
       if @current_balance.to_i < money + fees
         puts "WARNING: You need a minimum of $#{(fees + money)} to process this request. Your current balance is $#{@current_balance}."
-        return @current_balance
+        balance
       else @current_balance = @current_balance - money - self.class::TRANSACTION_FEE
-        return @current_balance
+        balance
       end
     end
 
     def deposit(money)
       if @current_balance < 0
         puts "WARNING: We cannot deposit negative amounts. Please enter your deposit amount."
-        return @current_balance
+        balance
       else @current_balance = @current_balance + money
-        return @current_balance
+        balance
       end
-    end
-
-    def balance
-      return @current_balance
     end
   end
 
@@ -137,32 +137,25 @@ module Bank
       overdraft_threshold = BALANCE_MINIMUM + 10
       overdraft_fee_per_check = TRANSACTION_FEE + 1
 
-      until @reset_checks == 0
+      until @used_transactions == 0
         if money > @current_balance.to_i + overdraft_threshold
           puts "WARNING: We cannot process this transaction. You have an allowable overdraft of $#{overdraft_threshold}. Your current balance is $#{@current_balance}."
           return @current_balance
-        elsif @reset_checks > 0
+        elsif @used_transactions > 0
           @current_balance = @current_balance - money
-          @reset_checks = @reset_checks - 1
-          puts "You have #{@reset_checks} free check(s) left."
-          return @current_balance
+          @used_transactions = @used_transactions - 1
+          puts "You have #{@used_transactions} free check(s) left."
+transactionreturn @current_balance
         end
       end
 
-      if @reset_checks == 0
+      if @reset_transactions == 0
         if money > @current_balance.to_i + overdraft_threshold
         puts "WARNING: We cannot process this transaction. You have an allowable overdraft of $#{overdraft_threshold}. Your current balance is $#{@current_balance}."
           return @current_balance
         else @current_balance = @current_balance - money - overdraft_fee_per_check
           return @current_balance
         end
-      end
-    end
-
-    def reset_checks(day)
-      if day == 1
-        @reset_checks = 3
-      puts "It's a new month and you have 3 free checks!"
       end
     end
   end
@@ -181,30 +174,28 @@ module Bank
       end
     end
 
-    #If a withdrawal causes the balance to go below $10,000, a fee of $100 is
-    #imposed and no more transactions are allowed until the balance is increased using a deposit transaction.
     def withdraw(money)
-      deposit_amount_needed = BALANCE_MINIMUM - @current_balance.to_i
-
+      #deposit_amount_needed = BALANCE_MINIMUM - @current_balance.to_i
       until @reset_transactions == 0
-        if money < @current_balance - BALANCE_MINIMUM
+        if money <= @current_balance - BALANCE_MINIMUM
           @current_balance = @current_balance - money
           @reset_transactions = @reset_transactions - 1
           puts "You have #{@reset_transactions} transaction(s) left without a fee."
           return @current_balance
 
         else money > @current_balance - BALANCE_MINIMUM
-          @current_balance.to_i = @current_balance + TRANSACTION_FEE
+          @current_balance = @current_balance - TRANSACTION_FEE
           @reset_transactions = @reset_transactions - 1
+          deposit_amount_needed = BALANCE_MINIMUM - @current_balance.to_i
           puts "WARNING: At the conclusion of this transaction your balance is now below the $#{self.class::BALANCE_MINIMUM} minimum."
-          puts "You will not be able to withdraw funds until a minimum deposit of $ #{deposit_amount_needed}."
+          puts "You will not be able to withdraw funds until you make a minimum deposit of $#{deposit_amount_needed}."
           puts "Your current balance is $#{@current_balance}."
           return @current_balance
 
         end
       end
 
-      if @reset_checks == 0
+      if @reset_transactions == 0
         if money > @current_balance.to_i + overdraft_threshold
         puts "WARNING: We cannot process this transaction. You have an allowable overdraft of $#{overdraft_threshold}. Your current balance is $#{@current_balance}."
           return @current_balance
