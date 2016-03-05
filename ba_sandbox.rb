@@ -35,7 +35,7 @@ module Bank
 
         def withdraw(amount)
             if enough_money_to_withdraw(amount)
-                @balance -= ( amount + self.class::WITHDARAWL_FEE )
+                @balance -= total_amount_to_withdraw(amount)
                 return balance
             elsif !enough_money_to_withdraw(amount)
                 puts "HEY! That is unpossible because this account MUST not go below #{self.class::ACCOUNT_MIN_BALANCE}!"
@@ -90,6 +90,10 @@ module Bank
             (balance - (amount + self.class::WITHDARAWL_FEE)) >= self.class::ACCOUNT_MIN_BALANCE
         end
 
+        def total_amount_to_withdraw(amount)
+            amount + self.class::WITHDARAWL_FEE
+        end
+
 
     end
 
@@ -109,6 +113,7 @@ module Bank
         WITHDARAWL_FEE = 100
         CHECK_FEE = 200
         
+        attr_reader :checks_used_in_month
         # adds an instance variable to track how many checks are used monthly.
         def initialize(account_info)
             super
@@ -118,7 +123,7 @@ module Bank
         # Allows the account to go into overdraft up to -$10 but not any lower
         # The user is allowed three free check uses in one month, but any subsequent use adds a $2 transaction fee
         def withdraw_with_check(amount)
-            if (@balance - amount) > -1000 && @checks_used_in_month < 3
+            if total_amount_to_withdraw(amount) > -1000 && self.checks_used_in_month < 3
                 @balance -= amount
                 @checks_used_in_month += 1
                 return @balance
