@@ -162,5 +162,14 @@ module Bank
       end
       return array_owners
     end
+
+    def self.find_with_id(id)
+      all_onwers = Bank::Owner.all
+      all_onwers.each do |owner|
+        if owner.id == id.to_s
+          return owner
+        end
+      end
+    end
   end
 end
