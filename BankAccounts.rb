@@ -156,7 +156,12 @@ module Bank
     end
 
 
-    
+    def reset_checks
+      if @checks_used > 3
+        return @checks_used = @checks_used = 0
+      end
+    end
+
 
   end
 
