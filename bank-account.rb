@@ -29,16 +29,16 @@ module Bank
     end
 
 
-    def self.find(id, key, class_name)
+    def self.find(id, class_name)
       #loop through until I find the one I'm looking for
-      found_account = nil
+      found_instance = nil
       class_name.all.each do |line|
-        if id == line.key
-          found_account = line
+        if id == line.id
+          found_instance = line
         end
       end
 
-      return found_account
+      return found_instance
     end
 
   end
@@ -98,17 +98,6 @@ module Bank
     # the CSV matches the passed parameter.
     def self.find(id)
       BankMethod::find(id, Account)
-    #   #loop through until I find the one I'm looking for
-    #   found_account = nil
-    #   self.all.each do |line|
-    #     if id == line.id
-    #       found_account = line
-    #       return found_account
-    #     end
-    #   end
-
-    #   # if no account is found that matches the id, return nil
-    #   return nil
     end
   end
 
@@ -116,10 +105,10 @@ module Bank
   class Owner
     include BankMethod
 
-    attr_reader :owner_id, :first_name, :last_name, :street_address, :city, :state
+    attr_reader :id, :first_name, :last_name, :street_address, :city, :state
 
     def initialize(owner_info)
-      @owner_id = owner_info[:owner_id].to_i
+      @id = owner_info[:id].to_i
       @first_name = owner_info[:first_name]
       @last_name = owner_info[:last_name]
       @street_address = owner_info[:street_address]
@@ -131,37 +120,31 @@ module Bank
     def accounts
       owners_accounts = []
       CSV.open("./support/account_owners.csv", 'r').each do |line|
-        if @owner_id == line[1]
-          account_num = line[0]
-          owners_accounts << Bank::Account.find(account_num)
+        if @id == line[1].to_i
+          account_num = line[0].to_i
+          owners_accounts << Account.find(account_num)
         end
       end
 
       # return array filled with owners account instances
-      owners_accounts
+      if owners_accounts.length == 0
+        return nil
+      else 
+        return owners_accounts
+      end
     end
 
 # return a collection of Owner instances, representing all owners described
 # in the CSV.
     def self.all
-      owner_keys = [:owner_id, :last_name, :first_name, :street_address, :city, :state]
+      owner_keys = [:id, :last_name, :first_name, :street_address, :city, :state]
       BankMethod::make_all("./support/owners.csv", owner_keys, Owner)
     end
 
   # return an instance of Owner where the value of the id field in the CSV
   # matches the passed parameter.
     def self.find(id)
-      BankMethod::find(id, owner_id, Owner)
-
-    #   found_owner = nil
-    #   self.all.each do |line|
-    #     if id == line.owner_id
-    #       found_owner = line
-    #       return found_owner
-    #     end
-    #   end
-
-    #   return nil
+      BankMethod::find(id, Owner)
     end
 
   end
