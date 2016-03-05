@@ -12,7 +12,6 @@ module Bank
     def initialize(id, initial_balance, opendate, owner=nil)
       @id = id
       @balance = initial_balance
-      @minimum_initial_balance = MIN_INITIAL_BALANCE
       check_initial_balance
       @opendate = opendate
       @owner = owner
@@ -23,7 +22,7 @@ module Bank
 
     def check_initial_balance
       raise ArgumentError, "Starting balance must be a number." unless balance.is_a? Numeric
-      raise ArgumentError, "Starting balance is too low." unless balance > @minimum_initial_balance
+      raise ArgumentError, "Starting balance is too low." unless balance >= self.class::MIN_INITIAL_BALANCE
     end
 
     # Creates an array containing data from "./support/accounts.csv" or another file
@@ -123,8 +122,6 @@ module Bank
     def initialize(id, initial_balance, opendate, owner=nil)
       super
       @minimum_balance = MINIMUM_BALANCE
-      @minimum_initial_balance = MIN_INITIAL_BALANCE
-      check_initial_balance
       @withdraw_fee = WITHDRAW_FEE
     end
 
@@ -170,8 +167,6 @@ module Bank
 
     def initialize(id, initial_balance, opendate, owner=nil)
       super
-      @minimum_initial_balance = MIN_INITIAL_BALANCE
-      check_initial_balance
       @minimum_balance = MINIMUM_BALANCE
     end
 
@@ -182,7 +177,7 @@ module Bank
     end
 
     def balance_too_low
-      raise ArgumentError, "Balance is under $10,000" unless balance > @minimum_balance
+      raise ArgumentError, "Balance is under $10,000" unless balance >= @minimum_balance
     end
 
     def maximum_transaction_check
