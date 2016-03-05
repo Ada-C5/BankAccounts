@@ -6,9 +6,10 @@ module Bank
 	class Account
 		attr_reader :account_id, :show_balance, :account_open_date, :withdraw_money, :deposit_money
 		
-		# magic number. Initial balance is in pennies This converts pennies to dollars 
+		# Initial balance is in pennies. This converts pennies to dollars. 
 		PENNY_CONVERTER = 100.0
 		WITHDRAW_FEE = 0.00
+		ALLOWED_BALANCE = 0.01
 		
 		def initialize(csv_data)
 			@csv_data = csv_data
@@ -16,13 +17,13 @@ module Bank
 			@initial_balance = @csv_data[:initial_balance]
 			@balance = @csv_data[:initial_balance]/PENNY_CONVERTER 
 			@account_open_date = @csv_data[:account_open_date]
-			check_new_account(@csv_data[:initial_balance])
+			check_new_account(@initial_balance)
 			@owner_id = nil 
 		end
 
 		# check to see if initial balance is less than 0
 		def check_new_account(initial_balance)
-			if initial_balance < 0 
+			if @initial_balance < ALLOWED_BALANCE 
 				raise ArgumentError.new("Starting account balance may not be negative.")
 			end
 		end
@@ -39,6 +40,7 @@ module Bank
 				show_balance
 			else 
 				puts format("Removing $%.2f from account #{@account_id} with a balance of $%.2f", amount, @balance)
+				puts format("Withdraw fee incurred: $%.2f", WITHDRAW_FEE)
 				@balance = new_balance
 				show_balance
 			end
@@ -75,6 +77,7 @@ module Bank
 			puts "*** ERROR ***"
 			puts "Insufficent Funds."
 		end
+
 		def show_balance
 			puts format("Currently you have an account balance of $%.2f", @balance)
 		end
@@ -108,9 +111,9 @@ module Bank
 		
 		attr_reader :add_interest
 
-		# magic number! Account balance cannot be less than $10 or an error is raised
+		# Account balance cannot be less than $10 or an error is raised
 		ALLOWED_BALANCE = 10
-		# magic number! All savings account withdrawals incur a $2 fee 
+		# All savings account withdrawals incur a $2 fee 
 		WITHDRAW_FEE = 2.00
 
 		def check_new_account(initial_balance)
@@ -118,6 +121,7 @@ module Bank
 				raise ArgumentError.new("Balance of account may not be less than $10.")
 			end
 		end
+
 		def withdraw_money(amount)
 		check_entry = check_entry(amount)
 			if check_entry == false
@@ -130,7 +134,7 @@ module Bank
 				show_balance
 			else 
 				puts format("Removing $%.2f from account #{@account_id} with a balance of $%.2f", amount, @balance)
-				puts format("Savings Accounts incur a $%.2f fee per withdrawal transation", WITHDRAW_FEE)
+				puts format("Withdraw fee incurred: $%.2f", WITHDRAW_FEE)
 				@balance = new_balance
 				show_balance
 			end
@@ -147,53 +151,34 @@ module Bank
 
 	class CheckingAccount < Account
 
-		attr_reader :withdraw_money, :checks, :reset_checks
+		attr_reader :checks, :reset_checks, :withdraw_using_check, :withdraw_money
+
+		# This fee is assessed whenever more than three checks are used per month
+		WITHDRAW_FEE = 1.00 
+		TRANSACTION_FEE = 2.00
+		# allowed with writing checks, not withdrawing by other means
+		ALLOWED_BALANCE = -10.00
 
 		def initialize(checks)
 			super
 			@checks = 0
-		end  
+		end 
 
-		WITHDRAW_FEE = 1.00 
-		# This fee is assessed whenever more than three checks are used per month
-		TRANSACTION_FEE = 2.00
-
-
-		def	withdraw_money(amount) 
+		def withdraw_money(amount)
 			check_entry = check_entry(amount)
 			if check_entry == false
 				show_error
 			end
-			if @checks < 3
-				new_balance = @balance - amount - WITHDRAW_FEE 
-				if new_balance < -10
-					show_insufficient_funds
-					new_balance = @balance + amount + WITHDRAW_FEE 
-					show_balance
-				else 
-					puts format("Removing $%.2f from account #{@account_id} with a balance of $%.2f", amount, @balance)
-					puts format("Checking Accounts incur a $%.2f fee per withdrawal transation", WITHDRAW_FEE)
-					@balance = new_balance
-					@checks += 1
-					show_balance
-					return @checks
-				end
-			else @checks > 3
-				new_balance = @balance - amount - WITHDRAW_FEE - TRANSACTION_FEE
-				if new_balance < -10
-					show_insufficient_funds
-					new_balance = @balance + amount + WITHDRAW_FEE + TRANSACTION_FEE
-					show_balance
-				else 
-					puts format("Removing $%.2f from account #{@account_id} with a balance of $%.2f", amount, @balance)
-					puts format("Checking Accounts incur a $%.2f fee per withdrawal transation.", WITHDRAW_FEE)
-					puts "Your account has used more than three checks this month."
-					puts format("Therefore you have an additional transaction fee of $%.2f", TRANSACTION_FEE)
-					@balance = new_balance
-					@checks += 1 
-					show_balance
-					return @checks
-				end
+			new_balance = @balance - amount - WITHDRAW_FEE
+			if new_balance < 0
+				show_insufficient_funds
+				new_balance = @balance + amount + WITHDRAW_FEE
+				show_balance
+			else 
+				puts format("Removing $%.2f from account #{@account_id} with a balance of $%.2f", amount, @balance)
+				puts format("Withdraw fee incurred: $%.2f", WITHDRAW_FEE)
+				@balance = new_balance
+				show_balance
 			end
 		end
 
@@ -205,7 +190,7 @@ module Bank
 	end
 
 	class Owner
-		attr_reader :owner_id, :first_name, :last_name
+		attr_reader :owner_id, :first_name, :last_name, :account_id
 
 		def initialize(csv_data)
 			@csv_data = csv_data
@@ -215,7 +200,7 @@ module Bank
 			@street_address = csv_data[:street_address]
 			@city = csv_data[:city]
 			@state = csv_data[:state]
-			@account_id = nil 
+			@account_id = nil
 		end 
 
 		def self.get_all(file)
@@ -243,31 +228,22 @@ module Bank
 					return owner
 				end
 			end
-		end 
+		end
+	end
+
+	class MoneyMarketAccount < Account 
+
+		ALLOWED_BALANCE = 10_000
+
+		def initialize(max_transactions)
+			super
+			@max_transactions = 0 
+		end
+
+		def check_new_account(initial_balance)
+			if initial_balance < ALLOWED_BALANCE 
+				raise ArgumentError.new format("Starting account balance may not be less than $%.2f.", ALLOWED_BALANCE)
+			end
+		end
 	end
 end
-
-#
-# Testing Below
-#
-
-accounts 	= Bank::Account.get_all('./support/accounts.csv')
-account 	= Bank::Account.find(1212, accounts).withdraw_money(20)
-pp account
-
-# savings_accounts 	= Bank::SavingsAccount.get_all('./support/savings_accounts.csv')
-
-# savings_account 	= Bank::SavingsAccount.find(1112, savings_accounts).show_balance
-# savings_account 	= Bank::SavingsAccount.find(1112, savings_accounts).withdraw_money(20)
-
-# checking_accounts = Bank::CheckingAccount.get_all('./support/checking_accounts.csv')
-
-# checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).show_balance
-# puts checking_account
-# checking_account 	= Bank::CheckingAccount.find(1012, checking_accounts).withdraw_money(9)
-
-
-# owners = Bank::Owner.get_all('./support/owners.csv') 
-
-# owner = Bank::Owner.find(14, owners)
-# pp owner
