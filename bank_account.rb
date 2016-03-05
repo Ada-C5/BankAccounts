@@ -63,12 +63,8 @@ module Bank
 
     # show current balance
     def show_balance
-      if money != 0 
-        print_mon = money.to_s
-        print_mon = print_mon.insert -3, "."
-      else
-        print_mon = 0
-      end
+      puts "#{money_convert(balance)}"
+      return @balance
     end
 
     # create new accounts from csv information & returns all account instances in array
@@ -116,7 +112,7 @@ module Bank
 
     # rate as decimal percentage 25% => 0.25
     def add_interest(rate)
-      @balance += balance * (rate/100)
+      @balance += balance * (rate/10)
       puts "#{money_convert(balance)}"
       return @balance
     end
